@@ -18,6 +18,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "round-robin-lite_SharedCode
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "round-robin-lite_VST3ManifestHelper", "round-robin-lite_VST3ManifestHelper.vcxproj", "{A78744B5-0757-6960-0879-D96EA717116A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B66394F7-5C43-4C6D-8D0E-1963F3A5B5B0}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\spec.md = ..\..\..\spec.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -43,5 +48,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D30199D2-FF15-4893-812F-96F67173E76D}
 	EndGlobalSection
 EndGlobal
