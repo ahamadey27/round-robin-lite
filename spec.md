@@ -61,8 +61,8 @@ This specification breaks the project into eight distinct phases, each with acti
   - [x] /Source/Parameters/ for parameter definitions and management
 - [x] Document folder structure and purpose in README.md
 - [x] Add plugin feature description to README.md
-- [ ] Create CHANGELOG.md for tracking version updates
-- [ ] Set up basic project documentation structure
+- [x] Create CHANGELOG.md for tracking version updates
+- [x] Set up basic project documentation structure
 
 ---
 
@@ -70,13 +70,13 @@ This specification breaks the project into eight distinct phases, each with acti
 **Goal:** Implement the fundamental audio playback system with custom synthesiser voice and sound classes for sample playback.
 
 ### Step 1: Study JUCE Synthesiser Architecture
-- [ ] Read JUCE documentation on Synthesiser class
-- [ ] Study SynthesiserVoice class and its virtual methods
-- [ ] Study SynthesiserSound class and its purpose
-- [ ] Review JUCE synthesiser example projects in JUCE/examples
-- [ ] Understand the renderNextBlock() audio callback workflow
-- [ ] Learn how JUCE handles MIDI note on/off events
-- [ ] Understand voice allocation and stealing mechanisms
+- [x] Read JUCE documentation on Synthesiser class
+- [x] Study SynthesiserVoice class and its virtual methods
+- [x] Study SynthesiserSound class and its purpose
+- [x] Review JUCE synthesiser example projects in JUCE/examples
+- [x] Understand the renderNextBlock() audio callback workflow
+- [x] Learn how JUCE handles MIDI note on/off events
+- [x] Understand voice allocation and stealing mechanisms
 
 ### Step 2: Create Custom Sound Class (RRSound)
 - [ ] Create RRSound.h header file in /Source/Audio/
