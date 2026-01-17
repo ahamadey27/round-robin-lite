@@ -81,17 +81,17 @@ This specification breaks the project into eight distinct phases, each with acti
 ### Step 2: Create Custom Sound Class (RRSound)
 - [x] Create RRSound.h header file in /Source/Audio/
 - [x] Create RRSound.cpp implementation file in /Source/Audio/
-- [ ] Set up class to inherit from juce::SynthesiserSound
-- [ ] Add member variable for storing audio sample buffer (juce::AudioBuffer<float>)
-- [ ] Add member variable for storing original sample rate (double)
-- [ ] Add member variable for root MIDI note number (int, default 48 for C2)
-- [ ] Add member variable for sample display name (juce::String)
-- [ ] Add member variable for key pair index (int, 0-9 representing which pair)
-- [ ] Implement appliesToNote() method to define which MIDI notes trigger this sound
-- [ ] Implement appliesToChannel() method (return true for all channels)
-- [ ] Add method to load audio from file and store in buffer
-- [ ] Add method to get sample buffer for playback
-- [ ] Add method to get root note for pitch calculation
+- [x] Set up class to inherit from juce::SynthesiserSound
+- [x] Add member variable for storing audio sample buffer (juce::AudioBuffer<float>)
+- [x] Add member variable for storing original sample rate (double)
+- [x] Add member variable for root MIDI note number (int, default 48 for C2)
+- [x] Add member variable for sample display name (juce::String)
+- [x] Add member variable for key pair index (int, 0-9 representing which pair)
+- [x] Implement appliesToNote() method to define which MIDI notes trigger this sound
+- [x] Implement appliesToChannel() method (return true for all channels)
+- [x] Add method to load audio from file and store in buffer
+- [x] Add method to get sample buffer for playback
+- [x] Add method to get root note for pitch calculation
 
 ### Step 3: Create Custom Voice Class (RRVoice)
 - [ ] Create RRVoice.h header file in /Source/Audio/
