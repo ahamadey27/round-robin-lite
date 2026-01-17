@@ -118,6 +118,12 @@ This specification breaks the project into eight distinct phases, each with acti
   - [ ] Add processed audio to output buffer
   - [ ] Handle monophonic voice stealing (stop current note if new note starts)
 
+**Quick Test After Step 3:**
+- [ ] Add RRVoice files to Projucer project and save
+- [ ] Regenerate Visual Studio solution
+- [ ] Build project - verify no compile errors
+- [ ] Check that RRVoice.h and RRVoice.cpp appear in Solution Explorer under Audio folder
+
 ### Step 4: Integrate Synthesiser into AudioProcessor
 - [ ] In PluginProcessor.h, add juce::Synthesiser member variable
 - [ ] In PluginProcessor constructor, add one RRVoice to synthesiser (monophonic)
@@ -129,6 +135,13 @@ This specification breaks the project into eight distinct phases, each with acti
   - [ ] Pass MIDI messages to synthesiser
   - [ ] Call synthesiser.renderNextBlock() to generate audio
   - [ ] Ensure synthesiser output fills the buffer correctly
+
+**Quick Test After Step 4:**
+- [ ] Build project successfully
+- [ ] Load plugin in AudioPluginHost
+- [ ] Connect MIDI input (keyboard or test signal)
+- [ ] Verify plugin loads without crashes (even though no sound yet - no samples loaded)
+- [ ] Check Output window in Visual Studio for any debug messages
 
 ### Step 5: Design and Implement MIDI Note Mapping System
 - [ ] Create MidiMapper.h utility file in /Source/Audio/
@@ -147,6 +160,12 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] Create function to get semitone offset for any given pair index
 - [ ] Create function to validate pair assignments (only 10 pairs maximum)
 - [ ] Add documentation explaining the pairing system for footstep sounds
+
+**Quick Test After Step 5:**
+- [ ] Build project successfully
+- [ ] In PluginProcessor, write test code to print MIDI mapping for all 10 pairs
+- [ ] Verify output shows correct note pairs and semitone offsets
+- [ ] Remove test code after verification
 
 ### Step 6: Test Basic Audio Playback
 - [ ] Load a single test WAV file manually in PluginProcessor constructor
@@ -182,12 +201,23 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] Create ID constant for Transient Decay parameter
 - [ ] Document each parameter's purpose and range in comments
 
+**Quick Test After Step 1:**
+- [ ] Build project successfully
+- [ ] Verify no naming conflicts or compile errors
+- [ ] Check that ParameterIDs.h is properly included where needed
+
 ### Step 2: Set Up AudioProcessorValueTreeState (APVTS)
 - [ ] In PluginProcessor.h, add APVTS member variable
 - [ ] Create helper function createParameterLayout() in PluginProcessor.cpp
 - [ ] Set up parameter layout object to hold all parameter definitions
 - [ ] Initialize APVTS in PluginProcessor constructor with layout
 - [ ] Ensure APVTS is properly constructed before other members
+
+**Quick Test After Step 2:**
+- [ ] Build project successfully
+- [ ] Load plugin in AudioPluginHost
+- [ ] Verify plugin still loads without crashes
+- [ ] Check no parameters appear yet (they'll be added in next step)
 
 ### Step 3: Define All Plugin Parameters with Proper Ranges
 - [ ] Add Semitone parameter: Range -12 to +12 semitones, step size 1, default 0
@@ -203,6 +233,14 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] Add Transient Decay: Range -127 to +127, default 0, linear scale
 - [ ] Set appropriate units and labels for each parameter (dB, Hz, semitones, cents)
 
+**Quick Test After Step 3:**
+- [ ] Build project successfully
+- [ ] Load plugin in AudioPluginHost or DAW
+- [ ] Open plugin's generic editor (provided by host)
+- [ ] Verify all 11 parameters appear in the parameter list
+- [ ] Move each parameter slider and verify ranges are correct
+- [ ] Check default values are as specified
+
 ### Step 4: Implement Parameter Smoothing
 - [ ] In PluginProcessor.h, add SmoothedValue object for Volume parameter
 - [ ] Add SmoothedValue object for Semitone parameter
@@ -215,6 +253,13 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] In processBlock(), update target values from APVTS parameters
 - [ ] Use smoothed values in audio processing instead of raw parameter values
 
+**Quick Test After Step 4:**
+- [ ] Build project successfully
+- [ ] Load plugin and play audio through it
+- [ ] Rapidly move volume parameter
+- [ ] Verify no clicks, pops, or audio glitches
+- [ ] Test with other parameters as well
+
 ### Step 5: Connect Parameters to Audio Processing
 - [ ] In processBlock(), retrieve current Semitone value from APVTS
 - [ ] In processBlock(), retrieve current Fine Tune value from APVTS
@@ -225,6 +270,14 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] Prepare parameter values for EQ processor (to be connected later)
 - [ ] Prepare parameter values for transient processor (to be connected later)
 - [ ] Ensure parameter changes are smooth and don't cause clicks or pops
+
+**Quick Test After Step 5:**
+- [ ] Build and load plugin with a sample loaded
+- [ ] Play a MIDI note and adjust Volume - verify level changes
+- [ ] Adjust Semitone knob - verify pitch changes in semitone steps
+- [ ] Adjust Fine Tune - verify subtle pitch changes
+- [ ] Test all three parameters together
+- [ ] Verify smooth transitions with no audio artifacts
 
 ### Step 6: Implement Preset Save and Load Functionality
 - [ ] In getStateInformation() method:
@@ -239,6 +292,13 @@ This specification breaks the project into eight distinct phases, each with acti
   - [ ] Restore APVTS state from ValueTree
   - [ ] Restore custom data (sample file paths - to implement later)
   - [ ] Update any dependent state or UI
+
+**Quick Test After Step 6:**
+- [ ] Set parameters to specific values (e.g., Volume 50%, Semitone +5)
+- [ ] Save DAW project or create a preset in host
+- [ ] Change all parameters to different values
+- [ ] Reload the project or preset
+- [ ] Verify all parameters return to saved values
 
 ### Step 7: Test Parameter Automation in DAW
 - [ ] Build plugin with all parameters defined
@@ -269,6 +329,12 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] Implement loadFromFile() method declaration
 - [ ] Create array of 20 SampleSlot objects in PluginProcessor
 
+**Quick Test After Step 1:**
+- [ ] Build project successfully
+- [ ] In PluginProcessor constructor, create test SampleSlot array
+- [ ] Verify project compiles and runs
+- [ ] Check that empty slots don't cause crashes
+
 ### Step 2: Implement Audio File Loading System
 - [ ] Create SampleLoader.h and SampleLoader.cpp in /Source/Data/
 - [ ] Set up juce::AudioFormatManager member variable
@@ -283,6 +349,14 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] Set isLoaded flag to true on success
 - [ ] Return success/failure status for error handling
 
+**Quick Test After Step 2:**
+- [ ] Build project successfully
+- [ ] Manually call loadSample() with a test WAV file in PluginProcessor
+- [ ] Add DBG() statements to confirm loading succeeds
+- [ ] Verify file loads into SampleSlot correctly
+- [ ] Test with both mono and stereo files
+- [ ] Test with different sample rates (44.1kHz, 48kHz)
+
 ### Step 3: Add Comprehensive Error Handling
 - [ ] Add error checking for invalid file formats
 - [ ] Add error checking for file not found
@@ -293,6 +367,13 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] Implement fallback behavior when loading fails
 - [ ] Add logging for debugging sample loading issues
 - [ ] Consider adding file size limits to prevent memory issues
+
+**Quick Test After Step 3:**
+- [ ] Try loading a non-audio file (e.g., .txt) - verify error message
+- [ ] Try loading a file that doesn't exist - verify error message
+- [ ] Try loading a very large file - verify behavior is acceptable
+- [ ] Check that failed loads don't crash the plugin
+- [ ] Verify error messages are clear and helpful
 
 ### Step 4: Implement Sample Rate Conversion (Resampling)
 - [ ] Add resampling utility function to SampleLoader
@@ -305,6 +386,13 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] Call resampling when plugin sample rate changes in prepareToPlay()
 - [ ] Ensure resampling maintains audio quality
 - [ ] Test with various source sample rates (44.1kHz, 48kHz, 96kHz)
+
+**Quick Test After Step 4:**
+- [ ] Load samples recorded at 44.1kHz into plugin running at 48kHz
+- [ ] Load samples recorded at 96kHz into plugin running at 48kHz
+- [ ] Play samples and listen for pitch accuracy
+- [ ] Verify no audio artifacts from resampling
+- [ ] Test that samples play at correct pitch regardless of source sample rate
 
 ### Step 5: Connect Loaded Samples to Synthesiser
 - [ ] Implement updateSynthesiserSounds() method in PluginProcessor
@@ -320,6 +408,14 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] Call updateSynthesiserSounds() whenever samples change
 - [ ] Call updateSynthesiserSounds() when key pair assignments change
 
+**Quick Test After Step 5:**
+- [ ] Load 2-3 test samples into different slots
+- [ ] Assign each to a different key pair
+- [ ] Call updateSynthesiserSounds()
+- [ ] Play MIDI notes for each assigned pair
+- [ ] Verify correct samples trigger on correct MIDI notes
+- [ ] Verify only one sample plays at a time (monophonic)
+
 ### Step 6: Implement Key Pair Assignment Logic
 - [ ] Create assignSampleToKeyPair() method in PluginProcessor
 - [ ] Validate that pair index is between 0-9
@@ -331,6 +427,13 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] Provide feedback about successful/failed assignment
 - [ ] Implement unassignSample() method to remove from pair
 - [ ] Allow user to see which pairs are currently assigned
+
+**Quick Test After Step 6:**
+- [ ] Load several samples
+- [ ] Assign them to various key pairs manually in code
+- [ ] Try assigning two samples to the same pair - verify conflict handling
+- [ ] Verify assignment/unassignment updates synthesiser correctly
+- [ ] Test that MIDI notes trigger correct samples after reassignment
 
 ### Step 7: Add Sample Persistence (Save/Load with Project State)
 - [ ] In getStateInformation():
@@ -350,6 +453,14 @@ This specification breaks the project into eight distinct phases, each with acti
     - [ ] Show warning message if file is missing
 - [ ] Consider option to embed samples as Base64 in project (increases file size)
 - [ ] Implement "Missing Samples" dialog on project load if files not found
+
+**Quick Test After Step 7:**
+- [ ] Load samples and assign to key pairs
+- [ ] Save DAW project
+- [ ] Close and reopen project
+- [ ] Verify all samples reload correctly with correct assignments
+- [ ] Move a sample file, reload project - verify missing file warning
+- [ ] Test with both absolute and relative paths (if implemented)
 
 ### Step 8: Test Complete Sample Management System
 - [ ] Prepare 10 diverse test WAV files (different lengths, sample rates)
@@ -398,6 +509,14 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] Test with different parameter ranges and units
 - [ ] Ensure knob is visually clear and easy to use
 
+**Quick Test After Step 2:**
+- [ ] Build project successfully
+- [ ] Add one test knob to PluginEditor
+- [ ] Load plugin and verify knob appears
+- [ ] Test mouse dragging - verify value changes
+- [ ] Test double-click reset to default
+- [ ] Verify knob is usable and visually acceptable
+
 ### Step 3: Create Sample Slot UI Component
 - [ ] Create SampleSlotComponent.h and SampleSlotComponent.cpp in /Source/UI/
 - [ ] Design two visual states:
@@ -414,6 +533,15 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] Display assigned key pair (e.g., "C0/D0") when sample is loaded
 - [ ] Add callback to notify parent editor when sample changes
 - [ ] Show loading indicator during sample load operation
+
+**Quick Test After Step 3:**
+- [ ] Build and add one sample slot to PluginEditor
+- [ ] Verify empty state appears correctly
+- [ ] Drag an audio file onto slot - verify it highlights
+- [ ] Drop file - verify sample loads (implement basic callback)
+- [ ] Verify loaded state shows filename
+- [ ] Test Clear button removes sample
+- [ ] Test hover effects work
 
 ### Step 4: Build Main Plugin Editor Layout
 - [ ] In PluginEditor.h, add member variables for all UI components:
@@ -439,6 +567,15 @@ This specification breaks the project into eight distinct phases, each with acti
   - [ ] Ensure proper spacing and alignment
   - [ ] Consider using FlexBox for responsive layout
 
+**Quick Test After Step 4:**
+- [ ] Build plugin successfully
+- [ ] Load in AudioPluginHost
+- [ ] Verify all components appear in correct positions
+- [ ] Verify no overlapping components
+- [ ] Test that UI fits in 800x600 window
+- [ ] Resize window if resizable - verify layout adjusts properly
+- [ ] Check all components are visible and accessible
+
 ### Step 5: Connect UI Controls to Parameters (APVTS Attachments)
 - [ ] In PluginEditor.h, add SliderAttachment unique_ptr for each knob
 - [ ] Create attachment for Semitone knob to semitone parameter
@@ -455,6 +592,14 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] Verify all attachments are created in editor constructor
 - [ ] Test that moving knobs updates parameters in real-time
 
+**Quick Test After Step 5:**
+- [ ] Load plugin with audio sample
+- [ ] Move each knob while playing audio
+- [ ] Verify audio changes match parameter (volume up = louder, etc.)
+- [ ] Check that host's generic editor shows same parameter values
+- [ ] Verify automation from DAW updates UI knobs correctly
+- [ ] Test that all 11 parameters work bidirectionally (UI ↔ host)
+
 ### Step 6: Implement Sample Loading UI Integration
 - [ ] For each SampleSlotComponent, set up onSampleLoaded callback
 - [ ] In callback, call PluginProcessor's loadSampleIntoSlot() method
@@ -468,6 +613,16 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] Implement file browser dialog as fallback to drag-and-drop
 - [ ] Consider adding recent files menu for quick reloading
 
+**Quick Test After Step 6:**
+- [ ] Drag sample files onto various slots
+- [ ] Verify each slot shows loading indicator briefly
+- [ ] Verify filename appears after loading completes
+- [ ] Verify key pair assignment is displayed
+- [ ] Play MIDI notes - verify samples trigger correctly
+- [ ] Test Load button file browser as alternative
+- [ ] Try loading invalid file - verify error message appears
+- [ ] Test Clear button removes samples
+
 ### Step 7: Add Visual Feedback and Polish
 - [ ] Add tooltips to all knobs showing current value
 - [ ] Add tooltips to sample slots explaining drag-and-drop
@@ -479,6 +634,14 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] Test UI with different OS themes (dark/light mode)
 - [ ] Verify UI doesn't freeze during sample loading
 - [ ] Add keyboard shortcuts for common actions (optional)
+
+**Quick Test After Step 7:**
+- [ ] Hover over each knob - verify tooltip appears with value
+- [ ] Hover over empty sample slots - verify helpful text appears
+- [ ] Test UI at different zoom levels/DPI settings
+- [ ] Verify all text is legible
+- [ ] Check color coding makes sense
+- [ ] Test that UI remains responsive during sample loading
 
 ### Step 8: Test Complete UI Workflow
 - [ ] Build plugin and load in AudioPluginHost or DAW
@@ -521,6 +684,14 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] Consider using ProcessorChain to organize filters
 - [ ] Ensure filters are properly initialized before use
 
+**Quick Test After Step 2:**
+- [ ] Build project successfully
+- [ ] Create EQProcessor instance in PluginProcessor
+- [ ] Call prepare() in prepareToPlay()
+- [ ] Process audio through EQ (even with neutral settings)
+- [ ] Verify audio passes through without glitches
+- [ ] Set Low band to +12dB - verify bass boost is audible
+
 ### Step 3: Connect EQ to Parameter System
 - [ ] In PluginProcessor, add EQProcessor member variable
 - [ ] Initialize EQ processor in prepareToPlay()
@@ -532,6 +703,15 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] Apply EQ processing to audio buffer after synthesiser
 - [ ] Test that EQ changes are audible and smooth
 - [ ] Verify no audio glitches when changing EQ parameters
+
+**Quick Test After Step 3:**
+- [ ] Play audio through plugin
+- [ ] Move Low Gain knob - verify bass increases/decreases
+- [ ] Move Mid Gain knob - verify midrange changes
+- [ ] Move High Gain knob - verify treble changes
+- [ ] Sweep Low Freq knob - verify frequency shift
+- [ ] Test extreme settings (+24dB, -24dB)
+- [ ] Verify smooth transitions, no clicks
 
 ### Step 4: Design Transient Shaping System
 - [ ] Research transient shaping techniques (envelope following, gain adjustment)
@@ -559,6 +739,15 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] Implement smoothing to prevent clicks when parameters change
 - [ ] Test with percussive samples (drums, percussion)
 
+**Quick Test After Step 5:**
+- [ ] Build and load plugin
+- [ ] Load percussive sample (drum hit, footstep)
+- [ ] Set Attack to +100 - verify transient is emphasized
+- [ ] Set Attack to -100 - verify transient is softened
+- [ ] Set Decay to +100 - verify tail is extended
+- [ ] Set Decay to -100 - verify tail is shortened
+- [ ] Listen for natural sound vs processed
+
 ### Step 6: Integrate Transient Processor into Signal Chain
 - [ ] In PluginProcessor, add TransientProcessor member variable
 - [ ] Initialize transient processor in prepareToPlay()
@@ -569,6 +758,14 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] Test that transient changes are audible
 - [ ] Verify no phase issues or artifacts
 - [ ] Check CPU usage is reasonable
+
+**Quick Test After Step 6:**
+- [ ] Play samples through complete chain
+- [ ] Verify processing order is correct
+- [ ] Test all effects together (Volume + EQ + Transient)
+- [ ] Verify no unwanted interactions between processors
+- [ ] Check CPU meter in DAW - ensure reasonable usage
+- [ ] Verify audio quality is maintained
 
 ### Step 7: Test Complete DSP Chain
 - [ ] Load various sample types (drums, vocals, sustained tones)
@@ -611,6 +808,13 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] Ensure component fits well in existing layout
 - [ ] Add tooltips explaining randomization feature
 
+**Quick Test After Step 2:**
+- [ ] Build and add one randomizable control to UI
+- [ ] Verify min/max sliders appear and are adjustable
+- [ ] Verify randomize button appears
+- [ ] Test button - verify it generates value within bounds
+- [ ] Verify visual feedback is clear
+
 ### Step 3: Implement Randomization Logic
 - [ ] Create Randomizer.h utility class in /Source/Data/
 - [ ] Implement getRandomValue() method that takes min and max bounds
@@ -620,6 +824,13 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] For MVP, use simple uniform distribution
 - [ ] Add seed option for reproducible randomization (optional)
 - [ ] Test that random values are evenly distributed
+
+**Quick Test After Step 3:**
+- [ ] Call getRandomValue() many times with bounds 0-100
+- [ ] Print values to debug output
+- [ ] Verify values are within bounds
+- [ ] Verify distribution appears reasonably uniform
+- [ ] Test with negative ranges (-50 to +50)
 
 ### Step 4: Connect Randomization to Parameters
 - [ ] For each randomizable parameter, add min/max bound storage
@@ -634,6 +845,13 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] Implement randomization for all 6 EQ parameters
 - [ ] Implement randomization for Transient section (Attack + Decay)
 
+**Quick Test After Step 4:**
+- [ ] Set bounds for Volume (e.g., 0.3 to 0.7)
+- [ ] Click randomize button multiple times
+- [ ] Verify volume changes each time within bounds
+- [ ] Test with all randomizable parameters
+- [ ] Verify UI updates correctly each time
+
 ### Step 5: Add Group Randomization
 - [ ] Add "Randomize All Pitch" button that randomizes both semitone and fine tune
 - [ ] Add "Randomize All EQ" button that randomizes all 6 EQ parameters at once
@@ -642,6 +860,13 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] Ensure grouped randomization respects individual parameter bounds
 - [ ] Provide visual feedback during randomization
 - [ ] Add undo support for randomization (APVTS handles this automatically)
+
+**Quick Test After Step 5:**
+- [ ] Click "Randomize All Pitch" - verify both semitone and fine tune change
+- [ ] Click "Randomize All EQ" - verify all 6 EQ params change
+- [ ] Click "Randomize All" - verify every parameter changes
+- [ ] Test undo (Ctrl+Z in DAW) - verify parameters return to previous values
+- [ ] Verify each click produces different random values
 
 ### Step 6: Test Randomization System
 - [ ] Set specific min/max bounds for each parameter
@@ -679,6 +904,12 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] Test preset recall accuracy
 - [ ] Ensure presets save/load sample assignments
 
+**Quick Test After Step 2:**
+- [ ] Load each factory preset
+- [ ] Verify settings match preset description
+- [ ] Test that presets sound appropriate
+- [ ] Switch between presets - verify smooth transitions
+
 ### Step 3: Performance Optimization
 - [ ] Profile CPU usage with all features active
 - [ ] Optimize sample loading to use background threads
@@ -691,6 +922,14 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] Ensure plugin doesn't drop audio or cause glitches
 - [ ] Optimize UI repainting to avoid visual lag
 - [ ] Test memory usage and check for leaks
+
+**Quick Test After Step 3:**
+- [ ] Load 20 large samples
+- [ ] Play continuous MIDI notes
+- [ ] Check CPU meter in DAW - aim for <10%
+- [ ] Test with buffer size set to 64 samples
+- [ ] Verify no audio dropouts or glitches
+- [ ] Run for extended period - check for memory leaks
 
 ### Step 4: Add Visualization Features (Optional for MVP)
 - [ ] Add waveform display in sample slots
@@ -719,6 +958,13 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] Add user-friendly error messages for all failure scenarios
 - [ ] Implement logging system for debugging user issues
 - [ ] Test plugin behavior with malformed project files
+
+**Quick Test After Step 6:**
+- [ ] Load plugin with no samples - verify no crash
+- [ ] Try loading 100MB+ file - verify graceful handling
+- [ ] Move sample files while project is open
+- [ ] Reload project - verify appropriate error messages
+- [ ] Test various edge cases specific to your implementation
 
 ### Step 7: Cross-Platform Testing
 - [ ] Test on Windows 10/11
