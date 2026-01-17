@@ -18,9 +18,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "round-robin-lite_SharedCode
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "round-robin-lite_VST3ManifestHelper", "round-robin-lite_VST3ManifestHelper.vcxproj", "{A78744B5-0757-6960-0879-D96EA717116A}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{10BA31B0-40C5-42D0-A05F-382D7C93D0F6}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5B52AEBC-A472-414B-AA0B-22B43CC561A4}"
 	ProjectSection(SolutionItems) = preProject
-		..\..\..\Changelog.md.txt = ..\..\..\Changelog.md.txt
+		..\..\..\changelog.md = ..\..\..\changelog.md
 	EndProjectSection
 EndProject
 Global
@@ -48,5 +48,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AB1CC59B-4072-4E16-A764-8ABFB36FC28E}
 	EndGlobalSection
 EndGlobal
