@@ -3468,6 +3468,9 @@
     <ClCompile Include="..\..\JuceLibraryCode\include_juce_gui_extra.cpp">
       <Filter>JUCE Library Code</Filter>
     </ClCompile>
+    <ClCompile Include="RRSound.cpp">
+      <Filter>round-robin-lite\Source\Audio</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\PluginProcessor.h">
@@ -7510,6 +7513,9 @@
     </ClInclude>
     <ClInclude Include="..\..\JuceLibraryCode\JucePluginDefines.h">
       <Filter>JUCE Library Code</Filter>
+    </ClInclude>
+    <ClInclude Include="RRSound.h">
+      <Filter>round-robin-lite\Source\Audio</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

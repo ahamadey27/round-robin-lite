@@ -79,8 +79,8 @@ This specification breaks the project into eight distinct phases, each with acti
 - [x] Understand voice allocation and stealing mechanisms
 
 ### Step 2: Create Custom Sound Class (RRSound)
-- [ ] Create RRSound.h header file in /Source/Audio/
-- [ ] Create RRSound.cpp implementation file in /Source/Audio/
+- [x] Create RRSound.h header file in /Source/Audio/
+- [x] Create RRSound.cpp implementation file in /Source/Audio/
 - [ ] Set up class to inherit from juce::SynthesiserSound
 - [ ] Add member variable for storing audio sample buffer (juce::AudioBuffer<float>)
 - [ ] Add member variable for storing original sample rate (double)
