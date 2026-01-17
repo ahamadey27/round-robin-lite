@@ -99,4 +99,51 @@ public:
      * @return The key pair index (0-9, or -1 if not assigned)
      */
     int getKeyPairIndex() const { return keyPairIndex; }
+
+    /**
+     * Gets the root MIDI note number for pitch calculations.
+     * This is the note at which the sample plays at its original pitch.
+     * For Round Robin Lite, the root is always C2 (MIDI note 48) by default,
+     * but can be adjusted based on the key pair offset.
+     * @return The root MIDI note number
+     */
+    int getRootNote() const { return rootNote; }
+
+    //==============================================================================
+   // Display Information
+
+    /**
+     * Sets the display name for this sample (shown in UI).
+     * @param name The display name (e.g., "FootstepLeft.wav")
+     */
+    void setDisplayName(const juce::String& name) { displayName = name; }
+
+    /**
+    * Gets the display name.
+    * @return The display name
+    */
+    juce::String getDisplayName() const { return displayName; }
+
+    /**
+     * Checks if this sound has audio data loaded.
+     * @return true if audio buffer contains samples
+     */
+    bool isLoaded() const { return audioBuffer.getNumSamples() > 0; }
+
+    private:
+        //==============================================================================
+        // Member Variables
+
+        juce::AudioBuffer<float> audioBuffer;    // The actual audio sample data (mono)
+        double originalSampleRate = 44100.0;     // Sample rate of the loaded file
+        int rootNote = 48;                       // MIDI note for original pitch (C2)
+        juce::String displayName;                // Name to show in UI
+        int keyPairIndex = -1;                   // Which key pair (0-9), -1 = unassigned
+
+        // Helper function to get the two MIDI notes for a given key pair index
+        void getMidiNotesForPair(int pairIndex, int& note1, int& note2) const;
+
+        //==============================================================================
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(RRSound)
+
 };
