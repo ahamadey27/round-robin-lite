@@ -42,6 +42,12 @@ bool RRSound::appliesToChannel(int midiChannel)
 // Audio Loading
 bool RRSound::loadFromFile(const juce::File& file, juce::AudioFormatManager& formatManager)
 {
+    if (!file.existsAsFile())
+    {
+        DBG("File does not exist: " + file.getFullPathName());
+        return false;
+    }
+
     // Step 1: Try to create a reader for the audio file
     std::unique_ptr<juce::AudioFormatReader> reader(formatManager.createReaderFor(file));
 
@@ -134,4 +140,12 @@ void RRSound::getMidiNotesForPair(int pairIndex, int& note1, int& note2) const
     case 9:  note1 = 67;  note2 = 69;  break;  // G2/A2
     default: note1 = -1;  note2 = -1;  break;  // Invalid
     }
+}
+
+void RRSound::clearSample()
+{
+    audioBuffer.setSize(0, 0);
+    displayName = "";
+    keyPairIndex = -1;
+    rootNote = 48;
 }

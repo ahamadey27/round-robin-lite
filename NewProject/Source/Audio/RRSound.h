@@ -68,6 +68,12 @@ public:
     const juce::AudioBuffer<float>& getAudioBuffer() const { return audioBuffer; }
 
     /**
+     * Gets the number of samples in the loaded audio buffer.
+     * @return Number of samples, or 0 if no audio is loaded
+     */
+    int getNumSamples() const { return audioBuffer.getNumSamples(); }
+
+    /**
      * Gets the original sample rate of the loaded audio file.
      * Used for pitch shift calculations.
      * @return The sample rate (e.g., 44100.0)
@@ -129,6 +135,10 @@ public:
      * @return true if audio buffer contains samples
      */
     bool isLoaded() const { return audioBuffer.getNumSamples() > 0; }
+
+    
+    //Clears all sample data and resets to empty state.
+    void clearSample();
 
     private:
         //==============================================================================
