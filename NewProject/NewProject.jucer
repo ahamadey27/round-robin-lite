@@ -6,14 +6,14 @@
               pluginCode="rrll" pluginFormats="buildStandalone,buildVST3">
   <MAINGROUP id="ayCzMd" name="round-robin-lite">
     <GROUP id="{16DB8BBD-FC25-C9E3-2064-70988F6ACE3E}" name="Source">
+      <GROUP id="{1BE7E09A-A222-8924-2891-598E28F8EACE}" name="Parameters"/>
+      <GROUP id="{99C4D0AE-47D4-3F1B-8AE2-65E1F59C4A25}" name="Data"/>
+      <GROUP id="{BE5F3C22-AB0D-49FF-90E9-8DCE18E735F3}" name="UI"/>
+      <GROUP id="{D32DE12E-6532-4C00-71D1-8EC4073A2608}" name="DSP"/>
       <GROUP id="{A9D9CA2D-D0D8-EF05-31D9-D59CA0D4367D}" name="Audio">
         <FILE id="g4RxPy" name="RRSound.cpp" compile="1" resource="0" file="Source/Audio/RRSound.cpp"/>
         <FILE id="LJPj3M" name="RRSound.h" compile="0" resource="0" file="Source/Audio/RRSound.h"/>
       </GROUP>
-      <GROUP id="{ED902625-0F67-141F-023A-E78F9274F648}" name="Data"/>
-      <GROUP id="{AFF0876B-29C3-BA2C-EBD3-7A7B3BB074B3}" name="DSP"/>
-      <GROUP id="{B2B728DF-7D97-6CB1-380D-E4FE1BD59317}" name="Parameters"/>
-      <GROUP id="{14BEB29C-B7D9-5D7E-591D-F878B85EE28C}" name="UI"/>
       <FILE id="aARBYy" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="sn7SK1" name="PluginProcessor.h" compile="0" resource="0"
