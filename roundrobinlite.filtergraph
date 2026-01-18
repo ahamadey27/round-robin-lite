@@ -61,10 +61,11 @@
       </OUTPUTS>
     </LAYOUT>
   </FILTER>
-  <FILTER uid="13" x="0.2475" y="0.4274193548387097" useARA="0">
+  <FILTER uid="13" x="0.24625" y="0.4213709677419355" useARA="0" uiLastX_Normal="230"
+          uiLastY_Normal="470" uiopen_Normal="0">
     <PLUGIN name="round-robin-lite" format="VST3" category="Instrument|Synth"
             manufacturer="roundrobinlite" version="1.0.0" file="C:\Program Files\Common Files\VST3\roundrobinlite.vst3\Contents\x86_64-win\roundrobinlite.vst3"
-            uniqueId="1fa6de21" isInstrument="1" fileTime="19bc7e1cbc1" infoUpdateTime="19bccd6bac6"
+            uniqueId="1fa6de21" isInstrument="1" fileTime="19bd2bf1a94" infoUpdateTime="19bd2c13cd1"
             numInputs="0" numOutputs="2" isShell="0" hasARAExtension="0"
             uid="e96804c5"/>
     <STATE>191.VMjLgXK....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOVMEUy.Ea0cVZtMEcgQWY9vSRC8Vav8lak4Fc9XCLt3hKt3hKt3hKt3hYRUUSTEETIckVwTjQisVTTgkdEYjKAQjYPQSPWgUdMcjKAQjct3hdA4hKt3hKt3hKtnTUv.UQAslXuk0UXoWUFE0YQcEV77RRC8Vav8lak4Fc9vyKVMEUy.Ea0cVZtMEcgQWY9..</STATE>
