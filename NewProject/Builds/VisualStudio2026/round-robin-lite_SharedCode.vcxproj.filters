@@ -2,6 +2,9 @@
 
 <Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <Filter Include="round-robin-lite\Source\Audio">
+      <UniqueIdentifier>{73965BAD-CF0D-ED06-3243-8BEA405EFBF8}</UniqueIdentifier>
+    </Filter>
     <Filter Include="round-robin-lite\Source">
       <UniqueIdentifier>{E70AE706-64AD-A3AA-3DCA-08DB07863B52}</UniqueIdentifier>
     </Filter>
@@ -679,6 +682,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\Audio\RRSound.cpp">
+      <Filter>round-robin-lite\Source\Audio</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\PluginProcessor.cpp">
       <Filter>round-robin-lite\Source</Filter>
     </ClCompile>
@@ -3606,6 +3612,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\Audio\RRSound.h">
+      <Filter>round-robin-lite\Source\Audio</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\PluginProcessor.h">
       <Filter>round-robin-lite\Source</Filter>
     </ClInclude>
