@@ -94,35 +94,35 @@ This specification breaks the project into eight distinct phases, each with acti
 - [x] Add method to get root note for pitch calculation
 
 ### Step 3: Create Custom Voice Class (RRVoice)
-- [ ] Create RRVoice.h header file in /Source/Audio/
-- [ ] Create RRVoice.cpp implementation file in /Source/Audio/
-- [ ] Set up class to inherit from juce::SynthesiserVoice
-- [ ] Add member variable for current sample playback position (double)
-- [ ] Add member variable for calculated pitch ratio (double)
-- [ ] Add member variable for ADSR envelope (juce::ADSR)
-- [ ] Add member variable for voice playing state flag (bool)
-- [ ] Implement canPlaySound() to check if sound is compatible (RRSound type)
-- [ ] Implement startNote() method:
-  - [ ] Calculate pitch shift ratio based on MIDI note vs root note
-  - [ ] Reset playback position to beginning of sample
-  - [ ] Trigger ADSR envelope attack phase
-  - [ ] Set voice as currently playing
-- [ ] Implement stopNote() method:
-  - [ ] Trigger ADSR envelope release phase
-  - [ ] Allow voice to fade out naturally
-  - [ ] Mark voice as finished when envelope completes
-- [ ] Implement renderNextBlock() method:
-  - [ ] Get audio data from associated RRSound
-  - [ ] Apply pitch shifting using sample rate conversion
-  - [ ] Apply ADSR envelope to each sample
-  - [ ] Add processed audio to output buffer
-  - [ ] Handle monophonic voice stealing (stop current note if new note starts)
+- [x] Create RRVoice.h header file in /Source/Audio/
+- [x] Create RRVoice.cpp implementation file in /Source/Audio/
+- [x] Set up class to inherit from juce::SynthesiserVoice
+- [x] Add member variable for current sample playback position (double)
+- [x] Add member variable for calculated pitch ratio (double)
+- [x] Add member variable for ADSR envelope (juce::ADSR)
+- [x] Add member variable for voice playing state flag (bool)
+- [x] Implement canPlaySound() to check if sound is compatible (RRSound type)
+- [x] Implement startNote() method:
+  - [x] Calculate pitch shift ratio based on MIDI note vs root note
+  - [x] Reset playback position to beginning of sample
+  - [x] Trigger ADSR envelope attack phase
+  - [x] Set voice as currently playing
+- [x] Implement stopNote() method:
+  - [x] Trigger ADSR envelope release phase
+  - [x] Allow voice to fade out naturally
+  - [x] Mark voice as finished when envelope completes
+- [x] Implement renderNextBlock() method:
+  - [x] Get audio data from associated RRSound
+  - [x] Apply pitch shifting using sample rate conversion
+  - [x] Apply ADSR envelope to each sample
+  - [x] Add processed audio to output buffer
+  - [x] Handle monophonic voice stealing (stop current note if new note starts)
 
 **Quick Test After Step 3:**
-- [ ] Add RRVoice files to Projucer project and save
-- [ ] Regenerate Visual Studio solution
-- [ ] Build project - verify no compile errors
-- [ ] Check that RRVoice.h and RRVoice.cpp appear in Solution Explorer under Audio folder
+- [x] Add RRVoice files to Projucer project and save
+- [x] Regenerate Visual Studio solution
+- [x] Build project - verify no compile errors
+- [x] Check that RRVoice.h and RRVoice.cpp appear in Solution Explorer under Audio folder
 
 ### Step 4: Integrate Synthesiser into AudioProcessor
 - [ ] In PluginProcessor.h, add juce::Synthesiser member variable
