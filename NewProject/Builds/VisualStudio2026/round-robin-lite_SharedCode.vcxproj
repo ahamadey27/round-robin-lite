@@ -2895,6 +2895,7 @@
     <ClCompile Include="..\..\JuceLibraryCode\include_juce_gui_extra.cpp"/>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\Audio\MidiMapper.h"/>
     <ClInclude Include="..\..\Source\Audio\RRSound.h"/>
     <ClInclude Include="..\..\Source\Audio\RRvoice.h"/>
     <ClInclude Include="..\..\Source\PluginProcessor.h"/>

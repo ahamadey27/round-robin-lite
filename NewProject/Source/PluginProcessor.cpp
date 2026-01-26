@@ -8,6 +8,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "Audio/MidiMapper.h" 
 
 //==============================================================================
 NewProjectAudioProcessor::NewProjectAudioProcessor()
@@ -30,6 +31,36 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
 
     DBG("Round Robin Lite initialized - Synthesiser ready");
     DBG("Number of voices: " + juce::String(synthesiser.getNumVoices()));
+
+    // ============================================================
+    // ADD THE TEST CODE HERE (from Step 3)
+    // ============================================================
+
+    // TEST: Print the complete MIDI mapping table
+    MidiMapper::printMappingTable();
+
+    // TEST: Verify specific pairs
+    DBG("\n=== Testing MidiMapper Functions ===");
+
+    // Test getting notes for root pair
+    int note1, note2;
+    if (MidiMapper::getMidiNotesForPair(7, note1, note2))
+    {
+        DBG("Root pair (7) notes: " + juce::String(note1) + " and " + juce::String(note2));
+    }
+
+    // Test finding pair for a MIDI note
+    int pairIndex = MidiMapper::getPairIndexForMidiNote(48);
+    DBG("MIDI note 48 (C2) belongs to pair: " + juce::String(pairIndex));
+
+    // Test semitone offset
+    int offset = MidiMapper::getSemitoneOffsetForPair(0);
+    DBG("Pair 0 semitone offset: " + juce::String(offset));
+
+    offset = MidiMapper::getSemitoneOffsetForPair(7);
+    DBG("Pair 7 (root) semitone offset: " + juce::String(offset));
+
+    DBG("====================================\n");
 }
 
 NewProjectAudioProcessor::~NewProjectAudioProcessor()

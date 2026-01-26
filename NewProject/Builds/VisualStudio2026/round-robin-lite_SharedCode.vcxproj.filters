@@ -3615,6 +3615,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\Audio\MidiMapper.h">
+      <Filter>round-robin-lite\Source\Audio</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\Audio\RRSound.h">
       <Filter>round-robin-lite\Source\Audio</Filter>
     </ClInclude>
