@@ -144,22 +144,22 @@ This specification breaks the project into eight distinct phases, each with acti
 - [x] Check Output window in Visual Studio for any debug messages
 
 ### Step 5: Design and Implement MIDI Note Mapping System
-- [ ] Create MidiMapper.h utility file in /Source/Audio/
-- [ ] Define the complete key pair mapping structure:
-  - [ ] Pair 0: C0/D0 (MIDI 36/38) maps to -7 semitones from root
-  - [ ] Pair 1: E0/F0 (MIDI 40/41) maps to -6 semitones from root
-  - [ ] Pair 2: G0/A0 (MIDI 43/45) maps to -5 semitones from root
-  - [ ] Pair 3: B0/C1 (MIDI 47/48) maps to -4 semitones from root
-  - [ ] Pair 4: E1/F1 (MIDI 52/53) maps to -3 semitones from root
-  - [ ] Pair 5: G1/A1 (MIDI 55/57) maps to -2 semitones from root
-  - [ ] Pair 6: B1/C2 (MIDI 59/60) maps to -1 semitone from root
-  - [ ] Pair 7: C2/D2 (MIDI 48/50) maps to 0 semitones (ROOT pitch)
-  - [ ] Pair 8: E2/F2 (MIDI 64/65) maps to +1 semitone from root
-  - [ ] Pair 9: G2/A2 (MIDI 67/69) maps to +2 semitones from root
-- [ ] Create function to get the two MIDI note numbers for any given pair index
-- [ ] Create function to get semitone offset for any given pair index
-- [ ] Create function to validate pair assignments (only 10 pairs maximum)
-- [ ] Add documentation explaining the pairing system for footstep sounds
+- [x] Create MidiMapper.h utility file in /Source/Audio/
+- [x] Define the complete key pair mapping structure:
+  - [x] Pair 0: C0/D0 (MIDI 36/38) maps to -7 semitones from root
+  - [x] Pair 1: E0/F0 (MIDI 40/41) maps to -6 semitones from root
+  - [x] Pair 2: G0/A0 (MIDI 43/45) maps to -5 semitones from root
+  - [x] Pair 3: B0/C1 (MIDI 47/48) maps to -4 semitones from root
+  - [x] Pair 4: E1/F1 (MIDI 52/53) maps to -3 semitones from root
+  - [x] Pair 5: G1/A1 (MIDI 55/57) maps to -2 semitones from root
+  - [x] Pair 6: B1/C2 (MIDI 59/60) maps to -1 semitone from root
+  - [x] Pair 7: C2/D2 (MIDI 48/50) maps to 0 semitones (ROOT pitch)
+  - [x] Pair 8: E2/F2 (MIDI 64/65) maps to +1 semitone from root
+  - [x] Pair 9: G2/A2 (MIDI 67/69) maps to +2 semitones from root
+- [x] Create function to get the two MIDI note numbers for any given pair index
+- [x] Create function to get semitone offset for any given pair index
+- [x] Create function to validate pair assignments (only 10 pairs maximum)
+- [x] Add documentation explaining the pairing system for footstep sounds
 
 **Quick Test After Step 5:**
 - [ ] Build project successfully

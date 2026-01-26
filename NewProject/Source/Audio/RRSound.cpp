@@ -101,8 +101,8 @@ bool RRSound::loadFromFile(const juce::File& file, juce::AudioFormatManager& for
 // MIDI Note Mapping
 void RRSound::setKeyPairIndex(int pairIndex)
 {
-    // Validate the pair index is in range
-    if (pairIndex < 0 || pairIndex > 9)
+    // Validate using MidiMapper
+    if (!MidiMapper::isValidPairIndex(pairIndex))
     {
         DBG("Invalid key pair index: " + juce::String(pairIndex));
         keyPairIndex = -1;
@@ -111,36 +111,21 @@ void RRSound::setKeyPairIndex(int pairIndex)
 
     keyPairIndex = pairIndex;
 
-    // Update root note based on the pair index offset
-    // Root is C2 (48), and each pair has a semitone offset
-    const int semitoneOffsets[] = { -7, -6, -5, -4, -3, -2, -1, 0, +1, +2 };
-    rootNote = 48 + semitoneOffsets[pairIndex];
+    // Get semitone offset from MidiMapper
+    int offset = MidiMapper::getSemitoneOffsetForPair(pairIndex);
+    rootNote = MidiMapper::ROOT_MIDI_NOTE + offset;
 
     DBG("Sound assigned to key pair " + juce::String(pairIndex) +
-        " (root note: " + juce::String(rootNote) + ")");
+        " (" + MidiMapper::getKeyPairName(pairIndex) + ")" +
+        " | Root note: " + juce::String(rootNote));
 }
 
 //==============================================================================
 // Helper Methods
 void RRSound::getMidiNotesForPair(int pairIndex, int& note1, int& note2) const
 {
-    // Map key pair index to the two MIDI note numbers
-    // These are the white key pairs in Round Robin Lite's mapping
-
-    switch (pairIndex)
-    {
-    case 0:  note1 = 36;  note2 = 38;  break;  // C0/D0
-    case 1:  note1 = 40;  note2 = 41;  break;  // E0/F0
-    case 2:  note1 = 43;  note2 = 45;  break;  // G0/A0
-    case 3:  note1 = 47;  note2 = 48;  break;  // B0/C1
-    case 4:  note1 = 52;  note2 = 53;  break;  // E1/F1
-    case 5:  note1 = 55;  note2 = 57;  break;  // G1/A1
-    case 6:  note1 = 59;  note2 = 60;  break;  // B1/C2
-    case 7:  note1 = 48;  note2 = 50;  break;  // C2/D2 (ROOT)
-    case 8:  note1 = 64;  note2 = 65;  break;  // E2/F2
-    case 9:  note1 = 67;  note2 = 69;  break;  // G2/A2
-    default: note1 = -1;  note2 = -1;  break;  // Invalid
-    }
+    // Delegate to the MidiMapper utility
+    MidiMapper::getMidiNotesForPair(pairIndex, note1, note2);
 }
 
 void RRSound::clearSample()
