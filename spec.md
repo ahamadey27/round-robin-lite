@@ -125,16 +125,16 @@ This specification breaks the project into eight distinct phases, each with acti
 - [x] Check that RRVoice.h and RRVoice.cpp appear in Solution Explorer under Audio folder
 
 ### Step 4: Integrate Synthesiser into AudioProcessor
-- [ ] In PluginProcessor.h, add juce::Synthesiser member variable
-- [ ] In PluginProcessor constructor, add one RRVoice to synthesiser (monophonic)
-- [ ] Initialize synthesiser with no sounds initially (will load later)
-- [ ] In prepareToPlay() method, set synthesiser sample rate
-- [ ] In prepareToPlay() method, initialize synthesiser for processing
-- [ ] In processBlock() method:
-  - [ ] Clear output buffer before processing
-  - [ ] Pass MIDI messages to synthesiser
-  - [ ] Call synthesiser.renderNextBlock() to generate audio
-  - [ ] Ensure synthesiser output fills the buffer correctly
+- [x] In PluginProcessor.h, add juce::Synthesiser member variable
+- [x] In PluginProcessor constructor, add one RRVoice to synthesiser (monophonic)
+- [x] Initialize synthesiser with no sounds initially (will load later)
+- [x] In prepareToPlay() method, set synthesiser sample rate
+- [x] In prepareToPlay() method, initialize synthesiser for processing
+- [x] In processBlock() method:
+  - [x] Clear output buffer before processing
+  - [x] Pass MIDI messages to synthesiser
+  - [x] Call synthesiser.renderNextBlock() to generate audio
+  - [x] Ensure synthesiser output fills the buffer correctly
 
 **Quick Test After Step 4:**
 - [ ] Build project successfully
