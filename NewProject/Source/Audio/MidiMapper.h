@@ -24,18 +24,19 @@
  * MAPPING TABLE:
  * Pair Index | Keys     | MIDI Notes | Semitone Offset | Use Case
  * -----------|----------|------------|-----------------|------------------
- * 0          | C0/D0    | 36/38      | -7              | Very low pitch
- * 1          | E0/F0    | 40/41      | -6              | Low pitch
- * 2          | G0/A0    | 43/45      | -5              | Low-mid pitch
- * 3          | B0/C1    | 47/48      | -4              | Mid-low pitch
- * 4          | E1/F1    | 52/53      | -3              | Mid pitch
- * 5          | G1/A1    | 55/57      | -2              | Mid-high pitch
- * 6          | B1/C2    | 59/60      | -1              | High-mid pitch
- * 7          | C2/D2    | 48/50      | 0 (ROOT)        | Original pitch ★
- * 8          | E2/F2    | 64/65      | +1              | High pitch
- * 9          | G2/A2    | 67/69      | +2              | Very high pitch
+ * 0          | C2/D2    | 36/38      | -12             | Very low (octave down)
+ * 1          | E2/F2    | 40/41      | -10             | Low pitch
+ * 2          | G2/A2    | 43/45      | -9              | Low-mid pitch
+ * 3          | B2/C3    | 47/49      | -7              | Mid-low pitch
+ * 4          | E3/F3    | 52/53      | -4              | Mid pitch
+ * 5          | G3/A3    | 55/57      | -3              | Mid-high pitch
+ * 6          | B3/C4    | 59/60      | -1              | High-mid pitch
+ * 7          | C4/D4    | 60/62      | 0 (ROOT)        | Original pitch (Middle C) ★
+ * 8          | E4/F4    | 64/65      | +2              | High pitch
+ * 9          | G4/A4    | 67/69      | +5              | Very high pitch
  *
- * ROOT NOTE: C2 (MIDI 48) is the reference pitch where samples play unmodified.
+ * ROOT NOTE: C4/Middle C (MIDI 60) is the reference pitch where samples play unmodified.
+ * This is the industry standard reference point used by most samplers and DAWs.
  */
 
 class MidiMapper
@@ -45,8 +46,8 @@ public:
     // Constants
 
     static constexpr int NUM_KEY_PAIRS = 10;        // Total number of key pairs
-    static constexpr int ROOT_PAIR_INDEX = 7;       // C2/D2 pair (no pitch shift)
-    static constexpr int ROOT_MIDI_NOTE = 48;       // C2 is the root reference pitch
+    static constexpr int ROOT_PAIR_INDEX = 7;       // C4/D4 pair (Middle C - no pitch shift)
+    static constexpr int ROOT_MIDI_NOTE = 60;       // C4 (Middle C) is the root reference pitch
 
     //==============================================================================
     /**
@@ -60,7 +61,7 @@ public:
      * Example:
      *   int n1, n2;
      *   MidiMapper::getMidiNotesForPair(7, n1, n2);
-     *   // Result: n1 = 48 (C2), n2 = 50 (D2)
+     *   // Result: n1 = 60 (C4/Middle C), n2 = 62 (D4)
      */
     static bool getMidiNotesForPair(int pairIndex, int& note1, int& note2)
     {
@@ -71,16 +72,16 @@ public:
         // Each pair: {first note, second note}
         static const int pairMapping[NUM_KEY_PAIRS][2] =
         {
-            { 36, 38 },  // Pair 0: C0/D0
-            { 40, 41 },  // Pair 1: E0/F0
-            { 43, 45 },  // Pair 2: G0/A0
-            { 47, 48 },  // Pair 3: B0/C1
-            { 52, 53 },  // Pair 4: E1/F1
-            { 55, 57 },  // Pair 5: G1/A1
-            { 59, 60 },  // Pair 6: B1/C2
-            { 48, 50 },  // Pair 7: C2/D2 (ROOT - note the duplicate C2!)
-            { 64, 65 },  // Pair 8: E2/F2
-            { 67, 69 }   // Pair 9: G2/A2
+            { 36, 38 },  // Pair 0: C2/D2
+            { 40, 41 },  // Pair 1: E2/F2
+            { 43, 45 },  // Pair 2: G2/A2
+            { 47, 49 },  // Pair 3: B2/C3
+            { 52, 53 },  // Pair 4: E3/F3
+            { 55, 57 },  // Pair 5: G3/A3
+            { 59, 60 },  // Pair 6: B3/C4
+            { 60, 62 },  // Pair 7: C4/D4 (ROOT - Middle C)
+            { 64, 65 },  // Pair 8: E4/F4
+            { 67, 69 }   // Pair 9: G4/A4
         };
 
         note1 = pairMapping[pairIndex][0];
@@ -96,30 +97,30 @@ public:
      * Positive = higher pitch, Negative = lower pitch, 0 = original pitch
      *
      * @param pairIndex The key pair index (0-9)
-     * @return Semitone offset (-7 to +2), or 0 if invalid index
+     * @return Semitone offset (-12 to +5), or 0 if invalid index
      *
      * Example:
      *   int offset = MidiMapper::getSemitoneOffsetForPair(0);
-     *   // Result: -7 (pair 0 plays 7 semitones lower than root)
+     *   // Result: -12 (pair 0 plays one octave lower than root)
      */
     static int getSemitoneOffsetForPair(int pairIndex)
     {
         if (pairIndex < 0 || pairIndex >= NUM_KEY_PAIRS)
             return 0;
 
-        // Semitone offsets for each pair relative to root (C2)
+        // Semitone offsets for each pair relative to root (Middle C = MIDI 60)
         static const int semitoneOffsets[NUM_KEY_PAIRS] =
         {
-            -7,  // Pair 0: C0/D0
-            -6,  // Pair 1: E0/F0
-            -5,  // Pair 2: G0/A0
-            -4,  // Pair 3: B0/C1
-            -3,  // Pair 4: E1/F1
-            -2,  // Pair 5: G1/A1
-            -1,  // Pair 6: B1/C2
-             0,  // Pair 7: C2/D2 (ROOT - no pitch shift)
-            +1,  // Pair 8: E2/F2
-            +2   // Pair 9: G2/A2
+            -12,  // Pair 0: C2/D2 (octave down)
+            -10,  // Pair 1: E2/F2
+            -9,   // Pair 2: G2/A2
+            -7,   // Pair 3: B2/C3
+            -4,   // Pair 4: E3/F3
+            -3,   // Pair 5: G3/A3
+            -1,   // Pair 6: B3/C4
+             0,   // Pair 7: C4/D4 (ROOT - Middle C, no pitch shift)
+            +2,   // Pair 8: E4/F4
+            +5    // Pair 9: G4/A4
         };
 
         return semitoneOffsets[pairIndex];
@@ -133,8 +134,10 @@ public:
      * @return The pair index (0-9) if found, or -1 if not part of any pair
      *
      * Example:
-     *   int pair = MidiMapper::getPairIndexForMidiNote(48);
-     *   // Result: 7 (C2 is in pair 7)
+     *   int pair = MidiMapper::getPairIndexForMidiNote(60);
+     *   // Result: 7 (C4/Middle C is in pair 7)
+     *   // Note: Also returns 6 because 60 appears in both pair 6 and 7
+     *   // In this case, returns the FIRST match (pair 6)
      */
     static int getPairIndexForMidiNote(int midiNoteNumber)
     {
@@ -181,14 +184,14 @@ public:
      * This is the note at which the sample should play at its original pitch.
      *
      * @param pairIndex The key pair index (0-9)
-     * @return The root MIDI note (e.g., 48 for C2 adjusted by semitone offset)
+     * @return The root MIDI note (e.g., 60 for Middle C adjusted by semitone offset)
      */
     static int getRootNoteForPair(int pairIndex)
     {
         if (!isValidPairIndex(pairIndex))
             return ROOT_MIDI_NOTE;
 
-        // Root note is C2 (48) adjusted by the pair's semitone offset
+        // Root note is Middle C (60) adjusted by the pair's semitone offset
         return ROOT_MIDI_NOTE + getSemitoneOffsetForPair(pairIndex);
     }
 
@@ -198,7 +201,7 @@ public:
      * Useful for UI display and debugging.
      *
      * @param pairIndex The key pair index (0-9)
-     * @return String like "C0/D0" or "C2/D2 (Root)"
+     * @return String like "C2/D2" or "C4/D4 (Root)"
      */
     static juce::String getKeyPairName(int pairIndex)
     {
@@ -207,16 +210,16 @@ public:
 
         static const juce::String pairNames[NUM_KEY_PAIRS] =
         {
-            "C0/D0",
-            "E0/F0",
-            "G0/A0",
-            "B0/C1",
-            "E1/F1",
-            "G1/A1",
-            "B1/C2",
-            "C2/D2 (Root)",  // Special label for root pair
+            "C2/D2",
             "E2/F2",
-            "G2/A2"
+            "G2/A2",
+            "B2/C3",
+            "E3/F3",
+            "G3/A3",
+            "B3/C4",
+            "C4/D4 (Root)",  // Middle C - the reference pitch
+            "E4/F4",
+            "G4/A4"
         };
 
         return pairNames[pairIndex];
