@@ -137,11 +137,11 @@ This specification breaks the project into eight distinct phases, each with acti
   - [x] Ensure synthesiser output fills the buffer correctly
 
 **Quick Test After Step 4:**
-- [ ] Build project successfully
-- [ ] Load plugin in AudioPluginHost
-- [ ] Connect MIDI input (keyboard or test signal)
-- [ ] Verify plugin loads without crashes (even though no sound yet - no samples loaded)
-- [ ] Check Output window in Visual Studio for any debug messages
+- [x] Build project successfully
+- [x] Load plugin in AudioPluginHost
+- [x] Connect MIDI input (keyboard or test signal)
+- [x] Verify plugin loads without crashes (even though no sound yet - no samples loaded)
+- [x] Check Output window in Visual Studio for any debug messages
 
 ### Step 5: Design and Implement MIDI Note Mapping System
 - [ ] Create MidiMapper.h utility file in /Source/Audio/
