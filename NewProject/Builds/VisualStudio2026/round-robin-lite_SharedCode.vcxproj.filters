@@ -685,6 +685,9 @@
     <ClCompile Include="..\..\Source\Audio\RRSound.cpp">
       <Filter>round-robin-lite\Source\Audio</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\Audio\RRvoice.cpp">
+      <Filter>round-robin-lite\Source\Audio</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\PluginProcessor.cpp">
       <Filter>round-robin-lite\Source</Filter>
     </ClCompile>
@@ -3613,6 +3616,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\Audio\RRSound.h">
+      <Filter>round-robin-lite\Source\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Audio\RRvoice.h">
       <Filter>round-robin-lite\Source\Audio</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\PluginProcessor.h">

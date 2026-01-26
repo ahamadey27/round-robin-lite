@@ -13,6 +13,8 @@
       <GROUP id="{A9D9CA2D-D0D8-EF05-31D9-D59CA0D4367D}" name="Audio">
         <FILE id="g4RxPy" name="RRSound.cpp" compile="1" resource="0" file="Source/Audio/RRSound.cpp"/>
         <FILE id="LJPj3M" name="RRSound.h" compile="0" resource="0" file="Source/Audio/RRSound.h"/>
+        <FILE id="ncPNFT" name="RRvoice.cpp" compile="1" resource="0" file="Source/Audio/RRvoice.cpp"/>
+        <FILE id="lya2zz" name="RRvoice.h" compile="0" resource="0" file="Source/Audio/RRvoice.h"/>
       </GROUP>
       <FILE id="aARBYy" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
