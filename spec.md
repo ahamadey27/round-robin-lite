@@ -162,10 +162,10 @@ This specification breaks the project into eight distinct phases, each with acti
 - [x] Add documentation explaining the pairing system for footstep sounds
 
 **Quick Test After Step 5:**
-- [ ] Build project successfully
-- [ ] In PluginProcessor, write test code to print MIDI mapping for all 10 pairs
-- [ ] Verify output shows correct note pairs and semitone offsets
-- [ ] Remove test code after verification
+- [x] Build project successfully
+- [x] In PluginProcessor, write test code to print MIDI mapping for all 10 pairs
+- [x] Verify output shows correct note pairs and semitone offsets
+- [x] Remove test code after verification
 
 ### Step 6: Test Basic Audio Playback
 - [ ] Load a single test WAV file manually in PluginProcessor constructor
