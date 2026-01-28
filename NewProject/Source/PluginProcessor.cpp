@@ -32,79 +32,45 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
     DBG("Round Robin Lite initialized - Synthesiser ready");
     DBG("Number of voices: " + juce::String(synthesiser.getNumVoices()));
 
+    // Print mapping info
+    MidiMapper::printMappingInfo();
+
     // ============================================================
-    // TEST: Load sample and assign to ALL pairs for testing
+    // TEST: Load single sample
     // ============================================================
 
     juce::File testFile("C:\\Users\\hamad\\OneDrive\\Desktop\\snd_surf_hard_dirt_01.wav");
 
     DBG("\n=== LOADING TEST SAMPLE ===");
-    DBG("Test file path: " + testFile.getFullPathName());
 
     if (!testFile.existsAsFile())
     {
-        DBG("ERROR: Test file not found!");
+        DBG("ERROR: Test file not found at: " + testFile.getFullPathName());
         return;
     }
 
-    DBG("File exists! Size: " + juce::String(testFile.getSize()) + " bytes");
+    // Create and load sound
+    RRSound* testSound = new RRSound();
 
-    // Load the sample ONCE into a temporary sound
-    RRSound* templateSound = new RRSound();
-
-    if (templateSound->loadFromFile(testFile, formatManager))
+    if (testSound->loadFromFile(testFile, formatManager))
     {
-        DBG("✓ Sample loaded successfully!");
-        DBG("  - Display name: " + templateSound->getDisplayName());
-        DBG("  - Sample count: " + juce::String(templateSound->getNumSamples()));
-        DBG("  - Sample rate: " + juce::String(templateSound->getOriginalSampleRate()) + " Hz");
+        DBG("✓ Sample loaded: " + testSound->getDisplayName());
+        DBG("  Samples: " + juce::String(testSound->getNumSamples()));
+        DBG("  Rate: " + juce::String(testSound->getOriginalSampleRate()) + " Hz");
 
-        // Now assign this sample to ALL 10 key pairs for testing
-        DBG("\n=== ASSIGNING TO ALL KEY PAIRS ===");
-
-        for (int pairIndex = 0; pairIndex < 10; ++pairIndex)
-        {
-            // Create a new RRSound for each pair
-            RRSound* sound = new RRSound();
-
-            // Load the same file
-            if (sound->loadFromFile(testFile, formatManager))
-            {
-                // Assign to this pair
-                sound->setKeyPairIndex(pairIndex);
-
-                // Add to synthesiser
-                synthesiser.addSound(sound);
-
-                // Get MIDI notes for logging
-                int note1, note2;
-                MidiMapper::getMidiNotesForPair(pairIndex, note1, note2);
-
-                DBG("  Pair " + juce::String(pairIndex) + ": " +
-                    MidiMapper::getKeyPairName(pairIndex) +
-                    " (MIDI " + juce::String(note1) + "/" + juce::String(note2) + ")");
-            }
-        }
-
-        delete templateSound;  // Clean up the template
-
-        DBG("\n✓ Sample assigned to all 10 key pairs!");
-        DBG("Total sounds in synthesiser: " + juce::String(synthesiser.getNumSounds()));
+        // Add to synthesiser
+        synthesiser.addSound(testSound);
 
         DBG("\n=== READY TO PLAY ===");
-        DBG("Try playing across your entire keyboard!");
-        DBG("Each pair should pitch-shift the sample:");
-        DBG("  - Lower pairs (C2-G2) = Lower pitch");
-        DBG("  - Pair 7 (C3/D3 on your keyboard) = Original pitch");
-        DBG("  - Higher pairs (E3-G3) = Higher pitch");
+        DBG("Press C2 (MIDI 36) or D2 (MIDI 38) to hear the sample");
+        DBG("Both keys play at original pitch");
+        DBG("=============================\n");
     }
     else
     {
-        DBG("✗ ERROR: Failed to load sample");
-        delete templateSound;
+        DBG("✗ Failed to load sample");
+        delete testSound;
     }
-
-    DBG("=============================\n");
 }
 
 NewProjectAudioProcessor::~NewProjectAudioProcessor()

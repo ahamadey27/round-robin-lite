@@ -5,8 +5,7 @@
 RRVoice::RRVoice()
 {
     // Set up default ADSR envelope parameters
-    // These create a natural-sounding envelope for samples
-    envelopeParams.attack = 0.01f;   // 10ms attack (quick but not clicky)
+    envelopeParams.attack = 0.01f;   // 10ms attack
     envelopeParams.decay = 0.1f;     // 100ms decay
     envelopeParams.sustain = 1.0f;   // Full sustain level
     envelopeParams.release = 0.1f;   // 100ms release
@@ -25,7 +24,6 @@ RRVoice::~RRVoice()
 bool RRVoice::canPlaySound(juce::SynthesiserSound* sound)
 {
     // We can only play RRSound objects
-    // dynamic_cast returns nullptr if the sound isn't an RRSound
     return dynamic_cast<RRSound*>(sound) != nullptr;
 }
 
@@ -45,17 +43,11 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
         return;
     }
 
-    // Calculate pitch ratio for pitch shifting
-    // Pitch ratio = 2^(semitones/12)
-    // Example: +12 semitones (1 octave up) = 2^(12/12) = 2.0 (play twice as fast)
-    //          -12 semitones (1 octave down) = 2^(-12/12) = 0.5 (play half speed)
-    const int rootNote = currentSound->getRootNote();
-    const int semitoneDiff = midiNoteNumber - rootNote;
-    pitchRatio = std::pow(2.0, semitoneDiff / 12.0);
+    // SIMPLIFIED: Always play at original pitch (no MIDI-based pitch shifting)
+    // Global pitch controls will be added in Phase 3
+    pitchRatio = 1.0;
 
-    DBG("Starting note " + juce::String(midiNoteNumber) +
-        " (root: " + juce::String(rootNote) +
-        ", ratio: " + juce::String(pitchRatio) + ")");
+    DBG("Starting note " + juce::String(midiNoteNumber) + " at original pitch");
 
     // Reset playback to beginning of sample
     sourceSamplePosition = 0.0;
@@ -114,8 +106,7 @@ void RRVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer,
         // Get the current envelope level (0.0 to 1.0)
         const float envelopeLevel = envelope.getNextSample();
 
-        // Simple linear interpolation for pitch shifting
-        // This reads between samples to get smooth pitch changes
+        // Linear interpolation for smooth playback
         const int index0 = static_cast<int>(sourceSamplePosition);
         const int index1 = index0 + 1;
 
@@ -144,7 +135,7 @@ void RRVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer,
         }
 
         // Advance the playback position by the pitch ratio
-        // Higher pitch ratio = faster playback = higher pitch
+        // (For now, always 1.0 = original speed/pitch)
         sourceSamplePosition += pitchRatio;
 
         // Check if envelope has finished (release phase complete)
@@ -162,7 +153,6 @@ void RRVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer,
 void RRVoice::pitchWheelMoved(int /*newPitchWheelValue*/)
 {
     // Could implement pitch bend here in future
-    // For MVP, we'll leave this empty
 }
 
 //==============================================================================
@@ -170,5 +160,4 @@ void RRVoice::pitchWheelMoved(int /*newPitchWheelValue*/)
 void RRVoice::controllerMoved(int /*controllerNumber*/, int /*newControllerValue*/)
 {
     // Could implement mod wheel, expression, etc. here in future
-    // For MVP, we'll leave this empty
 }
