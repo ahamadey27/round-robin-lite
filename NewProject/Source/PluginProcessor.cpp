@@ -33,10 +33,9 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
     DBG("Number of voices: " + juce::String(synthesiser.getNumVoices()));
 
     // ============================================================
-    // TEST: Load a single sample and assign to root key pair
+    // TEST: Load sample and assign to ALL pairs for testing
     // ============================================================
 
-    // IMPORTANT: Change this path to point to your test WAV file
     juce::File testFile("C:\\Users\\hamad\\OneDrive\\Desktop\\snd_surf_hard_dirt_01.wav");
 
     DBG("\n=== LOADING TEST SAMPLE ===");
@@ -45,49 +44,64 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
     if (!testFile.existsAsFile())
     {
         DBG("ERROR: Test file not found!");
-        DBG("Please update the file path in PluginProcessor constructor");
-        DBG("Current path: " + testFile.getFullPathName());
         return;
     }
 
     DBG("File exists! Size: " + juce::String(testFile.getSize()) + " bytes");
 
-    // Create a new RRSound object
-    RRSound* testSound = new RRSound();
+    // Load the sample ONCE into a temporary sound
+    RRSound* templateSound = new RRSound();
 
-    // Try to load the audio file
-    if (testSound->loadFromFile(testFile, formatManager))
+    if (templateSound->loadFromFile(testFile, formatManager))
     {
         DBG("✓ Sample loaded successfully!");
-        DBG("  - Display name: " + testSound->getDisplayName());
-        DBG("  - Sample count: " + juce::String(testSound->getNumSamples()));
-        DBG("  - Sample rate: " + juce::String(testSound->getOriginalSampleRate()) + " Hz");
+        DBG("  - Display name: " + templateSound->getDisplayName());
+        DBG("  - Sample count: " + juce::String(templateSound->getNumSamples()));
+        DBG("  - Sample rate: " + juce::String(templateSound->getOriginalSampleRate()) + " Hz");
 
-        // Assign to pair 7 (C4/D4 - MIDI 60/62) which is the ROOT pair
-        // At root pair, the sample plays at its original pitch (no pitch shift)
-        testSound->setKeyPairIndex(7);
-        DBG("  - Assigned to pair 7: " + MidiMapper::getKeyPairName(7));
+        // Now assign this sample to ALL 10 key pairs for testing
+        DBG("\n=== ASSIGNING TO ALL KEY PAIRS ===");
 
-        // Verify which MIDI notes this sound will respond to
-        int note1, note2;
-        MidiMapper::getMidiNotesForPair(7, note1, note2);
-        DBG("  - MIDI notes: " + juce::String(note1) + " and " + juce::String(note2));
-        DBG("  - Root note: " + juce::String(testSound->getRootNote()));
+        for (int pairIndex = 0; pairIndex < 10; ++pairIndex)
+        {
+            // Create a new RRSound for each pair
+            RRSound* sound = new RRSound();
 
-        // Add the sound to the synthesiser
-        synthesiser.addSound(testSound);
-        DBG("✓ Sound added to synthesiser");
+            // Load the same file
+            if (sound->loadFromFile(testFile, formatManager))
+            {
+                // Assign to this pair
+                sound->setKeyPairIndex(pairIndex);
+
+                // Add to synthesiser
+                synthesiser.addSound(sound);
+
+                // Get MIDI notes for logging
+                int note1, note2;
+                MidiMapper::getMidiNotesForPair(pairIndex, note1, note2);
+
+                DBG("  Pair " + juce::String(pairIndex) + ": " +
+                    MidiMapper::getKeyPairName(pairIndex) +
+                    " (MIDI " + juce::String(note1) + "/" + juce::String(note2) + ")");
+            }
+        }
+
+        delete templateSound;  // Clean up the template
+
+        DBG("\n✓ Sample assigned to all 10 key pairs!");
         DBG("Total sounds in synthesiser: " + juce::String(synthesiser.getNumSounds()));
 
         DBG("\n=== READY TO PLAY ===");
-        DBG("Press MIDI note 60 (C4/Middle C) to hear the sample at original pitch");
-        DBG("Press MIDI note 62 (D4) to hear the sample at original pitch");
-        DBG("Try other notes to hear pitch shifting!");
+        DBG("Try playing across your entire keyboard!");
+        DBG("Each pair should pitch-shift the sample:");
+        DBG("  - Lower pairs (C2-G2) = Lower pitch");
+        DBG("  - Pair 7 (C3/D3 on your keyboard) = Original pitch");
+        DBG("  - Higher pairs (E3-G3) = Higher pitch");
     }
     else
     {
-        DBG("✗ ERROR: Failed to load sample from file");
-        delete testSound;
+        DBG("✗ ERROR: Failed to load sample");
+        delete templateSound;
     }
 
     DBG("=============================\n");
