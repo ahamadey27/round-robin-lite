@@ -2,6 +2,9 @@
 
 <Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <Filter Include="round-robin-lite\Source\Parameters">
+      <UniqueIdentifier>{B3E605E8-83D3-3F00-90FC-A9E50585AE79}</UniqueIdentifier>
+    </Filter>
     <Filter Include="round-robin-lite\Source\Audio">
       <UniqueIdentifier>{73965BAD-CF0D-ED06-3243-8BEA405EFBF8}</UniqueIdentifier>
     </Filter>
@@ -3615,6 +3618,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\ParameterIDs.h">
+      <Filter>round-robin-lite\Source\Parameters</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\Audio\MidiMapper.h">
       <Filter>round-robin-lite\Source\Audio</Filter>
     </ClInclude>

@@ -6,7 +6,9 @@
               pluginCode="rrll" pluginFormats="buildStandalone,buildVST3">
   <MAINGROUP id="ayCzMd" name="round-robin-lite">
     <GROUP id="{16DB8BBD-FC25-C9E3-2064-70988F6ACE3E}" name="Source">
-      <GROUP id="{1BE7E09A-A222-8924-2891-598E28F8EACE}" name="Parameters"/>
+      <GROUP id="{1BE7E09A-A222-8924-2891-598E28F8EACE}" name="Parameters">
+        <FILE id="y6aUbV" name="ParameterIDs.h" compile="0" resource="0" file="Source/ParameterIDs.h"/>
+      </GROUP>
       <GROUP id="{99C4D0AE-47D4-3F1B-8AE2-65E1F59C4A25}" name="Data"/>
       <GROUP id="{BE5F3C22-AB0D-49FF-90E9-8DCE18E735F3}" name="UI"/>
       <GROUP id="{D32DE12E-6532-4C00-71D1-8EC4073A2608}" name="DSP"/>

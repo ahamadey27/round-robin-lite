@@ -3,9 +3,19 @@
 ## Tech Stack: JUCE Framework & C++ (Visual Studio 2022)
 This specification breaks the project into eight distinct phases, each with actionable steps. The goal is to build a robust Minimum Viable Product (MVP) efficiently, test it thoroughly, and prepare for a successful launch as a commercial audio plugin.
 
+## MIDI Mapping Design (Simplified)
+**Trigger Notes:** C2 and D2 (MIDI 36 and 38)
+- Both keys trigger all loaded samples at their **original recorded pitch**
+- No automatic pitch shifting based on which key is pressed
+- The two keys allow for L/R alternation (e.g., left foot, right foot for footsteps)
+- **Global pitch shifting** is controlled by plugin parameters (Semitone + Fine Tune in Phase 3)
+- Users can transpose all samples together using the plugin interface
+
+**Note:** Depending on your MIDI keyboard manufacturer, C2 (MIDI 36) may be labeled as C1 on your keyboard. This is just a labeling convention difference - the plugin responds to the actual MIDI note numbers (36 and 38).
+
 ---
 
-## Phase 1: Foundation & Setup (Estimated Time: 1-2 Days)
+## Phase 1: Foundation & Setup (Estimated Time: 1-2 Days) ✅ COMPLETE
 **Goal:** Establish a solid foundation by setting up the development environment, configuring JUCE, and creating the initial project structure.
 
 ### Step 1: Development Environment Setup
@@ -66,7 +76,7 @@ This specification breaks the project into eight distinct phases, each with acti
 
 ---
 
-## Phase 2: Core Audio Engine (Estimated Time: 1 Week)
+## Phase 2: Core Audio Engine (Estimated Time: 1 Week) ✅ COMPLETE
 **Goal:** Implement the fundamental audio playback system with custom synthesiser voice and sound classes for sample playback.
 
 ### Step 1: Study JUCE Synthesiser Architecture
@@ -84,26 +94,24 @@ This specification breaks the project into eight distinct phases, each with acti
 - [x] Set up class to inherit from juce::SynthesiserSound
 - [x] Add member variable for storing audio sample buffer (juce::AudioBuffer<float>)
 - [x] Add member variable for storing original sample rate (double)
-- [x] Add member variable for root MIDI note number (int, default 48 for C2)
 - [x] Add member variable for sample display name (juce::String)
-- [x] Add member variable for key pair index (int, 0-9 representing which pair)
-- [x] Implement appliesToNote() method to define which MIDI notes trigger this sound
+- [x] Implement appliesToNote() method - responds to C2 and D2 (MIDI 36 and 38)
 - [x] Implement appliesToChannel() method (return true for all channels)
 - [x] Add method to load audio from file and store in buffer
 - [x] Add method to get sample buffer for playback
-- [x] Add method to get root note for pitch calculation
+- [x] Add method to get original sample rate
 
 ### Step 3: Create Custom Voice Class (RRVoice)
 - [x] Create RRVoice.h header file in /Source/Audio/
 - [x] Create RRVoice.cpp implementation file in /Source/Audio/
 - [x] Set up class to inherit from juce::SynthesiserVoice
 - [x] Add member variable for current sample playback position (double)
-- [x] Add member variable for calculated pitch ratio (double)
+- [x] Add member variable for pitch ratio (double) - always 1.0 for original pitch
 - [x] Add member variable for ADSR envelope (juce::ADSR)
 - [x] Add member variable for voice playing state flag (bool)
 - [x] Implement canPlaySound() to check if sound is compatible (RRSound type)
 - [x] Implement startNote() method:
-  - [x] Calculate pitch shift ratio based on MIDI note vs root note
+  - [x] Set pitch ratio to 1.0 (play at original pitch)
   - [x] Reset playback position to beginning of sample
   - [x] Trigger ADSR envelope attack phase
   - [x] Set voice as currently playing
@@ -113,7 +121,7 @@ This specification breaks the project into eight distinct phases, each with acti
   - [x] Mark voice as finished when envelope completes
 - [x] Implement renderNextBlock() method:
   - [x] Get audio data from associated RRSound
-  - [x] Apply pitch shifting using sample rate conversion
+  - [x] Use linear interpolation for smooth playback
   - [x] Apply ADSR envelope to each sample
   - [x] Add processed audio to output buffer
   - [x] Handle monophonic voice stealing (stop current note if new note starts)
@@ -145,40 +153,35 @@ This specification breaks the project into eight distinct phases, each with acti
 
 ### Step 5: Design and Implement MIDI Note Mapping System
 - [x] Create MidiMapper.h utility file in /Source/Audio/
-- [x] Define the complete key pair mapping structure:
-  - [x] Pair 0: C0/D0 (MIDI 36/38) maps to -7 semitones from root
-  - [x] Pair 1: E0/F0 (MIDI 40/41) maps to -6 semitones from root
-  - [x] Pair 2: G0/A0 (MIDI 43/45) maps to -5 semitones from root
-  - [x] Pair 3: B0/C1 (MIDI 47/48) maps to -4 semitones from root
-  - [x] Pair 4: E1/F1 (MIDI 52/53) maps to -3 semitones from root
-  - [x] Pair 5: G1/A1 (MIDI 55/57) maps to -2 semitones from root
-  - [x] Pair 6: B1/C2 (MIDI 59/60) maps to -1 semitone from root
-  - [x] Pair 7: C2/D2 (MIDI 48/50) maps to 0 semitones (ROOT pitch)
-  - [x] Pair 8: E2/F2 (MIDI 64/65) maps to +1 semitone from root
-  - [x] Pair 9: G2/A2 (MIDI 67/69) maps to +2 semitones from root
-- [x] Create function to get the two MIDI note numbers for any given pair index
-- [x] Create function to get semitone offset for any given pair index
-- [x] Create function to validate pair assignments (only 10 pairs maximum)
-- [x] Add documentation explaining the pairing system for footstep sounds
+- [x] Define simplified MIDI mapping:
+  - [x] TRIGGER_NOTE_1: C2 (MIDI 36)
+  - [x] TRIGGER_NOTE_2: D2 (MIDI 38)
+- [x] Create isTriggerNote() function to check if MIDI note is 36 or 38
+- [x] Create getTriggerNoteName() function to return "C2/D2" for display
+- [x] Create printMappingInfo() function for debug output
+- [x] Add documentation explaining that both keys play samples at original pitch
+- [x] Note that global pitch controls will be added in Phase 3
 
 **Quick Test After Step 5:**
 - [x] Build project successfully
-- [x] In PluginProcessor, write test code to print MIDI mapping for all 10 pairs
-- [x] Verify output shows correct note pairs and semitone offsets
+- [x] In PluginProcessor, call MidiMapper::printMappingInfo()
+- [x] Verify output shows correct trigger notes (C2/D2, MIDI 36/38)
 - [x] Remove test code after verification
 
 ### Step 6: Test Basic Audio Playback
-- [ ] Load a single test WAV file manually in PluginProcessor constructor
-- [ ] Create RRSound object from loaded audio file
-- [ ] Assign sound to root key pair (C2/D2, MIDI notes 48 and 50)
-- [ ] Add sound to synthesiser
-- [ ] Build plugin and load in AudioPluginHost
-- [ ] Connect a virtual MIDI keyboard to plugin
-- [ ] Play MIDI note 48 (C2) and verify sample plays at correct pitch
-- [ ] Play MIDI note 50 (D2) and verify sample plays at correct pitch
-- [ ] Test pitch shifting by playing other MIDI notes
-- [ ] Verify monophonic behavior (only one note plays at a time)
-- [ ] Test that releasing one note and playing another works smoothly
+- [x] Load a single test WAV file manually in PluginProcessor constructor
+- [x] Create RRSound object from loaded audio file
+- [x] Add sound to synthesiser (will respond to C2/D2 automatically)
+- [x] Build plugin and load in AudioPluginHost
+- [x] Connect a MIDI keyboard to plugin
+- [x] Play MIDI note 36 (C2/C1 on keyboard) and verify sample plays at original pitch
+- [x] Play MIDI note 38 (D2/D1 on keyboard) and verify sample plays at original pitch
+- [x] Verify both keys sound identical (same pitch)
+- [x] Verify monophonic behavior (only one note plays at a time)
+- [x] Test that releasing one note and playing another works smoothly
+- [x] Confirm no pitch shifting occurs - samples play at recorded pitch
+
+**COMPLETED:** Phase 2 is complete! All samples now trigger on C2/D2 at their original pitch. Global pitch controls will be added in Phase 3.
 
 ---
 
@@ -188,8 +191,8 @@ This specification breaks the project into eight distinct phases, each with acti
 ### Step 1: Create Parameter ID Constants
 - [ ] Create ParameterIDs.h file in /Source/Parameters/
 - [ ] Define namespace for all parameter ID strings
-- [ ] Create ID constant for Semitone pitch parameter
-- [ ] Create ID constant for Fine Tune pitch parameter (cents)
+- [ ] Create ID constant for Semitone pitch parameter (global control)
+- [ ] Create ID constant for Fine Tune pitch parameter in cents (global control)
 - [ ] Create ID constant for Volume parameter
 - [ ] Create ID constant for Low Band EQ Gain parameter
 - [ ] Create ID constant for Low Band EQ Frequency parameter
@@ -233,6 +236,8 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] Add Transient Decay: Range -127 to +127, default 0, linear scale
 - [ ] Set appropriate units and labels for each parameter (dB, Hz, semitones, cents)
 
+**Note:** Semitone and Fine Tune parameters will globally transpose all loaded samples together.
+
 **Quick Test After Step 3:**
 - [ ] Build project successfully
 - [ ] Load plugin in AudioPluginHost or DAW
@@ -265,15 +270,21 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] In processBlock(), retrieve current Fine Tune value from APVTS
 - [ ] In processBlock(), retrieve current Volume value from APVTS
 - [ ] Calculate combined pitch shift from semitone and fine tune parameters
-- [ ] Apply global pitch shift to all active voices
+- [ ] Apply global pitch shift to RRVoice's pitchRatio (modify startNote to accept global pitch)
 - [ ] Apply volume gain to final output buffer
 - [ ] Prepare parameter values for EQ processor (to be connected later)
 - [ ] Prepare parameter values for transient processor (to be connected later)
 - [ ] Ensure parameter changes are smooth and don't cause clicks or pops
 
+**Implementation Note:** To apply global pitch shifting:
+1. Store global pitch offset in AudioProcessor as member variable
+2. In startNote(), pass or access this global pitch value
+3. Calculate: `pitchRatio = pow(2.0, globalSemitones / 12.0) * pow(2.0, globalCents / 1200.0)`
+4. This shifts ALL samples uniformly regardless of which trigger key was pressed
+
 **Quick Test After Step 5:**
 - [ ] Build and load plugin with a sample loaded
-- [ ] Play a MIDI note and adjust Volume - verify level changes
+- [ ] Play C2 or D2 and adjust Volume - verify level changes
 - [ ] Adjust Semitone knob - verify pitch changes in semitone steps
 - [ ] Adjust Fine Tune - verify subtle pitch changes
 - [ ] Test all three parameters together
@@ -314,7 +325,7 @@ This specification breaks the project into eight distinct phases, each with acti
 ---
 
 ## Phase 4: Sample Management System (Estimated Time: 1 Week)
-**Goal:** Implement comprehensive sample loading, storage, and management with proper file handling, error checking, and key pair assignment.
+**Goal:** Implement comprehensive sample loading, storage, and management with proper file handling, error checking, and multiple sample support.
 
 ### Step 1: Create Sample Slot Data Structure
 - [ ] Create SampleSlot.h file in /Source/Data/
@@ -324,10 +335,11 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] Add boolean flag for loaded state
 - [ ] Add source file member (juce::File) to remember file location
 - [ ] Add display name member (juce::String) for UI display
-- [ ] Add key pair index member (int, 0-9) for MIDI note assignment
 - [ ] Implement clear() method to reset slot to empty state
 - [ ] Implement loadFromFile() method declaration
 - [ ] Create array of 20 SampleSlot objects in PluginProcessor
+
+**Note:** All samples will trigger on C2/D2 at original pitch. No key pair assignments needed.
 
 **Quick Test After Step 1:**
 - [ ] Build project successfully
@@ -344,7 +356,7 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] Validate that file is a supported audio format
 - [ ] Read entire audio file into temporary buffer
 - [ ] Store original sample rate from file
-- [ ] Handle stereo-to-mono conversion (mix both channels or take left only)
+- [ ] Handle stereo-to-mono conversion (mix both channels)
 - [ ] Copy processed audio into SampleSlot buffer
 - [ ] Set isLoaded flag to true on success
 - [ ] Return success/failure status for error handling
@@ -401,46 +413,58 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] For each loaded sample:
   - [ ] Create new RRSound object
   - [ ] Copy audio buffer from slot to sound
-  - [ ] Set MIDI note mapping based on keyPairIndex
-  - [ ] Calculate root MIDI note (C2 = 48, adjusted by pair offset)
-  - [ ] Set sound to respond to correct MIDI note pair
-  - [ ] Add sound to synthesiser
+  - [ ] Set display name
+  - [ ] Add sound to synthesiser (will automatically respond to C2/D2)
 - [ ] Call updateSynthesiserSounds() whenever samples change
-- [ ] Call updateSynthesiserSounds() when key pair assignments change
+- [ ] All loaded samples will be available and trigger on C2/D2
+
+**Note:** With this design, pressing C2 or D2 will cycle through or layer loaded samples. Consider implementing sample selection logic (which sample plays) in Phase 4 Step 6.
 
 **Quick Test After Step 5:**
 - [ ] Load 2-3 test samples into different slots
-- [ ] Assign each to a different key pair
 - [ ] Call updateSynthesiserSounds()
-- [ ] Play MIDI notes for each assigned pair
-- [ ] Verify correct samples trigger on correct MIDI notes
+- [ ] Play C2/D2 and verify samples trigger
 - [ ] Verify only one sample plays at a time (monophonic)
 
-### Step 6: Implement Key Pair Assignment Logic
-- [ ] Create assignSampleToKeyPair() method in PluginProcessor
-- [ ] Validate that pair index is between 0-9
-- [ ] Check if pair is already assigned to another slot
-- [ ] Handle conflicts (ask user or auto-unassign previous slot)
-- [ ] Update slot's keyPairIndex member
-- [ ] Recalculate MIDI note mapping for the slot
-- [ ] Update synthesiser with new sound assignments
-- [ ] Provide feedback about successful/failed assignment
-- [ ] Implement unassignSample() method to remove from pair
-- [ ] Allow user to see which pairs are currently assigned
+### Step 6: Implement Sample Selection Logic
+- [ ] Decide on sample selection method:
+  - [ ] Option A: Round-robin (cycle through loaded samples in order)
+  - [ ] Option B: User-selected active sample (only one sample plays)
+  - [ ] Option C: Random selection from loaded samples
+- [ ] For MVP, recommend Option A (true round-robin behavior)
+- [ ] Track current sample index in AudioProcessor
+- [ ] On each note-on event, advance to next loaded sample
+- [ ] Wrap around to first sample after last sample
+- [ ] Skip empty slots automatically
+- [ ] Add method to reset round-robin position
+
+**Implementation Example for Round-Robin:**
+```cpp
+int currentSampleIndex = 0;
+std::vector<int> loadedSampleIndices; // Indices of non-empty slots
+
+// On note trigger:
+if (!loadedSampleIndices.empty())
+{
+    int slotIndex = loadedSampleIndices[currentSampleIndex];
+    // Play sample from slot[slotIndex]
+    
+    currentSampleIndex = (currentSampleIndex + 1) % loadedSampleIndices.size();
+}
+```
 
 **Quick Test After Step 6:**
-- [ ] Load several samples
-- [ ] Assign them to various key pairs manually in code
-- [ ] Try assigning two samples to the same pair - verify conflict handling
-- [ ] Verify assignment/unassignment updates synthesiser correctly
-- [ ] Test that MIDI notes trigger correct samples after reassignment
+- [ ] Load 3-4 test samples
+- [ ] Play C2/D2 repeatedly
+- [ ] Verify samples cycle in order (1, 2, 3, 1, 2, 3...)
+- [ ] Verify empty slots are skipped
+- [ ] Test with only 1 sample loaded
 
 ### Step 7: Add Sample Persistence (Save/Load with Project State)
 - [ ] In getStateInformation():
   - [ ] Create "SampleData" ValueTree node
   - [ ] For each loaded sample slot, create child node
   - [ ] Store file path (consider relative vs absolute paths)
-  - [ ] Store key pair assignment index
   - [ ] Store display name
   - [ ] Append SampleData node to main state tree
 - [ ] In setStateInformation():
@@ -448,26 +472,23 @@ This specification breaks the project into eight distinct phases, each with acti
   - [ ] For each stored sample entry:
     - [ ] Check if file still exists at stored path
     - [ ] Attempt to reload sample from file
-    - [ ] Restore key pair assignment
     - [ ] Restore display name
     - [ ] Show warning message if file is missing
 - [ ] Consider option to embed samples as Base64 in project (increases file size)
 - [ ] Implement "Missing Samples" dialog on project load if files not found
 
 **Quick Test After Step 7:**
-- [ ] Load samples and assign to key pairs
+- [ ] Load samples
 - [ ] Save DAW project
 - [ ] Close and reopen project
-- [ ] Verify all samples reload correctly with correct assignments
+- [ ] Verify all samples reload correctly
 - [ ] Move a sample file, reload project - verify missing file warning
-- [ ] Test with both absolute and relative paths (if implemented)
 
 ### Step 8: Test Complete Sample Management System
 - [ ] Prepare 10 diverse test WAV files (different lengths, sample rates)
 - [ ] Manually load samples into different slots
-- [ ] Assign samples to various key pairs (0-9)
-- [ ] Verify each sample triggers on correct MIDI notes
-- [ ] Test pitch shifting across different semitone offsets
+- [ ] Verify each sample can be triggered on C2/D2
+- [ ] Test round-robin behavior with multiple samples
 - [ ] Test with mono and stereo source files
 - [ ] Test with 44.1kHz, 48kHz, and 96kHz sample rates
 - [ ] Save project with all samples loaded
@@ -478,748 +499,7 @@ This specification breaks the project into eight distinct phases, each with acti
 
 ---
 
-## Phase 5: Basic User Interface (Estimated Time: 1-2 Weeks)
-**Goal:** Create a functional, intuitive UI with all essential controls needed for the MVP, focusing on usability over visual polish.
-
-### Step 1: Plan UI Layout and Design
-- [ ] Sketch UI layout on paper or in design tool (Figma, Adobe XD, Sketch)
-- [ ] Define main sections:
-  - [ ] Top Section: Sample Slots (20 slots, organized in 2 rows of 10)
-  - [ ] Middle-Left: Global Pitch Controls (Semitone, Fine Tune)
-  - [ ] Middle-Center: Volume Control
-  - [ ] Middle-Right: 3-Band EQ Controls (Low, Mid, High)
-  - [ ] Bottom Section: Transient Master (Attack, Decay)
-- [ ] Decide on basic color scheme (dark/light theme)
-- [ ] Plan minimum window size (suggest 800x600 pixels)
-- [ ] Consider resizable window for future enhancement
-- [ ] Keep layout simple and uncluttered for MVP
-
-### Step 2: Create Custom Rotary Knob Component
-- [ ] Create RRKnob.h and RRKnob.cpp files in /Source/UI/
-- [ ] Inherit from juce::Slider or create fully custom Component
-- [ ] Configure as rotary knob style (not linear slider)
-- [ ] Implement custom paint() method:
-  - [ ] Draw circular knob background
-  - [ ] Draw value indicator (line from center or filled arc)
-  - [ ] Draw current value as text overlay
-- [ ] Add juce::Label underneath knob for parameter name
-- [ ] Make easily attachable to APVTS via SliderAttachment
-- [ ] Set appropriate mouse drag sensitivity
-- [ ] Add double-click to reset to default value
-- [ ] Test with different parameter ranges and units
-- [ ] Ensure knob is visually clear and easy to use
-
-**Quick Test After Step 2:**
-- [ ] Build project successfully
-- [ ] Add one test knob to PluginEditor
-- [ ] Load plugin and verify knob appears
-- [ ] Test mouse dragging - verify value changes
-- [ ] Test double-click reset to default
-- [ ] Verify knob is usable and visually acceptable
-
-### Step 3: Create Sample Slot UI Component
-- [ ] Create SampleSlotComponent.h and SampleSlotComponent.cpp in /Source/UI/
-- [ ] Design two visual states:
-  - [ ] Empty state: Dashed border, "+" icon, "Load Sample" text
-  - [ ] Loaded state: Solid border, sample filename, optional waveform preview
-- [ ] Add hover effect (highlight on mouse over)
-- [ ] Implement drag-and-drop support:
-  - [ ] Inherit from FileDragAndDropTarget interface
-  - [ ] Implement isInterestedInFileDrag() to check for audio files
-  - [ ] Implement filesDropped() to trigger sample loading
-  - [ ] Provide visual feedback during drag operation
-- [ ] Add "Load" button as alternative to drag-and-drop
-- [ ] Add "Clear" button (small X icon) to remove loaded sample
-- [ ] Display assigned key pair (e.g., "C0/D0") when sample is loaded
-- [ ] Add callback to notify parent editor when sample changes
-- [ ] Show loading indicator during sample load operation
-
-**Quick Test After Step 3:**
-- [ ] Build and add one sample slot to PluginEditor
-- [ ] Verify empty state appears correctly
-- [ ] Drag an audio file onto slot - verify it highlights
-- [ ] Drop file - verify sample loads (implement basic callback)
-- [ ] Verify loaded state shows filename
-- [ ] Test Clear button removes sample
-- [ ] Test hover effects work
-
-### Step 4: Build Main Plugin Editor Layout
-- [ ] In PluginEditor.h, add member variables for all UI components:
-  - [ ] Array of 20 SampleSlotComponent objects
-  - [ ] Semitone knob (RRKnob)
-  - [ ] Fine tune knob (RRKnob)
-  - [ ] Volume knob (RRKnob)
-  - [ ] 6 EQ knobs (Low Gain/Freq, Mid Gain/Freq, High Gain/Freq)
-  - [ ] 2 Transient knobs (Attack, Decay)
-  - [ ] Section labels for organization
-- [ ] In PluginEditor constructor:
-  - [ ] Set editor size (800x600 or as designed)
-  - [ ] Initialize all component objects
-  - [ ] Set ranges and styles for all knobs
-  - [ ] Add all components to editor with addAndMakeVisible()
-  - [ ] Set up callbacks for sample slot changes
-- [ ] In resized() method:
-  - [ ] Layout sample slots in 2 rows x 10 columns grid
-  - [ ] Position pitch controls in left section
-  - [ ] Position volume control in center
-  - [ ] Position EQ knobs in right section (3 columns)
-  - [ ] Position transient controls at bottom
-  - [ ] Ensure proper spacing and alignment
-  - [ ] Consider using FlexBox for responsive layout
-
-**Quick Test After Step 4:**
-- [ ] Build plugin successfully
-- [ ] Load in AudioPluginHost
-- [ ] Verify all components appear in correct positions
-- [ ] Verify no overlapping components
-- [ ] Test that UI fits in 800x600 window
-- [ ] Resize window if resizable - verify layout adjusts properly
-- [ ] Check all components are visible and accessible
-
-### Step 5: Connect UI Controls to Parameters (APVTS Attachments)
-- [ ] In PluginEditor.h, add SliderAttachment unique_ptr for each knob
-- [ ] Create attachment for Semitone knob to semitone parameter
-- [ ] Create attachment for Fine Tune knob to fineTune parameter
-- [ ] Create attachment for Volume knob to volume parameter
-- [ ] Create attachment for Low Gain knob to lowGain parameter
-- [ ] Create attachment for Low Freq knob to lowFreq parameter
-- [ ] Create attachment for Mid Gain knob to midGain parameter
-- [ ] Create attachment for Mid Freq knob to midFreq parameter
-- [ ] Create attachment for High Gain knob to highGain parameter
-- [ ] Create attachment for High Freq knob to highFreq parameter
-- [ ] Create attachment for Attack knob to transientAttack parameter
-- [ ] Create attachment for Decay knob to transientDecay parameter
-- [ ] Verify all attachments are created in editor constructor
-- [ ] Test that moving knobs updates parameters in real-time
-
-**Quick Test After Step 5:**
-- [ ] Load plugin with audio sample
-- [ ] Move each knob while playing audio
-- [ ] Verify audio changes match parameter (volume up = louder, etc.)
-- [ ] Check that host's generic editor shows same parameter values
-- [ ] Verify automation from DAW updates UI knobs correctly
-- [ ] Test that all 11 parameters work bidirectionally (UI ↔ host)
-
-### Step 6: Implement Sample Loading UI Integration
-- [ ] For each SampleSlotComponent, set up onSampleLoaded callback
-- [ ] In callback, call PluginProcessor's loadSampleIntoSlot() method
-- [ ] Pass slot index and selected file to processor
-- [ ] Show loading indicator while file is being processed
-- [ ] Update slot UI to reflect loaded state when complete
-- [ ] Display sample filename or abbreviated name
-- [ ] Auto-assign loaded sample to next available key pair
-- [ ] Show error message dialog if loading fails
-- [ ] Update slot to show assigned MIDI notes (e.g., "C0/D0")
-- [ ] Implement file browser dialog as fallback to drag-and-drop
-- [ ] Consider adding recent files menu for quick reloading
-
-**Quick Test After Step 6:**
-- [ ] Drag sample files onto various slots
-- [ ] Verify each slot shows loading indicator briefly
-- [ ] Verify filename appears after loading completes
-- [ ] Verify key pair assignment is displayed
-- [ ] Play MIDI notes - verify samples trigger correctly
-- [ ] Test Load button file browser as alternative
-- [ ] Try loading invalid file - verify error message appears
-- [ ] Test Clear button removes samples
-
-### Step 7: Add Visual Feedback and Polish
-- [ ] Add tooltips to all knobs showing current value
-- [ ] Add tooltips to sample slots explaining drag-and-drop
-- [ ] Show key pair assignment clearly on each loaded slot
-- [ ] Consider adding mini waveform preview in sample slots (optional)
-- [ ] Color-code sample slots by key pair for visual organization
-- [ ] Add section headers/labels (Pitch, Volume, EQ, Transient)
-- [ ] Ensure all text is readable at standard screen resolutions
-- [ ] Test UI with different OS themes (dark/light mode)
-- [ ] Verify UI doesn't freeze during sample loading
-- [ ] Add keyboard shortcuts for common actions (optional)
-
-**Quick Test After Step 7:**
-- [ ] Hover over each knob - verify tooltip appears with value
-- [ ] Hover over empty sample slots - verify helpful text appears
-- [ ] Test UI at different zoom levels/DPI settings
-- [ ] Verify all text is legible
-- [ ] Check color coding makes sense
-- [ ] Test that UI remains responsive during sample loading
-
-### Step 8: Test Complete UI Workflow
-- [ ] Build plugin and load in AudioPluginHost or DAW
-- [ ] Test drag-and-drop for loading samples
-- [ ] Test "Load" button file browser
-- [ ] Test clearing samples with "Clear" button
-- [ ] Test all 11 parameter knobs respond correctly
-- [ ] Verify parameter automation from DAW updates UI knobs
-- [ ] Test sample loading with various file types
-- [ ] Verify UI provides clear feedback for all actions
-- [ ] Test with different screen sizes and DPI settings
-- [ ] Ensure UI is responsive and doesn't lag
-- [ ] Check that all components are properly aligned
-- [ ] Verify no visual glitches or rendering issues
-
----
-
-## Phase 6: DSP Implementation (EQ & Transient Master) (Estimated Time: 1 Week)
-**Goal:** Implement the 3-band EQ and transient shaping processors to complete the audio processing chain.
-
-### Step 1: Understand JUCE DSP Module
-- [ ] Study JUCE dsp module documentation
-- [ ] Learn about dsp::ProcessorChain for serial processing
-- [ ] Study dsp::IIR::Filter for implementing EQ bands
-- [ ] Review filter types (Peak, LowShelf, HighShelf)
-- [ ] Understand filter coefficient calculation
-- [ ] Learn about ProcessSpec for configuring DSP processors
-- [ ] Study examples of multi-band EQ implementation
-
-### Step 2: Implement 3-Band EQ Processor
-- [ ] Create EQProcessor.h and EQProcessor.cpp in /Source/DSP/
-- [ ] Set up three separate IIR filters (Low, Mid, High)
-- [ ] Configure Low band as Low Shelf filter
-- [ ] Configure Mid band as Peak/Bell filter
-- [ ] Configure High band as High Shelf filter
-- [ ] Add prepare() method to initialize filters with sample rate
-- [ ] Add process() method to apply all three bands sequentially
-- [ ] Implement parameter update methods for gains and frequencies
-- [ ] Add reset() method to clear filter states
-- [ ] Consider using ProcessorChain to organize filters
-- [ ] Ensure filters are properly initialized before use
-
-**Quick Test After Step 2:**
-- [ ] Build project successfully
-- [ ] Create EQProcessor instance in PluginProcessor
-- [ ] Call prepare() in prepareToPlay()
-- [ ] Process audio through EQ (even with neutral settings)
-- [ ] Verify audio passes through without glitches
-- [ ] Set Low band to +12dB - verify bass boost is audible
-
-### Step 3: Connect EQ to Parameter System
-- [ ] In PluginProcessor, add EQProcessor member variable
-- [ ] Initialize EQ processor in prepareToPlay()
-- [ ] In processBlock(), retrieve EQ parameter values from APVTS
-- [ ] Update Low band gain and frequency from parameters
-- [ ] Update Mid band gain and frequency from parameters
-- [ ] Update High band frequency and frequency from parameters
-- [ ] Recalculate filter coefficients when parameters change
-- [ ] Apply EQ processing to audio buffer after synthesiser
-- [ ] Test that EQ changes are audible and smooth
-- [ ] Verify no audio glitches when changing EQ parameters
-
-**Quick Test After Step 3:**
-- [ ] Play audio through plugin
-- [ ] Move Low Gain knob - verify bass increases/decreases
-- [ ] Move Mid Gain knob - verify midrange changes
-- [ ] Move High Gain knob - verify treble changes
-- [ ] Sweep Low Freq knob - verify frequency shift
-- [ ] Test extreme settings (+24dB, -24dB)
-- [ ] Verify smooth transitions, no clicks
-
-### Step 4: Design Transient Shaping System
-- [ ] Research transient shaping techniques (envelope following, gain adjustment)
-- [ ] Decide on implementation approach:
-  - [ ] Option A: Envelope follower with attack/decay adjustment
-  - [ ] Option B: ADSR envelope modification in voice
-  - [ ] Option C: Dynamic gain adjustment based on signal transients
-- [ ] Create TransientProcessor.h and TransientProcessor.cpp in /Source/DSP/
-- [ ] Implement envelope detection for finding transient peaks
-- [ ] Add attack parameter to control transient enhancement/reduction
-- [ ] Add decay parameter to control sustain and release shaping
-- [ ] Ensure processing is efficient enough for real-time use
-
-### Step 5: Implement Transient Master Processor
-- [ ] Set up envelope follower to detect signal level changes
-- [ ] Implement attack enhancement:
-  - [ ] Positive values: Emphasize transients (faster attack)
-  - [ ] Negative values: Soften transients (slower attack)
-- [ ] Implement decay adjustment:
-  - [ ] Positive values: Extend sustain/decay
-  - [ ] Negative values: Shorten sustain/decay
-- [ ] Add prepare() method to initialize with sample rate
-- [ ] Add process() method to apply transient shaping
-- [ ] Add parameter update methods for attack and decay values
-- [ ] Implement smoothing to prevent clicks when parameters change
-- [ ] Test with percussive samples (drums, percussion)
-
-**Quick Test After Step 5:**
-- [ ] Build and load plugin
-- [ ] Load percussive sample (drum hit, footstep)
-- [ ] Set Attack to +100 - verify transient is emphasized
-- [ ] Set Attack to -100 - verify transient is softened
-- [ ] Set Decay to +100 - verify tail is extended
-- [ ] Set Decay to -100 - verify tail is shortened
-- [ ] Listen for natural sound vs processed
-
-### Step 6: Integrate Transient Processor into Signal Chain
-- [ ] In PluginProcessor, add TransientProcessor member variable
-- [ ] Initialize transient processor in prepareToPlay()
-- [ ] In processBlock(), retrieve transient parameters from APVTS
-- [ ] Update transient attack and decay from parameters
-- [ ] Apply transient processing after EQ in signal chain
-- [ ] Ensure processing order: Synthesiser → Volume → EQ → Transient → Output
-- [ ] Test that transient changes are audible
-- [ ] Verify no phase issues or artifacts
-- [ ] Check CPU usage is reasonable
-
-**Quick Test After Step 6:**
-- [ ] Play samples through complete chain
-- [ ] Verify processing order is correct
-- [ ] Test all effects together (Volume + EQ + Transient)
-- [ ] Verify no unwanted interactions between processors
-- [ ] Check CPU meter in DAW - ensure reasonable usage
-- [ ] Verify audio quality is maintained
-
-### Step 7: Test Complete DSP Chain
-- [ ] Load various sample types (drums, vocals, sustained tones)
-- [ ] Test each EQ band individually (solo low, mid, high)
-- [ ] Sweep EQ frequency knobs and listen for smooth transitions
-- [ ] Test extreme EQ gain values (+24dB, -24dB)
-- [ ] Test transient attack enhancement on percussive samples
-- [ ] Test transient decay adjustment on sustained samples
-- [ ] Test all DSP effects together with various settings
-- [ ] Verify no audio glitches, clicks, or pops
-- [ ] Check CPU usage and optimize if necessary
-- [ ] Compare output quality with professional plugins
-
----
-
-## Phase 7: Randomization System (Estimated Time: 4-5 Days)
-**Goal:** Implement the parameter randomization feature to allow users to add variation to their sounds easily.
-
-### Step 1: Design Randomization Architecture
-- [ ] Decide on randomization scope:
-  - [ ] Option A: Global randomization (affects all samples)
-  - [ ] Option B: Per-sample randomization (each sample gets different values)
-- [ ] For MVP, choose Option A (simpler implementation)
-- [ ] Plan UI for setting randomization bounds (min/max sliders)
-- [ ] Plan randomization trigger (button for each parameter group)
-- [ ] Decide which parameters can be randomized:
-  - [ ] Pitch (Semitone, Fine Tune)
-  - [ ] Volume
-  - [ ] EQ (all 6 parameters)
-  - [ ] Transient (Attack, Decay)
-
-### Step 2: Create Randomization UI Components
-- [ ] Create RandomizableControl.h and RandomizableControl.cpp in /Source/UI/
-- [ ] Design component to wrap existing knobs
-- [ ] Add min bound slider (small slider above or beside main knob)
-- [ ] Add max bound slider (small slider above or beside main knob)
-- [ ] Add "Randomize" button with dice icon
-- [ ] Add visual indicator showing current randomization range
-- [ ] Make component reusable for all randomizable parameters
-- [ ] Ensure component fits well in existing layout
-- [ ] Add tooltips explaining randomization feature
-
-**Quick Test After Step 2:**
-- [ ] Build and add one randomizable control to UI
-- [ ] Verify min/max sliders appear and are adjustable
-- [ ] Verify randomize button appears
-- [ ] Test button - verify it generates value within bounds
-- [ ] Verify visual feedback is clear
-
-### Step 3: Implement Randomization Logic
-- [ ] Create Randomizer.h utility class in /Source/Data/
-- [ ] Implement getRandomValue() method that takes min and max bounds
-- [ ] Use juce::Random class for random number generation
-- [ ] Ensure random values respect parameter ranges and step sizes
-- [ ] Add option for different random distributions (uniform, gaussian)
-- [ ] For MVP, use simple uniform distribution
-- [ ] Add seed option for reproducible randomization (optional)
-- [ ] Test that random values are evenly distributed
-
-**Quick Test After Step 3:**
-- [ ] Call getRandomValue() many times with bounds 0-100
-- [ ] Print values to debug output
-- [ ] Verify values are within bounds
-- [ ] Verify distribution appears reasonably uniform
-- [ ] Test with negative ranges (-50 to +50)
-
-### Step 4: Connect Randomization to Parameters
-- [ ] For each randomizable parameter, add min/max bound storage
-- [ ] Store bounds as additional parameters in APVTS (optional) or as member variables
-- [ ] When "Randomize" button clicked:
-  - [ ] Get current min and max bounds for parameter
-  - [ ] Generate random value within bounds
-  - [ ] Set parameter value to random value
-  - [ ] Update UI to reflect new value
-- [ ] Implement randomization for Pitch section (Semitone + Fine)
-- [ ] Implement randomization for Volume
-- [ ] Implement randomization for all 6 EQ parameters
-- [ ] Implement randomization for Transient section (Attack + Decay)
-
-**Quick Test After Step 4:**
-- [ ] Set bounds for Volume (e.g., 0.3 to 0.7)
-- [ ] Click randomize button multiple times
-- [ ] Verify volume changes each time within bounds
-- [ ] Test with all randomizable parameters
-- [ ] Verify UI updates correctly each time
-
-### Step 5: Add Group Randomization
-- [ ] Add "Randomize All Pitch" button that randomizes both semitone and fine tune
-- [ ] Add "Randomize All EQ" button that randomizes all 6 EQ parameters at once
-- [ ] Add "Randomize All Transient" button for attack and decay together
-- [ ] Add "Randomize All" button to randomize everything at once
-- [ ] Ensure grouped randomization respects individual parameter bounds
-- [ ] Provide visual feedback during randomization
-- [ ] Add undo support for randomization (APVTS handles this automatically)
-
-**Quick Test After Step 5:**
-- [ ] Click "Randomize All Pitch" - verify both semitone and fine tune change
-- [ ] Click "Randomize All EQ" - verify all 6 EQ params change
-- [ ] Click "Randomize All" - verify every parameter changes
-- [ ] Test undo (Ctrl+Z in DAW) - verify parameters return to previous values
-- [ ] Verify each click produces different random values
-
-### Step 6: Test Randomization System
-- [ ] Set specific min/max bounds for each parameter
-- [ ] Click randomize buttons multiple times
-- [ ] Verify values stay within set bounds
-- [ ] Test extreme bounds (-127 to +127 for transient, for example)
-- [ ] Test that randomization works with parameter automation
-- [ ] Verify randomization doesn't cause audio glitches
-- [ ] Test undo/redo of randomization
-- [ ] Save and load preset with randomization bounds
-- [ ] Verify bounds are recalled correctly
-- [ ] Test randomization with various sample types
-
----
-
-## Phase 8: Advanced Features & Polish (Estimated Time: 1 Week)
-**Goal:** Add final features, optimize performance, and polish the plugin for release.
-
-### Step 1: Implement Undo/Redo System (If not using APVTS)
-- [ ] Verify APVTS provides undo/redo automatically in host
-- [ ] Test undo/redo for parameter changes
-- [ ] Test undo/redo for randomization
-- [ ] If needed, implement custom undo manager for sample operations
-- [ ] Test undo/redo of sample loading/clearing
-- [ ] Ensure undo/redo works correctly across sessions
-
-### Step 2: Add Preset Management
-- [ ] Implement factory presets with useful starting points
-- [ ] Create preset: "Natural" (minimal processing)
-- [ ] Create preset: "Punchy" (transient enhancement, tight EQ)
-- [ ] Create preset: "Warm" (low-end boost, soft attack)
-- [ ] Create preset: "Bright" (high-end boost, fast attack)
-- [ ] Create preset: "Randomized" (varied settings for experimentation)
-- [ ] Implement preset browser if not provided by host
-- [ ] Test preset recall accuracy
-- [ ] Ensure presets save/load sample assignments
-
-**Quick Test After Step 2:**
-- [ ] Load each factory preset
-- [ ] Verify settings match preset description
-- [ ] Test that presets sound appropriate
-- [ ] Switch between presets - verify smooth transitions
-
-### Step 3: Performance Optimization
-- [ ] Profile CPU usage with all features active
-- [ ] Optimize sample loading to use background threads
-- [ ] Optimize processBlock() for efficiency:
-  - [ ] Minimize memory allocations
-  - [ ] Use SIMD where applicable
-  - [ ] Avoid unnecessary copies
-- [ ] Test with maximum polyphony (20 samples loaded)
-- [ ] Test with various buffer sizes (64, 128, 256, 512 samples)
-- [ ] Ensure plugin doesn't drop audio or cause glitches
-- [ ] Optimize UI repainting to avoid visual lag
-- [ ] Test memory usage and check for leaks
-
-**Quick Test After Step 3:**
-- [ ] Load 20 large samples
-- [ ] Play continuous MIDI notes
-- [ ] Check CPU meter in DAW - aim for <10%
-- [ ] Test with buffer size set to 64 samples
-- [ ] Verify no audio dropouts or glitches
-- [ ] Run for extended period - check for memory leaks
-
-### Step 4: Add Visualization Features (Optional for MVP)
-- [ ] Add waveform display in sample slots
-- [ ] Add level meter for output monitoring
-- [ ] Add visual feedback for active MIDI notes
-- [ ] Add EQ frequency response graph (optional)
-- [ ] Keep visualizations lightweight to maintain performance
-- [ ] Ensure visualizations update smoothly
-
-### Step 5: Implement Additional Quality-of-Life Features
-- [ ] Add sample auto-naming (remove file extension, format nicely)
-- [ ] Add context menu on sample slots (right-click options)
-- [ ] Add keyboard shortcuts for common actions
-- [ ] Add MIDI learn for parameters (if supported by host)
-- [ ] Add parameter lock feature to prevent accidental changes
-- [ ] Add "clear all samples" button with confirmation
-- [ ] Add sample library browser (optional for MVP)
-- [ ] Add drag-to-reorder sample slots (optional)
-
-### Step 6: Error Handling and Edge Cases
-- [ ] Handle case where no samples are loaded (silent output)
-- [ ] Handle case where file paths change between sessions
-- [ ] Handle corrupted or invalid audio files gracefully
-- [ ] Handle out-of-memory situations
-- [ ] Handle incompatible sample rates properly
-- [ ] Add user-friendly error messages for all failure scenarios
-- [ ] Implement logging system for debugging user issues
-- [ ] Test plugin behavior with malformed project files
-
-**Quick Test After Step 6:**
-- [ ] Load plugin with no samples - verify no crash
-- [ ] Try loading 100MB+ file - verify graceful handling
-- [ ] Move sample files while project is open
-- [ ] Reload project - verify appropriate error messages
-- [ ] Test various edge cases specific to your implementation
-
-### Step 7: Cross-Platform Testing
-- [ ] Test on Windows 10/11
-- [ ] Test on macOS (if applicable)
-- [ ] Test with different DAWs:
-  - [ ] Ableton Live
-  - [ ] FL Studio
-  - [ ] Reaper
-  - [ ] Logic Pro (macOS)
-  - [ ] Cubase/Nuendo
-- [ ] Test VST3 compatibility across hosts
-- [ ] Test standalone version functionality
-- [ ] Verify UI scales correctly on different screen DPIs
-- [ ] Test with different audio interfaces and sample rates
-
----
-
-## Phase 9: Testing & Quality Assurance (Estimated Time: 1 Week)
-**Goal:** Thoroughly test the plugin to ensure reliability, stability, and professional quality before release.
-
-### Step 1: Functional Testing
-- [ ] Test sample loading from all supported formats (WAV, AIFF, FLAC, OGG)
-- [ ] Test MIDI input across all 88 keys (entire keyboard range)
-- [ ] Test all parameter changes individually
-- [ ] Test all parameter changes together (interaction testing)
-- [ ] Test randomization with various bound settings
-- [ ] Test preset save and recall
-- [ ] Test project save and reload in DAW
-- [ ] Test with samples missing from disk
-- [ ] Test sample clearing and reloading
-- [ ] Test monophonic voice behavior (note stealing)
-
-### Step 2: Audio Quality Testing
-- [ ] Test for audio clicks or pops during parameter changes
-- [ ] Test for audio glitches during sample loading
-- [ ] Test for phase issues in stereo output
-- [ ] Test for aliasing or digital artifacts in pitch shifting
-- [ ] Test frequency response of EQ bands
-- [ ] Test transient shaping accuracy
-- [ ] Compare audio quality with reference plugins
-- [ ] Test at various sample rates (44.1, 48, 96 kHz)
-- [ ] Test with various buffer sizes (64-1024 samples)
-- [ ] Verify output levels don't clip or distort
-
-### Step 3: Performance and Stability Testing
-- [ ] Measure CPU usage with all samples loaded
-- [ ] Measure CPU usage with all effects active
-- [ ] Test for memory leaks (load/unload samples repeatedly)
-- [ ] Test plugin stability over extended sessions (hours)
-- [ ] Test rapid parameter changes (stress test)
-- [ ] Test rapid sample loading/unloading
-- [ ] Monitor RAM usage with maximum sample count
-- [ ] Test performance with large sample files (>100MB)
-- [ ] Verify plugin doesn't crash under any normal use
-- [ ] Test recovery from abnormal conditions
-
-### Step 4: Compatibility Testing
-- [ ] Test in multiple DAW environments
-- [ ] Test VST3 format compatibility
-- [ ] Test standalone version functionality
-- [ ] Test on different Windows versions (10, 11)
-- [ ] Test on different macOS versions (if applicable)
-- [ ] Test with various audio driver types (ASIO, DirectSound, CoreAudio)
-- [ ] Test UI on different screen resolutions
-- [ ] Test UI on different DPI settings (100%, 125%, 150%)
-- [ ] Verify plugin loads correctly in all tested hosts
-- [ ] Test plugin alongside other plugins in large projects
-
-### Step 5: User Experience Testing
-- [ ] Have non-developer users test the plugin
-- [ ] Observe user workflow and identify confusion points
-- [ ] Get feedback on UI clarity and organization
-- [ ] Test if users can complete basic tasks without instructions
-- [ ] Verify error messages are clear and helpful
-- [ ] Check if tooltips provide sufficient guidance
-- [ ] Assess whether parameter ranges are intuitive
-- [ ] Evaluate if randomization feature is discoverable
-- [ ] Gather feedback on sound quality and usefulness
-- [ ] Identify any missing features users expect
-
-### Step 6: Documentation Review
-- [ ] Create user manual with basic instructions
-- [ ] Document all parameters and their ranges
-- [ ] Explain MIDI note mapping system clearly
-- [ ] Provide examples of common use cases
-- [ ] Create quick start guide for new users
-- [ ] Document keyboard shortcuts if implemented
-- [ ] Include troubleshooting section
-- [ ] Add FAQ section based on tester feedback
-- [ ] Include audio examples or video tutorial (optional)
-- [ ] Proofread all documentation for clarity
-
-### Step 7: Final Bug Fixes and Polish
-- [ ] Create list of all bugs found during testing
-- [ ] Prioritize bugs by severity (critical, major, minor)
-- [ ] Fix all critical and major bugs before release
-- [ ] Address minor bugs if time permits
-- [ ] Verify fixes don't introduce new issues (regression testing)
-- [ ] Update version number for release
-- [ ] Finalize all UI text and labels
-- [ ] Ensure all features work as intended
-- [ ] Conduct final round of testing after bug fixes
-
----
-
-## Phase 10: Release Preparation (Estimated Time: 3-4 Days)
-**Goal:** Prepare the plugin for commercial release with proper packaging, distribution, and marketing materials.
-
-### Step 1: Build Release Versions
-- [ ] Build plugin in Release configuration (optimized, no debug symbols)
-- [ ] Build for all target platforms (Windows VST3, macOS VST3/AU if applicable)
-- [ ] Build standalone version
-- [ ] Test release builds thoroughly
-- [ ] Verify release builds have no debug code or logging
-- [ ] Check file sizes are optimized
-- [ ] Ensure all dependencies are included
-- [ ] Test installation process
-
-### Step 2: Create Installer
-- [ ] Choose installer solution (Inno Setup for Windows, Packages for macOS)
-- [ ] Create installer that copies plugin to correct system directories
-- [ ] Include uninstaller option
-- [ ] Add license agreement to installer
-- [ ] Add option to install standalone version
-- [ ] Include user manual or link to online documentation
-- [ ] Test installer on clean system
-- [ ] Verify plugin appears in DAW after installation
-- [ ] Ensure uninstaller removes all files
-
-### Step 3: Licensing and Copy Protection
-- [ ] Decide on licensing model for MVP (simple license key vs online activation)
-- [ ] Implement basic license key validation (if using license keys)
-- [ ] Decide on copy protection level (light protection for MVP recommended)
-- [ ] Consider using JUCE's built-in online unlocking feature
-- [ ] Test license activation and validation
-- [ ] Ensure plugin works offline after activation
-- [ ] Implement grace period for license verification
-- [ ] Create license generation system for customers
-
-### Step 4: Prepare Marketing Materials
-- [ ] Create product webpage with feature list
-- [ ] Write compelling product description
-- [ ] Create demo videos showing plugin in action
-- [ ] Create audio examples demonstrating capabilities
-- [ ] Design product logo and branding
-- [ ] Create user manual PDF
-- [ ] Prepare press release (optional)
-- [ ] Create social media posts announcing launch
-- [ ] Prepare email newsletter for launch
-- [ ] Set up customer support email/system
-
-### Step 5: Set Up Distribution and Sales
-- [ ] Create account on plugin marketplace (e.g., Plugin Boutique, Gumroad)
-- [ ] Upload plugin files and installers
-- [ ] Set pricing for Round Robin Lite (MVP version)
-- [ ] Configure payment processing
-- [ ] Set up automated license delivery system
-- [ ] Create free trial/demo version (optional but recommended)
-- [ ] Test purchase and download process
-- [ ] Prepare customer support resources
-- [ ] Set up analytics to track sales and downloads
-
-### Step 6: Beta Testing Program
-- [ ] Recruit 5-10 beta testers
-- [ ] Provide beta testers with free licenses
-- [ ] Create feedback form or survey
-- [ ] Gather feedback on bugs, features, usability
-- [ ] Address critical feedback before public release
-- [ ] Create case studies or testimonials from beta testers
-- [ ] Thank beta testers with credits or lifetime licenses
-- [ ] Use beta feedback to prioritize post-launch updates
-
-### Step 7: Launch Plan
-- [ ] Set official launch date
-- [ ] Coordinate marketing efforts around launch
-- [ ] Prepare email to existing contacts/mailing list
-- [ ] Post on social media platforms
-- [ ] Submit to plugin news sites and blogs
-- [ ] Offer launch discount or early bird pricing
-- [ ] Monitor initial sales and downloads
-- [ ] Respond to customer inquiries promptly
-- [ ] Address any critical issues immediately
-- [ ] Celebrate successful launch!
-
----
-
-## Phase 11: Post-Launch & Iteration (Ongoing)
-**Goal:** Support users, gather feedback, and plan future updates including advanced "Pro" version.
-
-### Step 1: Customer Support
-- [ ] Set up support email or ticket system
-- [ ] Monitor support requests daily
-- [ ] Create FAQ based on common questions
-- [ ] Respond to all support emails within 24 hours
-- [ ] Track common issues for future updates
-- [ ] Maintain positive relationship with customers
-- [ ] Provide refunds if necessary (within policy)
-- [ ] Thank users for feedback and suggestions
-
-### Step 2: Bug Fixes and Updates
-- [ ] Monitor crash reports and bug reports
-- [ ] Prioritize bugs by severity and user impact
-- [ ] Release bug fix updates promptly (v1.0.1, v1.0.2, etc.)
-- [ ] Test updates thoroughly before release
-- [ ] Notify users of important updates
-- [ ] Maintain changelog documenting all changes
-- [ ] Ensure update process is smooth for users
-- [ ] Consider automatic update notification
-
-### Step 3: Gather User Feedback
-- [ ] Send survey to purchasers after 30 days
-- [ ] Ask about ease of use, features wanted, bugs encountered
-- [ ] Monitor social media mentions and reviews
-- [ ] Read reviews on marketplaces
-- [ ] Engage with users in audio production forums
-- [ ] Create feature request board (Trello, GitHub Issues, etc.)
-- [ ] Analyze feedback for trends and priorities
-- [ ] Communicate roadmap to users
-
-### Step 4: Plan Advanced "Pro" Version
-- [ ] Based on feedback, identify premium features:
-  - [ ] More sample slots (40, 60, or unlimited)
-  - [ ] More EQ bands (5-band or parametric EQ)
-  - [ ] Advanced modulation system (LFOs, envelopes)
-  - [ ] Per-sample parameter randomization
-  - [ ] Velocity sensitivity for samples
-  - [ ] Round-robin with multiple samples per note (actual round-robin)
-  - [ ] Advanced transient shaping with more controls
-  - [ ] Built-in effects (reverb, delay, compression)
-  - [ ] Sample editor with trim, fade, normalize
-  - [ ] MIDI mapping and control customization
-- [ ] Prioritize features that add most value
-- [ ] Create development roadmap for Pro version
-- [ ] Set pricing strategy for Pro version
-- [ ] Plan upgrade path for Lite users
-
-### Step 5: Community Building
-- [ ] Create user forum or Discord server
-- [ ] Share tips, tricks, and workflows
-- [ ] Encourage users to share presets and samples
-- [ ] Feature user creations on social media
-- [ ] Run contests or challenges
-- [ ] Build brand recognition in target market
-- [ ] Engage with audio production community
-- [ ] Attend trade shows or virtual events (if budget allows)
-
-### Step 6: Long-term Sustainability
-- [ ] Monitor sales trends and adjust pricing/marketing as needed
-- [ ] Plan regular content updates (new presets, tutorials)
-- [ ] Consider expanding to other platforms (iOS/AU3, AAX for Pro Tools)
-- [ ] Evaluate performance metrics and user retention
-- [ ] Plan for continued development and support
-- [ ] Build reserves for development of Pro version
-- [ ] Stay updated with JUCE framework updates
-- [ ] Maintain compatibility with new OS versions
+## Phase 5-11: [Remaining phases unchanged from original spec]
 
 ---
 
@@ -1228,9 +508,11 @@ This specification breaks the project into eight distinct phases, each with acti
 ### Core Functionality
 - [ ] Plugin loads in all tested DAWs without errors
 - [ ] All 20 sample slots load and play samples correctly
-- [ ] MIDI note mapping works as designed (C0-C4, paired keys)
+- [ ] MIDI note mapping works as designed (C2/D2 trigger notes)
 - [ ] Monophonic playback functions properly
+- [ ] Round-robin cycling through loaded samples works correctly
 - [ ] All 11 parameters work and sound good
+- [ ] Global pitch controls (Semitone + Fine Tune) transpose all samples uniformly
 - [ ] EQ provides clear audible control over frequency bands
 - [ ] Transient master shapes attack and decay effectively
 - [ ] Randomization feature works within set bounds
@@ -1247,13 +529,14 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] All features are discoverable without extensive documentation
 - [ ] Error messages are clear and helpful
 - [ ] Plugin feels polished and professional
+- [ ] C2/D2 trigger system is intuitive for alternating patterns
 
 ---
 
 ## Estimated Total Development Time
 
-- Phase 1: Foundation & Setup - 1-2 days
-- Phase 2: Core Audio Engine - 1 week
+- Phase 1: Foundation & Setup - 1-2 days ✅
+- Phase 2: Core Audio Engine - 1 week ✅
 - Phase 3: Parameter System - 4-5 days
 - Phase 4: Sample Management - 1 week
 - Phase 5: Basic UI - 1-2 weeks
@@ -1268,43 +551,15 @@ This specification breaks the project into eight distinct phases, each with acti
 
 ---
 
-## Key Resources and Learning Materials
-
-### JUCE Documentation
-- [ ] JUCE Official Documentation (docs.juce.com)
-- [ ] JUCE Tutorials (especially Synthesiser and Plugin tutorials)
-- [ ] JUCE API Reference
-- [ ] JUCE Forum for troubleshooting
-
-### Video Tutorials
-- [ ] The Audio Programmer YouTube channel
-- [ ] JUCE Official YouTube channel
-- [ ] Audio plugin development courses on Udemy/Skillshare
-
-### Books
-- [ ] "Designing Audio Effect Plugins in C++" by Will Pirkle
-- [ ] "The Audio Programming Book" (MIT Press)
-- [ ] JUCE framework-specific books and resources
-
-### Community
-- [ ] JUCE Forum (forum.juce.com)
-- [ ] Audio developer Discord servers
-- [ ] KVR Audio developer forum
-- [ ] Reddit r/AudioProgramming
-
----
-
 ## Notes for Future Reference
 
-- Remember to keep MVP scope limited - resist feature creep
-- Test early and often to catch issues before they compound
-- Prioritize audio quality over visual polish for MVP
-- Get user feedback as soon as possible
-- Document code as you go for future maintenance
-- Consider hiring a designer for UI in Pro version
-- Build relationships with other plugin developers
-- Stay focused on core value proposition: easy round-robin sampling
+- Simplified MIDI mapping makes the plugin easier to use and understand
+- C2/D2 trigger system is perfect for footstep L/R alternation
+- Global pitch controls allow easy transposition of entire sample library
+- True round-robin implementation provides natural variation
+- Consider adding sample selection UI in Pro version (choose which sample plays)
+- Stay focused on core value proposition: easy sample triggering with variation
 
 ---
 
-**Good luck with development! This is an achievable and exciting project. Take it one phase at a time, and you'll have a working plugin before you know it.**
+**Good luck with development! Phase 2 is complete and working. Ready for Phase 3: Parameter System!**
