@@ -16,7 +16,7 @@
       </OUTPUTS>
     </LAYOUT>
   </FILTER>
-  <FILTER uid="10" x="0.25" y="0.1" useARA="0">
+  <FILTER uid="10" x="0.24875" y="0.1926977687626775" useARA="0">
     <PLUGIN name="MIDI Input" descriptiveName="" format="Internal" category="I/O devices"
             manufacturer="JUCE" version="1.0" file="" uniqueId="a9e4f9eb"
             isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="0"
@@ -61,11 +61,10 @@
       </OUTPUTS>
     </LAYOUT>
   </FILTER>
-  <FILTER uid="13" x="0.24625" y="0.4213709677419355" useARA="0" uiLastX_Normal="230"
-          uiLastY_Normal="470" uiopen_Normal="0">
+  <FILTER uid="14" x="0.21125" y="0.4401622718052738" useARA="0">
     <PLUGIN name="round-robin-lite" format="VST3" category="Instrument|Synth"
             manufacturer="roundrobinlite" version="1.0.0" file="C:\Program Files\Common Files\VST3\roundrobinlite.vst3\Contents\x86_64-win\roundrobinlite.vst3"
-            uniqueId="1fa6de21" isInstrument="1" fileTime="19bfbeeb801" infoUpdateTime="19bfbf5a1e0"
+            uniqueId="1fa6de21" isInstrument="1" fileTime="19c063065c9" infoUpdateTime="19c0632212d"
             numInputs="0" numOutputs="2" isShell="0" hasARAExtension="0"
             uid="e96804c5"/>
     <STATE>191.VMjLgXK....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOVMEUy.Ea0cVZtMEcgQWY9vSRC8Vav8lak4Fc9XCLt3hKt3hKt3hKt3hYRUUSTEETIckVwTjQisVTTgkdEYjKAQjYPQSPWgUdMcjKAQjct3hdA4hKt3hKt3hKtnTUv.UQAslXuk0UXoWUFE0YQcEV77RRC8Vav8lak4Fc9vyKVMEUy.Ea0cVZtMEcgQWY9..</STATE>
@@ -76,7 +75,7 @@
       </OUTPUTS>
     </LAYOUT>
   </FILTER>
-  <CONNECTION srcFilter="10" srcChannel="4096" dstFilter="13" dstChannel="4096"/>
-  <CONNECTION srcFilter="13" srcChannel="0" dstFilter="11" dstChannel="0"/>
-  <CONNECTION srcFilter="13" srcChannel="1" dstFilter="11" dstChannel="1"/>
+  <CONNECTION srcFilter="10" srcChannel="4096" dstFilter="14" dstChannel="4096"/>
+  <CONNECTION srcFilter="14" srcChannel="0" dstFilter="11" dstChannel="0"/>
+  <CONNECTION srcFilter="14" srcChannel="1" dstFilter="11" dstChannel="1"/>
 </FILTERGRAPH>

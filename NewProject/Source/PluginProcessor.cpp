@@ -1,4 +1,4 @@
-/*
+﻿/*
   ==============================================================================
 
     This file contains the basic framework code for a JUCE plugin processor.
@@ -32,31 +32,65 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
     DBG("Round Robin Lite initialized - Synthesiser ready");
     DBG("Number of voices: " + juce::String(synthesiser.getNumVoices()));
 
-    // TEST: Print the complete MIDI mapping table
-    MidiMapper::printMappingTable();
+    // ============================================================
+    // TEST: Load a single sample and assign to root key pair
+    // ============================================================
 
-    // TEST: Verify specific pairs
-    DBG("\n=== Testing MidiMapper Functions ===");
+    // IMPORTANT: Change this path to point to your test WAV file
+    juce::File testFile("C:\\Users\\hamad\\OneDrive\\Desktop\\snd_surf_hard_dirt_01.wav");
 
-    // Test getting notes for root pair
-    int note1, note2;
-    if (MidiMapper::getMidiNotesForPair(7, note1, note2))
+    DBG("\n=== LOADING TEST SAMPLE ===");
+    DBG("Test file path: " + testFile.getFullPathName());
+
+    if (!testFile.existsAsFile())
     {
-        DBG("Root pair (7) notes: " + juce::String(note1) + " and " + juce::String(note2));
+        DBG("ERROR: Test file not found!");
+        DBG("Please update the file path in PluginProcessor constructor");
+        DBG("Current path: " + testFile.getFullPathName());
+        return;
     }
 
-    // Test finding pair for a MIDI note
-    int pairIndex = MidiMapper::getPairIndexForMidiNote(48);
-    DBG("MIDI note 48 (C2) belongs to pair: " + juce::String(pairIndex));
+    DBG("File exists! Size: " + juce::String(testFile.getSize()) + " bytes");
 
-    // Test semitone offset
-    int offset = MidiMapper::getSemitoneOffsetForPair(0);
-    DBG("Pair 0 semitone offset: " + juce::String(offset));
+    // Create a new RRSound object
+    RRSound* testSound = new RRSound();
 
-    offset = MidiMapper::getSemitoneOffsetForPair(7);
-    DBG("Pair 7 (root) semitone offset: " + juce::String(offset));
+    // Try to load the audio file
+    if (testSound->loadFromFile(testFile, formatManager))
+    {
+        DBG("✓ Sample loaded successfully!");
+        DBG("  - Display name: " + testSound->getDisplayName());
+        DBG("  - Sample count: " + juce::String(testSound->getNumSamples()));
+        DBG("  - Sample rate: " + juce::String(testSound->getOriginalSampleRate()) + " Hz");
 
-    DBG("====================================\n");
+        // Assign to pair 7 (C4/D4 - MIDI 60/62) which is the ROOT pair
+        // At root pair, the sample plays at its original pitch (no pitch shift)
+        testSound->setKeyPairIndex(7);
+        DBG("  - Assigned to pair 7: " + MidiMapper::getKeyPairName(7));
+
+        // Verify which MIDI notes this sound will respond to
+        int note1, note2;
+        MidiMapper::getMidiNotesForPair(7, note1, note2);
+        DBG("  - MIDI notes: " + juce::String(note1) + " and " + juce::String(note2));
+        DBG("  - Root note: " + juce::String(testSound->getRootNote()));
+
+        // Add the sound to the synthesiser
+        synthesiser.addSound(testSound);
+        DBG("✓ Sound added to synthesiser");
+        DBG("Total sounds in synthesiser: " + juce::String(synthesiser.getNumSounds()));
+
+        DBG("\n=== READY TO PLAY ===");
+        DBG("Press MIDI note 60 (C4/Middle C) to hear the sample at original pitch");
+        DBG("Press MIDI note 62 (D4) to hear the sample at original pitch");
+        DBG("Try other notes to hear pitch shifting!");
+    }
+    else
+    {
+        DBG("✗ ERROR: Failed to load sample from file");
+        delete testSound;
+    }
+
+    DBG("=============================\n");
 }
 
 NewProjectAudioProcessor::~NewProjectAudioProcessor()
