@@ -9,6 +9,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "Audio/MidiMapper.h" 
+#include "Parameters/ParametersIDs.h"
 
 //==============================================================================
 NewProjectAudioProcessor::NewProjectAudioProcessor()
@@ -38,6 +39,11 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
     // ============================================================
     // TEST: Load single sample
     // ============================================================
+    DBG("\n=== Testing Parameter IDs ===");
+    DBG("Semitone ID: " + juce::String(ParameterIDs::semitone));
+    DBG("Volume ID: " + juce::String(ParameterIDs::volume));
+    DBG("Total parameters: " + juce::String(ParameterIDs::totalParameters));
+    DBG("============================\n");
 
     juce::File testFile("C:\\Users\\hamad\\OneDrive\\Desktop\\snd_surf_hard_dirt_01.wav");
 
@@ -72,6 +78,8 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
         delete testSound;
     }
 }
+
+
 
 NewProjectAudioProcessor::~NewProjectAudioProcessor()
 {
