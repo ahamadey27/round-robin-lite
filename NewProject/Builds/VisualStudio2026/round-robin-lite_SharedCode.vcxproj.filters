@@ -3618,7 +3618,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Source\ParametersIDs.h">
+    <ClInclude Include="..\..\Source\Parameters\ParametersIDs.h">
       <Filter>round-robin-lite\Source\Parameters</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Audio\MidiMapper.h">
