@@ -254,12 +254,12 @@ This specification breaks the project into eight distinct phases, each with acti
 - Semitone and Fine Tune parameters will globally transpose all loaded samples together
 
 **Quick Test After Step 3:**
-- [ ] Build project successfully
-- [ ] Load plugin in AudioPluginHost or DAW
-- [ ] Open plugin's generic editor (provided by host)
-- [ ] Verify all 13 parameters appear in the parameter list
-- [ ] Move each parameter slider and verify ranges are correct
-- [ ] Check default values are as specified
+- [x] Build project successfully
+- [x] Load plugin in AudioPluginHost or DAW
+- [x] Open plugin's generic editor (provided by host)
+- [x] Verify all 13 parameters appear in the parameter list
+- [x] Move each parameter slider and verify ranges are correct
+- [x] Check default values are as specified
 
 ### Step 4: Implement Parameter Smoothing
 - [ ] In PluginProcessor.h, add SmoothedValue object for Volume parameter
