@@ -54,7 +54,7 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
 
     if (testSound->loadFromFile(testFile, formatManager))
     {
-        DBG("✓ Sample loaded: " + testSound->getDisplayName());
+        DBG("Sample loaded: " + testSound->getDisplayName());
         DBG("  Samples: " + juce::String(testSound->getNumSamples()));
         DBG("  Rate: " + juce::String(testSound->getOriginalSampleRate()) + " Hz");
 
@@ -68,7 +68,7 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
     }
     else
     {
-        DBG("✗ Failed to load sample");
+        DBG("Failed to load sample");
         delete testSound;
     }
 }
