@@ -1,4 +1,4 @@
-/*
+﻿/*
   ==============================================================================
 
     This file contains the basic framework code for a JUCE plugin processor.
@@ -21,7 +21,8 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
 #endif
         .withOutput("Output", juce::AudioChannelSet::stereo(), true)
 #endif
-    )
+    ),
+    apvts(*this, nullptr, "Parameters", createParameterLayout())
 #endif
 {
     // Initialize the synthesiser with one voice for monophonic playback
@@ -36,49 +37,27 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
     // Print mapping info
     MidiMapper::printMappingInfo();
 
-    // ============================================================
-    // TEST: Load single sample
-    // ============================================================
+    // TEST: Verify parameter IDs are accessible
     DBG("\n=== Testing Parameter IDs ===");
     DBG("Semitone ID: " + juce::String(ParameterIDs::semitone));
     DBG("Volume ID: " + juce::String(ParameterIDs::volume));
     DBG("Total parameters: " + juce::String(ParameterIDs::totalParameters));
     DBG("============================\n");
 
+    // TEST: Verify APVTS is initialized
+    DBG("\n=== Testing APVTS ===");
+    DBG("APVTS initialized: " + juce::String(apvts.state.isValid() ? "YES" : "NO"));
+    DBG("Current parameter count: " + juce::String(apvts.state.getNumChildren()));
+    DBG("=====================\n");
+
+    // ============================================================
+    // TEST: Load single sample
+    // ============================================================
+
     juce::File testFile("C:\\Users\\hamad\\OneDrive\\Desktop\\snd_surf_hard_dirt_01.wav");
 
-    DBG("\n=== LOADING TEST SAMPLE ===");
-
-    if (!testFile.existsAsFile())
-    {
-        DBG("ERROR: Test file not found at: " + testFile.getFullPathName());
-        return;
-    }
-
-    // Create and load sound
-    RRSound* testSound = new RRSound();
-
-    if (testSound->loadFromFile(testFile, formatManager))
-    {
-        DBG("Sample loaded: " + testSound->getDisplayName());
-        DBG("  Samples: " + juce::String(testSound->getNumSamples()));
-        DBG("  Rate: " + juce::String(testSound->getOriginalSampleRate()) + " Hz");
-
-        // Add to synthesiser
-        synthesiser.addSound(testSound);
-
-        DBG("\n=== READY TO PLAY ===");
-        DBG("Press C2 (MIDI 36) or D2 (MIDI 38) to hear the sample");
-        DBG("Both keys play at original pitch");
-        DBG("=============================\n");
-    }
-    else
-    {
-        DBG("Failed to load sample");
-        delete testSound;
-    }
+    // ... rest of your sample loading test ...
 }
-
 
 
 NewProjectAudioProcessor::~NewProjectAudioProcessor()
@@ -254,6 +233,30 @@ void NewProjectAudioProcessor::setStateInformation(const void* data, int sizeInB
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+}
+
+//==============================================================================
+// PARAMETER LAYOUT CREATION
+
+juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::createParameterLayout()
+{
+    // This function creates and returns the layout of all plugin parameters
+    // For now, we'll create an empty layout
+    // In Step 3, we'll add all 11 parameters here
+
+    juce::AudioProcessorValueTreeState::ParameterLayout layout;
+
+    // Parameters will be added in Step 3
+    DBG("Parameter layout created (currently empty)");
+
+    return layout;
+}
+
+//==============================================================================
+// This creates new instances of the plugin..
+juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+{
+    return new NewProjectAudioProcessor();
 }
 
 //==============================================================================

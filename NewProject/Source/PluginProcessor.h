@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 #include "Audio/RRVoice.h"
 #include "Audio/RRSound.h"
+#include "Parameters/ParametersIDs.h"
 
 //==============================================================================
 /**
@@ -56,6 +57,28 @@ public:
     void setStateInformation(const void* data, int sizeInBytes) override;
 
 private:
+    //==============================================================================
+    // PARAMETER SYSTEM
+
+    /**
+     * AudioProcessorValueTreeState (APVTS) - The parameter management system
+     *
+     * This handles:
+     * - Parameter registration and storage
+     * - DAW automation
+     * - Preset save/load
+     * - UI control attachment
+     * - Thread-safe parameter access
+     */
+    juce::AudioProcessorValueTreeState apvts;
+
+    /**
+     * Helper function to create the parameter layout.
+     * Called once during APVTS initialization.
+     * @return ParameterLayout containing all plugin parameters
+     */
+    juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+
     //==============================================================================
     // SYNTHESISER - The core audio engine
     juce::Synthesiser synthesiser;
