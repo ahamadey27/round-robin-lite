@@ -188,12 +188,21 @@ This specification breaks the project into eight distinct phases, each with acti
 ## Phase 3: Parameter System with APVTS (Estimated Time: 4-5 Days)
 **Goal:** Implement all plugin parameters using JUCE's AudioProcessorValueTreeState for proper DAW automation, preset management, and parameter smoothing.
 
+**Total Parameters: 13**
+- 2 Global Pitch Controls (Semitone, Fine Tune)
+- 1 Volume Control
+- 2 Amplitude Envelope (Attack, Decay)
+- 6 EQ Controls (3 bands × 2 parameters each)
+- 2 Transient Master Controls (Attack, Decay)
+
 ### Step 1: Create Parameter ID Constants
 - [x] Create ParameterIDs.h file in /Source/Parameters/
 - [x] Define namespace for all parameter ID strings
 - [x] Create ID constant for Semitone pitch parameter (global control)
 - [x] Create ID constant for Fine Tune pitch parameter in cents (global control)
 - [x] Create ID constant for Volume parameter
+- [x] Create ID constant for Envelope Attack parameter
+- [x] Create ID constant for Envelope Decay parameter
 - [x] Create ID constant for Low Band EQ Gain parameter
 - [x] Create ID constant for Low Band EQ Frequency parameter
 - [x] Create ID constant for Mid Band EQ Gain parameter
@@ -223,26 +232,32 @@ This specification breaks the project into eight distinct phases, each with acti
 - [x] Check no parameters appear yet (they'll be added in next step)
 
 ### Step 3: Define All Plugin Parameters with Proper Ranges
-- [ ] Add Semitone parameter: Range -12 to +12 semitones, step size 1, default 0
-- [ ] Add Fine Tune parameter: Range -100 to +100 cents, step size 1, default 0
-- [ ] Add Volume parameter: Range 0.0 to 1.0 (linear) or -60dB to 0dB, default 0.75
-- [ ] Add Low EQ Gain: Range -24dB to +24dB, default 0dB, use decibel scaling
-- [ ] Add Low EQ Frequency: Range 20Hz to 500Hz, use logarithmic skew factor, default 100Hz
-- [ ] Add Mid EQ Gain: Range -24dB to +24dB, default 0dB, use decibel scaling
-- [ ] Add Mid EQ Frequency: Range 200Hz to 5000Hz, use logarithmic skew factor, default 1000Hz
-- [ ] Add High EQ Gain: Range -24dB to +24dB, default 0dB, use decibel scaling
-- [ ] Add High EQ Frequency: Range 2000Hz to 20000Hz, use logarithmic skew factor, default 5000Hz
-- [ ] Add Transient Attack: Range -127 to +127, default 0, linear scale
-- [ ] Add Transient Decay: Range -127 to +127, default 0, linear scale
-- [ ] Set appropriate units and labels for each parameter (dB, Hz, semitones, cents)
+- [x] Add Semitone parameter: Range -12 to +12 semitones, step size 1, default 0
+- [x] Add Fine Tune parameter: Range -100 to +100 cents, step size 1, default 0
+- [x] Add Volume parameter: Range 0.0 to 1.0 (linear) or -60dB to 0dB, default 0.75
+- [x] Add Envelope Attack: Range 0 to 1000ms, default 0ms (instant attack)
+- [x] Add Envelope Decay: Range 0 to 5000ms, default 100ms (short natural release)
+- [x] Add Low EQ Gain: Range -24dB to +24dB, default 0dB, use decibel scaling
+- [x] Add Low EQ Frequency: Range 20Hz to 500Hz, use logarithmic skew factor, default 100Hz
+- [x] Add Mid EQ Gain: Range -24dB to +24dB, default 0dB, use decibel scaling
+- [x] Add Mid EQ Frequency: Range 200Hz to 5000Hz, use logarithmic skew factor, default 1000Hz
+- [x] Add High EQ Gain: Range -24dB to +24dB, default 0dB, use decibel scaling
+- [x] Add High EQ Frequency: Range 2000Hz to 20000Hz, use logarithmic skew factor, default 5000Hz
+- [x] Add Transient Attack: Range -127 to +127, default 0, linear scale
+- [x] Add Transient Decay: Range -127 to +127, default 0, linear scale
+- [x] Set appropriate units and labels for each parameter (dB, Hz, semitones, cents, ms)
 
-**Note:** Semitone and Fine Tune parameters will globally transpose all loaded samples together.
+**Note:** 
+- Envelope Attack/Decay control the ADSR amplitude envelope applied to all samples
+- Attack: 0ms = instant (no fade-in), higher values = gradual fade-in
+- Decay: Controls the release time after note-off (how quickly sound fades out)
+- Semitone and Fine Tune parameters will globally transpose all loaded samples together
 
 **Quick Test After Step 3:**
 - [ ] Build project successfully
 - [ ] Load plugin in AudioPluginHost or DAW
 - [ ] Open plugin's generic editor (provided by host)
-- [ ] Verify all 11 parameters appear in the parameter list
+- [ ] Verify all 13 parameters appear in the parameter list
 - [ ] Move each parameter slider and verify ranges are correct
 - [ ] Check default values are as specified
 
@@ -250,8 +265,9 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] In PluginProcessor.h, add SmoothedValue object for Volume parameter
 - [ ] Add SmoothedValue object for Semitone parameter
 - [ ] Add SmoothedValue object for Fine Tune parameter
+- [ ] Add SmoothedValue objects for Envelope Attack and Decay (2 total)
 - [ ] Add SmoothedValue objects for all EQ parameters (6 total)
-- [ ] Add SmoothedValue objects for Transient Attack and Decay
+- [ ] Add SmoothedValue objects for Transient Attack and Decay (2 total)
 - [ ] In prepareToPlay(), initialize all SmoothedValue objects with sample rate
 - [ ] Set appropriate ramp time for each parameter (typically 20-50ms)
 - [ ] Reset all smoothed values to current parameter values
@@ -269,8 +285,10 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] In processBlock(), retrieve current Semitone value from APVTS
 - [ ] In processBlock(), retrieve current Fine Tune value from APVTS
 - [ ] In processBlock(), retrieve current Volume value from APVTS
+- [ ] In processBlock(), retrieve Envelope Attack and Decay values from APVTS
 - [ ] Calculate combined pitch shift from semitone and fine tune parameters
 - [ ] Apply global pitch shift to RRVoice's pitchRatio (modify startNote to accept global pitch)
+- [ ] Pass envelope Attack/Decay values to RRVoice to update ADSR parameters
 - [ ] Apply volume gain to final output buffer
 - [ ] Prepare parameter values for EQ processor (to be connected later)
 - [ ] Prepare parameter values for transient processor (to be connected later)
@@ -281,6 +299,13 @@ This specification breaks the project into eight distinct phases, each with acti
 2. In startNote(), pass or access this global pitch value
 3. Calculate: `pitchRatio = pow(2.0, globalSemitones / 12.0) * pow(2.0, globalCents / 1200.0)`
 4. This shifts ALL samples uniformly regardless of which trigger key was pressed
+
+**Envelope Implementation Note:**
+1. Store envelope parameters in AudioProcessor or pass to RRVoice
+2. Update RRVoice's ADSR::Parameters in prepareToPlay() or startNote()
+3. Set attack time from Envelope Attack parameter (convert ms to seconds)
+4. Set decay/release time from Envelope Decay parameter (convert ms to seconds)
+5. Keep sustain at 1.0 (full) for consistent playback
 
 **Quick Test After Step 5:**
 - [ ] Build and load plugin with a sample loaded
@@ -314,8 +339,9 @@ This specification breaks the project into eight distinct phases, each with acti
 ### Step 7: Test Parameter Automation in DAW
 - [ ] Build plugin with all parameters defined
 - [ ] Load plugin in AudioPluginHost or actual DAW
-- [ ] Verify all 11 parameters appear in host's parameter list
+- [ ] Verify all 13 parameters appear in host's parameter list
 - [ ] Test moving each parameter and hearing the effect
+- [ ] Test Envelope Attack/Decay parameters affect sample fade-in and fade-out
 - [ ] Test parameter automation by recording parameter movements
 - [ ] Save a preset with specific parameter values
 - [ ] Load the preset and verify all parameters recall correctly
@@ -511,8 +537,9 @@ if (!loadedSampleIndices.empty())
 - [ ] MIDI note mapping works as designed (C2/D2 trigger notes)
 - [ ] Monophonic playback functions properly
 - [ ] Round-robin cycling through loaded samples works correctly
-- [ ] All 11 parameters work and sound good
+- [ ] All 13 parameters work and sound good
 - [ ] Global pitch controls (Semitone + Fine Tune) transpose all samples uniformly
+- [ ] Amplitude envelope (Attack/Decay) shapes sample playback naturally
 - [ ] EQ provides clear audible control over frequency bands
 - [ ] Transient master shapes attack and decay effectively
 - [ ] Randomization feature works within set bounds
