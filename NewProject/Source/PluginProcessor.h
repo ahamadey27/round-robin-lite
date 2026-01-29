@@ -62,22 +62,45 @@ private:
 
     /**
      * AudioProcessorValueTreeState (APVTS) - The parameter management system
-     *
-     * This handles:
-     * - Parameter registration and storage
-     * - DAW automation
-     * - Preset save/load
-     * - UI control attachment
-     * - Thread-safe parameter access
      */
     juce::AudioProcessorValueTreeState apvts;
 
     /**
      * Helper function to create the parameter layout.
-     * Called once during APVTS initialization.
-     * @return ParameterLayout containing all plugin parameters
      */
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+
+    //==============================================================================
+    // PARAMETER SMOOTHING
+
+    /**
+     * SmoothedValue objects for all parameters.
+     * These prevent clicks/pops when parameters change by ramping gradually
+     * from old value to new value over a short time period (typically 20-50ms).
+     */
+
+     // Pitch Controls
+    juce::LinearSmoothedValue<float> smoothedSemitone;
+    juce::LinearSmoothedValue<float> smoothedFineTune;
+
+    // Volume
+    juce::LinearSmoothedValue<float> smoothedVolume;
+
+    // Amplitude Envelope
+    juce::LinearSmoothedValue<float> smoothedEnvAttack;
+    juce::LinearSmoothedValue<float> smoothedEnvDecay;
+
+    // EQ Parameters
+    juce::LinearSmoothedValue<float> smoothedLowGain;
+    juce::LinearSmoothedValue<float> smoothedLowFreq;
+    juce::LinearSmoothedValue<float> smoothedMidGain;
+    juce::LinearSmoothedValue<float> smoothedMidFreq;
+    juce::LinearSmoothedValue<float> smoothedHighGain;
+    juce::LinearSmoothedValue<float> smoothedHighFreq;
+
+    // Transient Master
+    juce::LinearSmoothedValue<float> smoothedTransientAttack;
+    juce::LinearSmoothedValue<float> smoothedTransientDecay;
 
     //==============================================================================
     // SYNTHESISER - The core audio engine

@@ -171,6 +171,61 @@ void NewProjectAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBl
     // Tell the synthesiser what sample rate we're running at
     // This is CRITICAL for correct pitch calculation
     synthesiser.setCurrentPlaybackSampleRate(sampleRate);
+
+    //==============================================================================
+    // INITIALIZE PARAMETER SMOOTHING
+
+    // Set ramp time to 50ms for smooth parameter changes
+    const double rampTimeSeconds = 0.05; // 50 milliseconds
+
+    // For LinearSmoothedValue, reset() takes (sample rate, ramp time in seconds)
+    // This sets both the sample rate AND the smoothing duration
+
+    // Pitch Controls
+    smoothedSemitone.reset(sampleRate, rampTimeSeconds);
+    smoothedSemitone.setCurrentAndTargetValue(apvts.getRawParameterValue(ParameterIDs::semitone)->load());
+
+    smoothedFineTune.reset(sampleRate, rampTimeSeconds);
+    smoothedFineTune.setCurrentAndTargetValue(apvts.getRawParameterValue(ParameterIDs::fineTune)->load());
+
+    // Volume
+    smoothedVolume.reset(sampleRate, rampTimeSeconds);
+    smoothedVolume.setCurrentAndTargetValue(apvts.getRawParameterValue(ParameterIDs::volume)->load());
+
+    // Amplitude Envelope
+    smoothedEnvAttack.reset(sampleRate, rampTimeSeconds);
+    smoothedEnvAttack.setCurrentAndTargetValue(apvts.getRawParameterValue(ParameterIDs::envAttack)->load());
+
+    smoothedEnvDecay.reset(sampleRate, rampTimeSeconds);
+    smoothedEnvDecay.setCurrentAndTargetValue(apvts.getRawParameterValue(ParameterIDs::envDecay)->load());
+
+    // EQ Parameters
+    smoothedLowGain.reset(sampleRate, rampTimeSeconds);
+    smoothedLowGain.setCurrentAndTargetValue(apvts.getRawParameterValue(ParameterIDs::lowGain)->load());
+
+    smoothedLowFreq.reset(sampleRate, rampTimeSeconds);
+    smoothedLowFreq.setCurrentAndTargetValue(apvts.getRawParameterValue(ParameterIDs::lowFreq)->load());
+
+    smoothedMidGain.reset(sampleRate, rampTimeSeconds);
+    smoothedMidGain.setCurrentAndTargetValue(apvts.getRawParameterValue(ParameterIDs::midGain)->load());
+
+    smoothedMidFreq.reset(sampleRate, rampTimeSeconds);
+    smoothedMidFreq.setCurrentAndTargetValue(apvts.getRawParameterValue(ParameterIDs::midFreq)->load());
+
+    smoothedHighGain.reset(sampleRate, rampTimeSeconds);
+    smoothedHighGain.setCurrentAndTargetValue(apvts.getRawParameterValue(ParameterIDs::highGain)->load());
+
+    smoothedHighFreq.reset(sampleRate, rampTimeSeconds);
+    smoothedHighFreq.setCurrentAndTargetValue(apvts.getRawParameterValue(ParameterIDs::highFreq)->load());
+
+    // Transient Master
+    smoothedTransientAttack.reset(sampleRate, rampTimeSeconds);
+    smoothedTransientAttack.setCurrentAndTargetValue(apvts.getRawParameterValue(ParameterIDs::transientAttack)->load());
+
+    smoothedTransientDecay.reset(sampleRate, rampTimeSeconds);
+    smoothedTransientDecay.setCurrentAndTargetValue(apvts.getRawParameterValue(ParameterIDs::transientDecay)->load());
+
+    DBG("All parameter smoothing initialized");
 }
 
 void NewProjectAudioProcessor::releaseResources()
@@ -212,6 +267,46 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
+
+    //==============================================================================
+   // UPDATE SMOOTHED PARAMETER VALUES
+
+   // Get raw parameter values from APVTS and set as targets for smoothing
+    smoothedSemitone.setTargetValue(apvts.getRawParameterValue(ParameterIDs::semitone)->load());
+    smoothedFineTune.setTargetValue(apvts.getRawParameterValue(ParameterIDs::fineTune)->load());
+    smoothedVolume.setTargetValue(apvts.getRawParameterValue(ParameterIDs::volume)->load());
+    smoothedEnvAttack.setTargetValue(apvts.getRawParameterValue(ParameterIDs::envAttack)->load());
+    smoothedEnvDecay.setTargetValue(apvts.getRawParameterValue(ParameterIDs::envDecay)->load());
+    smoothedLowGain.setTargetValue(apvts.getRawParameterValue(ParameterIDs::lowGain)->load());
+    smoothedLowFreq.setTargetValue(apvts.getRawParameterValue(ParameterIDs::lowFreq)->load());
+    smoothedMidGain.setTargetValue(apvts.getRawParameterValue(ParameterIDs::midGain)->load());
+    smoothedMidFreq.setTargetValue(apvts.getRawParameterValue(ParameterIDs::midFreq)->load());
+    smoothedHighGain.setTargetValue(apvts.getRawParameterValue(ParameterIDs::highGain)->load());
+    smoothedHighFreq.setTargetValue(apvts.getRawParameterValue(ParameterIDs::highFreq)->load());
+    smoothedTransientAttack.setTargetValue(apvts.getRawParameterValue(ParameterIDs::transientAttack)->load());
+    smoothedTransientDecay.setTargetValue(apvts.getRawParameterValue(ParameterIDs::transientDecay)->load());
+
+    // Advance smoothed values by one sample
+    // (We'll actually use these values in Step 5 when connecting to audio processing)
+    smoothedSemitone.getNextValue();
+    smoothedFineTune.getNextValue();
+    smoothedVolume.getNextValue();
+    smoothedEnvAttack.getNextValue();
+    smoothedEnvDecay.getNextValue();
+    smoothedLowGain.getNextValue();
+    smoothedLowFreq.getNextValue();
+    smoothedMidGain.getNextValue();
+    smoothedMidFreq.getNextValue();
+    smoothedHighGain.getNextValue();
+    smoothedHighFreq.getNextValue();
+    smoothedTransientAttack.getNextValue();
+    smoothedTransientDecay.getNextValue();
+
+    //==============================================================================
+    // CRITICAL: Clear the output buffer first
+    // The synthesiser uses addSample(), so we need to start with silence
+    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
+        buffer.clear(i, 0, buffer.getNumSamples());
 
     // CRITICAL: Clear the output buffer first
     // The synthesiser uses addSample(), so we need to start with silence
