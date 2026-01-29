@@ -54,9 +54,42 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
     // TEST: Load single sample
     // ============================================================
 
+    // ============================================================
+// TEST: Load single sample
+// ============================================================
+
     juce::File testFile("C:\\Users\\hamad\\OneDrive\\Desktop\\snd_surf_hard_dirt_01.wav");
 
-    // ... rest of your sample loading test ...
+    DBG("\n=== LOADING TEST SAMPLE ===");
+
+    if (!testFile.existsAsFile())
+    {
+        DBG("ERROR: Test file not found at: " + testFile.getFullPathName());
+        return;
+    }
+
+    // Create and load sound
+    RRSound* testSound = new RRSound();
+
+    if (testSound->loadFromFile(testFile, formatManager))
+    {
+        DBG("Sample loaded: " + testSound->getDisplayName());
+        DBG("  Samples: " + juce::String(testSound->getNumSamples()));
+        DBG("  Rate: " + juce::String(testSound->getOriginalSampleRate()) + " Hz");
+
+        // Add to synthesiser
+        synthesiser.addSound(testSound);
+
+        DBG("\n=== READY TO PLAY ===");
+        DBG("Press C2 (MIDI 36) or D2 (MIDI 38) to hear the sample");
+        DBG("Both keys play at original pitch");
+        DBG("=============================\n");
+    }
+    else
+    {
+        DBG("Failed to load sample");
+        delete testSound;
+    }
 }
 
 
@@ -259,9 +292,3 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
     return new NewProjectAudioProcessor();
 }
 
-//==============================================================================
-// This creates new instances of the plugin..
-juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
-{
-    return new NewProjectAudioProcessor();
-}
