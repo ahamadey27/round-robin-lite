@@ -128,6 +128,36 @@ namespace ParameterIDs
     inline constexpr auto highFreq = "highFreq";
 
     //==============================================================================
+// AMPLITUDE ENVELOPE
+
+/**
+ * ENV_ATTACK - Amplitude envelope attack time
+ * Range: 0.0 to 1000.0 milliseconds
+ * Default: 0.0ms (instant attack)
+ * Scaling: Linear or slightly exponential
+ *
+ * Controls how quickly the sample reaches full volume after note-on.
+ * 0ms = instant (no fade-in)
+ * Higher values = slower fade-in
+ */
+    inline constexpr auto envAttack = "envAttack";
+
+    /**
+     * ENV_DECAY - Amplitude envelope decay/release time
+     * Range: 0.0 to 5000.0 milliseconds
+     * Default: 100.0ms (short natural release)
+     * Scaling: Linear or exponential
+     *
+     * Controls how long the sample takes to fade out after note-off.
+     * Lower values = quick fade-out (tight, punchy)
+     * Higher values = long fade-out (sustained, ambient)
+     */
+    inline constexpr auto envDecay = "envDecay";
+
+    //==============================================================================
+    // TRANSIENT MASTER
+
+    //==============================================================================
     // TRANSIENT MASTER
 
     /**
@@ -161,6 +191,6 @@ namespace ParameterIDs
      * Total number of parameters in the plugin.
      * Update this if you add/remove parameters!
      */
-    inline constexpr int totalParameters = 11;
+    inline constexpr int totalParameters = 13;
 
 } // namespace ParameterIDs
