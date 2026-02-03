@@ -1,4 +1,4 @@
-#include "RRVoice.h"
+﻿#include "RRVoice.h"
 
 //==============================================================================
 // Constructor
@@ -40,38 +40,26 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
     juce::SynthesiserSound* sound,
     int /*currentPitchWheelPosition*/)
 {
-    // Cast the generic sound to our specific RRSound type
-    currentSound = dynamic_cast<RRSound*>(sound);
+    // ONE-SHOT ENVELOPE: Attack = fade in, Release = fade out
+    // We immediately call noteOff() after noteOn() so it goes: Attack → Release
+    // This ignores the sustain phase completely
 
-    if (currentSound == nullptr || !currentSound->isLoaded())
-    {
-        isPlaying = false;
-        return;
-    }
-
-    // CALCULATE GLOBAL PITCH SHIFT
-    // Formula: pitchRatio = 2^(semitones/12) * 2^(cents/1200)
-    double semitonePitch = std::pow(2.0, currentSemitones / 12.0);
-    double centsPitch = std::pow(2.0, currentCents / 1200.0);
-    pitchRatio = semitonePitch * centsPitch;
-
-    DBG("Starting note " + juce::String(midiNoteNumber) +
-        " - Pitch: " + juce::String(currentSemitones) + " st + " +
-        juce::String(currentCents) + " cents (ratio: " + juce::String(pitchRatio) + ")");
-
-    // UPDATE ENVELOPE PARAMETERS
-    envelopeParams.attack = currentAttackMs / 1000.0f;   // Convert ms to seconds
-    envelopeParams.decay = 0.1f;                         // Keep decay short
-    envelopeParams.sustain = 1.0f;                       // Full sustain
-    envelopeParams.release = currentDecayMs / 1000.0f;   // Use decay as release time
+    envelopeParams.attack = currentAttackMs / 1000.0f;   // Fade in time
+    envelopeParams.decay = 0.001f;                       // Minimal decay (1ms)
+    envelopeParams.sustain = 1.0f;                       // Full level (but we skip this)
+    envelopeParams.release = currentDecayMs / 1000.0f;   // Fade out time (user's "decay")
 
     envelope.setParameters(envelopeParams);
 
     // Reset playback to beginning of sample
     sourceSamplePosition = 0.0;
 
-    // Trigger the ADSR envelope's attack phase
+    // Trigger envelope attack phase
     envelope.noteOn();
+
+    // IMMEDIATELY trigger release phase (one-shot behavior)
+    // This makes the envelope go: Attack → Release (skipping sustain)
+    envelope.noteOff();
 
     // Mark voice as playing
     isPlaying = true;
