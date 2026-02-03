@@ -287,20 +287,20 @@ This specification breaks the project into eight distinct phases, each with acti
 **Context:** Round Robin Lite will trigger samples without pitch modification, allowing natural footstep sounds to play consistently regardless of which key is pressed. This differs from traditional samplers that pitch-shift samples across the keyboard.
 
 **Implementation Tasks:**
-- [ ] Update MidiMapper constants to set C1 (MIDI 36) as ROOT_MIDI_NOTE
-- [ ] Modify RRSound::appliesToNote() to respond to ALL MIDI notes (0-127)
-- [ ] Remove pitch shifting logic from key pair mapping
-- [ ] Update RRSound to store samples without pitch offset calculations
-- [ ] Verify root note reference is C1 for consistency
-- [ ] Update documentation/comments to reflect unpitched behavior
+- [x] Update MidiMapper constants to set C1 (MIDI 36) as ROOT_MIDI_NOTE
+- [x] Modify RRSound::appliesToNote() to respond to ALL MIDI notes (0-127)
+- [x] Remove pitch shifting logic from key pair mapping
+- [x] Update RRSound to store samples without pitch offset calculations
+- [x] Verify root note reference is C1 for consistency
+- [x] Update documentation/comments to reflect unpitched behavior
 
 **Quick Test After Step 4.1:**
-- [ ] Build project successfully
-- [ ] Load a test sample into any slot
-- [ ] Play various MIDI notes (low C1, middle C4, high C7)
-- [ ] Verify sample plays at identical pitch for all keys
-- [ ] Confirm monophonic behavior (only one sample plays at a time)
-- [ ] Test with multiple samples - each should play unpitched
+- [x] Build project successfully
+- [x] Load a test sample into any slot
+- [x] Play various MIDI notes (low C1, middle C4, high C7)
+- [x] Verify sample plays at identical pitch for all keys
+- [x] Confirm monophonic behavior (only one sample plays at a time)
+- [x] Test with multiple samples - each should play unpitched
 
 **Files to Modify:**
 - MidiMapper.h (update ROOT_MIDI_NOTE constant)
