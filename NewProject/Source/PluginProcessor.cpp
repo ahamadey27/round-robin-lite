@@ -265,21 +265,6 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     smoothedTransientAttack.setTargetValue(apvts.getRawParameterValue(ParameterIDs::transientAttack)->load());
     smoothedTransientDecay.setTargetValue(apvts.getRawParameterValue(ParameterIDs::transientDecay)->load());
 
-    // Advance smoothed values
-    smoothedSemitone.getNextValue();
-    smoothedFineTune.getNextValue();
-    smoothedVolume.getNextValue();
-    smoothedEnvAttack.getNextValue();
-    smoothedEnvDecay.getNextValue();
-    smoothedLowGain.getNextValue();
-    smoothedLowFreq.getNextValue();
-    smoothedMidGain.getNextValue();
-    smoothedMidFreq.getNextValue();
-    smoothedHighGain.getNextValue();
-    smoothedHighFreq.getNextValue();
-    smoothedTransientAttack.getNextValue();
-    smoothedTransientDecay.getNextValue();
-
     //==============================================================================
     // CLEAR OUTPUT BUFFERS
 
@@ -294,7 +279,30 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
 
     synthesiser.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 
-    // Log MIDI activity for debugging
+    //==============================================================================
+    // APPLY VOLUME CONTROL
+
+    // Get the number of samples in this block
+    const int numSamples = buffer.getNumSamples();
+
+    // Apply volume to each sample with smoothing
+    for (int channel = 0; channel < totalNumOutputChannels; ++channel)
+    {
+        float* channelData = buffer.getWritePointer(channel);
+
+        for (int sample = 0; sample < numSamples; ++sample)
+        {
+            // Get the next smoothed volume value
+            float volumeGain = smoothedVolume.getNextValue();
+
+            // Apply gain to this sample
+            channelData[sample] *= volumeGain;
+        }
+    }
+
+    //==============================================================================
+    // LOG MIDI ACTIVITY (for debugging)
+
     if (!midiMessages.isEmpty())
     {
         DBG("Processing " + juce::String(midiMessages.getNumEvents()) + " MIDI events");
