@@ -4,15 +4,15 @@
 // Constructor
 RRVoice::RRVoice()
 {
-    // Set up default ADSR envelope parameters
-    envelopeParams.attack = 0.01f;   // 10ms attack
-    envelopeParams.decay = 0.1f;     // 100ms decay
-    envelopeParams.sustain = 1.0f;   // Full sustain level
-    envelopeParams.release = 0.1f;   // 100ms release
+    // UPDATE ENVELOPE PARAMETERS (One-shot drum machine style)
+    envelopeParams.attack = currentAttackMs / 1000.0f;   // Fade in
+    envelopeParams.decay = currentDecayMs / 1000.0f;     // Fade out to silence
+    envelopeParams.sustain = 0.0f;                       // Fade to silence (not 1.0!)
+    envelopeParams.release = 0.0f;                       // Not used in one-shot mode
 
     envelope.setParameters(envelopeParams);
 }
-
+ 
 // Destructor
 RRVoice::~RRVoice()
 {
@@ -81,18 +81,20 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
 // Stop playing a note
 void RRVoice::stopNote(float /*velocity*/, bool allowTailOff)
 {
-    if (allowTailOff)
+    // ONE-SHOT BEHAVIOR: Ignore key releases
+    // The envelope will play through regardless of when the key is released
+    // This gives us drum machine/one-shot behavior
+
+    if (!allowTailOff)
     {
-        // Let the envelope fade out naturally (release phase)
-        envelope.noteOff();
-    }
-    else
-    {
-        // Stop immediately (hard cut)
+        // Hard stop (only for emergency voice stealing)
         clearCurrentNote();
         envelope.reset();
         isPlaying = false;
     }
+
+    // If allowTailOff is true, do NOTHING - let the envelope play through!
+    // The voice will stop automatically when envelope.isActive() returns false
 }
 
 //==============================================================================
