@@ -359,10 +359,111 @@ juce::AudioProcessorEditor* NewProjectAudioProcessor::createEditor()
 //==============================================================================
 void NewProjectAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
 {
+    // SAVE PLUGIN STATE TO PRESET
+    // This is called by the DAW when saving a project or preset
+
+    DBG("=== SAVING PLUGIN STATE ===");
+
+    // Step 1: Get the current parameter state from APVTS as a ValueTree
+    auto state = apvts.copyState();
+
+    // Step 2: Add custom data (for future use - sample paths will go here)
+    // For now, we'll create a placeholder section
+    juce::ValueTree customData("CustomData");
+    customData.setProperty("version", 1, nullptr);  // Track preset format version
+
+    // TODO (Phase 4): Add sample file paths here
+    // Example structure for future:
+    // juce::ValueTree samples("Samples");
+    // for (int i = 0; i < 20; ++i)
+    // {
+    //     juce::ValueTree sample("Sample");
+    //     sample.setProperty("slot", i, nullptr);
+    //     sample.setProperty("path", samplePaths[i], nullptr);
+    //     samples.appendChild(sample, nullptr);
+    // }
+    // customData.appendChild(samples, nullptr);
+
+    state.appendChild(customData, nullptr);
+
+    // Step 3: Convert the ValueTree to XML
+    std::unique_ptr<juce::XmlElement> xml(state.createXml());
+
+    if (xml != nullptr)
+    {
+        // Step 4: Convert XML to binary and store in destData
+        copyXmlToBinary(*xml, destData);
+
+        DBG("State saved successfully");
+        DBG("  Parameters saved: " + juce::String(apvts.state.getNumChildren()));
+        DBG("========================");
+    }
+    else
+    {
+        DBG("ERROR: Failed to create XML from state");
+    }
 }
 
 void NewProjectAudioProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
+    // LOAD PLUGIN STATE FROM PRESET
+    // This is called by the DAW when loading a project or preset
+
+    DBG("=== LOADING PLUGIN STATE ===");
+
+    // Step 1: Parse the binary data back to XML
+    std::unique_ptr<juce::XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
+
+    if (xmlState == nullptr)
+    {
+        DBG("ERROR: Failed to parse XML from binary data");
+        return;
+    }
+
+    // Step 2: Check if the XML is valid and matches our state format
+    if (!xmlState->hasTagName(apvts.state.getType()))
+    {
+        DBG("ERROR: XML tag name doesn't match APVTS state type");
+        return;
+    }
+
+    // Step 3: Convert XML back to ValueTree
+    juce::ValueTree state = juce::ValueTree::fromXml(*xmlState);
+
+    if (!state.isValid())
+    {
+        DBG("ERROR: Failed to create ValueTree from XML");
+        return;
+    }
+
+    // Step 4: Restore APVTS parameter values from the loaded state
+    apvts.replaceState(state);
+
+    DBG("State loaded successfully");
+    DBG("  Parameters restored: " + juce::String(apvts.state.getNumChildren()));
+
+    // Step 5: Restore custom data (sample paths - for future implementation)
+    juce::ValueTree customData = state.getChildWithName("CustomData");
+    if (customData.isValid())
+    {
+        int version = customData.getProperty("version", 0);
+        DBG("  Custom data version: " + juce::String(version));
+
+        // TODO (Phase 4): Load sample file paths here
+        // juce::ValueTree samples = customData.getChildWithName("Samples");
+        // if (samples.isValid())
+        // {
+        //     for (int i = 0; i < samples.getNumChildren(); ++i)
+        //     {
+        //         juce::ValueTree sample = samples.getChild(i);
+        //         int slot = sample.getProperty("slot");
+        //         juce::String path = sample.getProperty("path").toString();
+        //         // Load sample from path...
+        //     }
+        // }
+    }
+
+    DBG("========================");
 }
 
 //==============================================================================
