@@ -129,5 +129,5 @@ void RRSound::clearSample()
     audioBuffer.setSize(0, 0);
     displayName = "";
     keyPairIndex = -1;
-    rootNote = 36;  // C1 (MIDI 36) is the root reference
+    rootNote = 36;  // C1 (MIDI 36) - Changed from 48
 }

@@ -31,11 +31,11 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
     // Register basic audio formats for sample loading
     formatManager.registerBasicFormats();
 
-    DBG("Round Robin Lite initialized - Synthesiser ready");
-    DBG("Number of voices: " + juce::String(synthesiser.getNumVoices()));
-
-    // Print mapping info
-    MidiMapper::printMappingInfo();
+    DBG("=== Round Robin Lite Initialized ===");
+    DBG("Synthesiser ready with " + juce::String(synthesiser.getNumVoices()) + " voice(s)");
+    DBG("UNPITCHED PLAYBACK MODE - All samples play at original pitch");
+    DBG("Root reference note: C1 (MIDI 36)");
+    DBG("===================================");
 
     // TEST: Verify parameter IDs are accessible
     DBG("\n=== Testing Parameter IDs ===");
@@ -54,10 +54,6 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
     // TEST: Load single sample
     // ============================================================
 
-    // ============================================================
-// TEST: Load single sample
-// ============================================================
-
     juce::File testFile("C:\\Users\\hamad\\OneDrive\\Desktop\\snd_surf_hard_dirt_01.wav");
 
     DBG("\n=== LOADING TEST SAMPLE ===");
@@ -65,6 +61,7 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
     if (!testFile.existsAsFile())
     {
         DBG("ERROR: Test file not found at: " + testFile.getFullPathName());
+        DBG("Please update the file path in PluginProcessor.cpp constructor");
         return;
     }
 
@@ -81,8 +78,8 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
         synthesiser.addSound(testSound);
 
         DBG("\n=== READY TO PLAY ===");
-        DBG("Press C2 (MIDI 36) or D2 (MIDI 38) to hear the sample");
-        DBG("Both keys play at original pitch");
+        DBG("Press ANY MIDI key to hear the sample");
+        DBG("All keys play at original pitch (unpitched mode)");
         DBG("=============================\n");
     }
     else
@@ -91,7 +88,6 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
         delete testSound;
     }
 }
-
 
 NewProjectAudioProcessor::~NewProjectAudioProcessor()
 {
@@ -138,8 +134,7 @@ double NewProjectAudioProcessor::getTailLengthSeconds() const
 
 int NewProjectAudioProcessor::getNumPrograms()
 {
-    return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
-    // so this should be at least 1, even if you're not really implementing programs.
+    return 1;
 }
 
 int NewProjectAudioProcessor::getCurrentProgram()
@@ -163,23 +158,16 @@ void NewProjectAudioProcessor::changeProgramName(int index, const juce::String& 
 //==============================================================================
 void NewProjectAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
-    // This is called before playback starts, giving us a chance to prepare
-
     DBG("prepareToPlay called - Sample Rate: " + juce::String(sampleRate) +
         " Hz, Buffer Size: " + juce::String(samplesPerBlock) + " samples");
 
     // Tell the synthesiser what sample rate we're running at
-    // This is CRITICAL for correct pitch calculation
     synthesiser.setCurrentPlaybackSampleRate(sampleRate);
 
     //==============================================================================
     // INITIALIZE PARAMETER SMOOTHING
 
-    // Set ramp time to 50ms for smooth parameter changes
     const double rampTimeSeconds = 0.05; // 50 milliseconds
-
-    // For LinearSmoothedValue, reset() takes (sample rate, ramp time in seconds)
-    // This sets both the sample rate AND the smoothing duration
 
     // Pitch Controls
     smoothedSemitone.reset(sampleRate, rampTimeSeconds);
@@ -230,9 +218,6 @@ void NewProjectAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBl
 
 void NewProjectAudioProcessor::releaseResources()
 {
-    // When playback stops, you can use this as an opportunity to free up any
-    // spare memory, etc.
-
     DBG("releaseResources called - Playback stopped");
 }
 
@@ -243,15 +228,10 @@ bool NewProjectAudioProcessor::isBusesLayoutSupported(const BusesLayout& layouts
     juce::ignoreUnused(layouts);
     return true;
 #else
-    // This is the place where you check if the layout is supported.
-    // In this template code we only support mono or stereo.
-    // Some plugin hosts, such as certain GarageBand versions, will only
-    // load plugins that support stereo bus layouts.
     if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
         && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
         return false;
 
-    // This checks if the input layout matches the output layout
 #if ! JucePlugin_IsSynth
     if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
         return false;
@@ -269,9 +249,8 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
     //==============================================================================
-   // UPDATE SMOOTHED PARAMETER VALUES
+    // UPDATE SMOOTHED PARAMETER VALUES
 
-   // Get raw parameter values from APVTS and set as targets for smoothing
     smoothedSemitone.setTargetValue(apvts.getRawParameterValue(ParameterIDs::semitone)->load());
     smoothedFineTune.setTargetValue(apvts.getRawParameterValue(ParameterIDs::fineTune)->load());
     smoothedVolume.setTargetValue(apvts.getRawParameterValue(ParameterIDs::volume)->load());
@@ -286,8 +265,7 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     smoothedTransientAttack.setTargetValue(apvts.getRawParameterValue(ParameterIDs::transientAttack)->load());
     smoothedTransientDecay.setTargetValue(apvts.getRawParameterValue(ParameterIDs::transientDecay)->load());
 
-    // Advance smoothed values by one sample
-    // (We'll actually use these values in Step 5 when connecting to audio processing)
+    // Advance smoothed values
     smoothedSemitone.getNextValue();
     smoothedFineTune.getNextValue();
     smoothedVolume.getNextValue();
@@ -303,25 +281,20 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     smoothedTransientDecay.getNextValue();
 
     //==============================================================================
-    // CRITICAL: Clear the output buffer first
-    // The synthesiser uses addSample(), so we need to start with silence
+    // CLEAR OUTPUT BUFFERS
+
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
 
-    // CRITICAL: Clear the output buffer first
-    // The synthesiser uses addSample(), so we need to start with silence
-    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear(i, 0, buffer.getNumSamples());
-
-    // For a synth, we also clear the input channels since we're generating audio
     for (int i = 0; i < totalNumInputChannels; ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
 
-    // THIS IS WHERE THE MAGIC HAPPENS!
-    // The synthesiser processes all MIDI messages and renders audio from active voices
+    //==============================================================================
+    // RENDER AUDIO FROM SYNTHESISER
+
     synthesiser.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 
-    // Optional: Log MIDI activity for debugging
+    // Log MIDI activity for debugging
     if (!midiMessages.isEmpty())
     {
         DBG("Processing " + juce::String(midiMessages.getNumEvents()) + " MIDI events");
@@ -341,7 +314,7 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
 //==============================================================================
 bool NewProjectAudioProcessor::hasEditor() const
 {
-    return true; // (change this to false if you choose to not supply an editor)
+    return true;
 }
 
 juce::AudioProcessorEditor* NewProjectAudioProcessor::createEditor()
@@ -352,15 +325,10 @@ juce::AudioProcessorEditor* NewProjectAudioProcessor::createEditor()
 //==============================================================================
 void NewProjectAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
 }
 
 void NewProjectAudioProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
 }
 
 //==============================================================================
@@ -373,24 +341,18 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
     //==============================================================================
     // GLOBAL PITCH CONTROLS
 
-    // Semitone: -12 to +12 semitones, step 1, default 0
     layout.add(std::make_unique<juce::AudioParameterInt>(
-        juce::ParameterID(ParameterIDs::semitone, 1),  // ID and version
-        "Semitone",                                      // Name shown in DAW
-        -12,                                             // Min
-        12,                                              // Max
-        0,                                               // Default
-        juce::String(),                                  // Label (empty for now)
-        [](int value, int) { return juce::String(value) + " st"; }  // Value to text
+        juce::ParameterID(ParameterIDs::semitone, 1),
+        "Semitone",
+        -12, 12, 0,
+        juce::String(),
+        [](int value, int) { return juce::String(value) + " st"; }
     ));
 
-    // Fine Tune: -100 to +100 cents, step 1, default 0
     layout.add(std::make_unique<juce::AudioParameterInt>(
         juce::ParameterID(ParameterIDs::fineTune, 1),
         "Fine Tune",
-        -100,                                            // Min
-        100,                                             // Max
-        0,                                               // Default
+        -100, 100, 0,
         juce::String(),
         [](int value, int) { return juce::String(value) + " cents"; }
     ));
@@ -398,12 +360,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
     //==============================================================================
     // VOLUME
 
-    // Volume: 0.0 to 1.0, default 0.75 (approx -2.5dB)
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::volume, 1),
         "Volume",
-        juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f),  // Min, Max, Step
-        0.75f,                                                // Default
+        juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f),
+        0.75f,
         juce::String(),
         juce::AudioProcessorParameter::genericParameter,
         [](float value, int) {
@@ -417,23 +378,21 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
     //==============================================================================
     // AMPLITUDE ENVELOPE
 
-    // Envelope Attack: 0 to 1000ms, default 0ms (instant)
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::envAttack, 1),
         "Env Attack",
-        juce::NormalisableRange<float>(0.0f, 1000.0f, 0.1f, 0.3f),  // Min, Max, Step, Skew (slight curve)
-        0.0f,                                                         // Default
+        juce::NormalisableRange<float>(0.0f, 1000.0f, 0.1f, 0.3f),
+        0.0f,
         "ms",
         juce::AudioProcessorParameter::genericParameter,
         [](float value, int) { return juce::String(value, 1) + " ms"; }
     ));
 
-    // Envelope Decay: 0 to 5000ms, default 100ms
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::envDecay, 1),
         "Env Decay",
-        juce::NormalisableRange<float>(0.0f, 5000.0f, 1.0f, 0.4f),  // Slight curve for better control
-        100.0f,                                                       // Default
+        juce::NormalisableRange<float>(0.0f, 5000.0f, 1.0f, 0.4f),
+        100.0f,
         "ms",
         juce::AudioProcessorParameter::genericParameter,
         [](float value, int) { return juce::String(value, 1) + " ms"; }
@@ -442,7 +401,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
     //==============================================================================
     // 3-BAND EQ
 
-    // Low Band Gain: -24dB to +24dB, default 0dB
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::lowGain, 1),
         "Low Gain",
@@ -451,16 +409,14 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
         "dB"
     ));
 
-    // Low Band Frequency: 20Hz to 500Hz, default 100Hz (logarithmic)
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::lowFreq, 1),
         "Low Freq",
-        juce::NormalisableRange<float>(20.0f, 500.0f, 1.0f, 0.25f),  // 0.25 skew = logarithmic
+        juce::NormalisableRange<float>(20.0f, 500.0f, 1.0f, 0.25f),
         100.0f,
         "Hz"
     ));
 
-    // Mid Band Gain: -24dB to +24dB, default 0dB
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::midGain, 1),
         "Mid Gain",
@@ -469,7 +425,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
         "dB"
     ));
 
-    // Mid Band Frequency: 200Hz to 5000Hz, default 1000Hz (logarithmic)
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::midFreq, 1),
         "Mid Freq",
@@ -478,7 +433,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
         "Hz"
     ));
 
-    // High Band Gain: -24dB to +24dB, default 0dB
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::highGain, 1),
         "High Gain",
@@ -487,7 +441,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
         "dB"
     ));
 
-    // High Band Frequency: 2000Hz to 20000Hz, default 5000Hz (logarithmic)
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::highFreq, 1),
         "High Freq",
@@ -499,25 +452,17 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
     //==============================================================================
     // TRANSIENT MASTER
 
-    // Transient Attack: -127 to +127, default 0
     layout.add(std::make_unique<juce::AudioParameterInt>(
         juce::ParameterID(ParameterIDs::transientAttack, 1),
         "Transient Attack",
-        -127,
-        127,
-        0
+        -127, 127, 0
     ));
 
-    // Transient Decay: -127 to +127, default 0
     layout.add(std::make_unique<juce::AudioParameterInt>(
         juce::ParameterID(ParameterIDs::transientDecay, 1),
         "Transient Decay",
-        -127,
-        127,
-        0
+        -127, 127, 0
     ));
-
-    //==============================================================================
 
     DBG("Parameter layout created with " + juce::String(ParameterIDs::totalParameters) + " parameters");
 
@@ -525,9 +470,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
 }
 
 //==============================================================================
-// This creates new instances of the plugin..
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new NewProjectAudioProcessor();
 }
-
