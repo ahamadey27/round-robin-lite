@@ -275,6 +275,31 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
         buffer.clear(i, 0, buffer.getNumSamples());
 
     //==============================================================================
+   // STORE GLOBAL PARAMETER VALUES FOR VOICES
+
+   // These values will be accessed by voices when they start
+    globalSemitones.store(smoothedSemitone.getCurrentValue());
+    globalCents.store(smoothedFineTune.getCurrentValue());
+    globalAttackMs.store(smoothedEnvAttack.getCurrentValue());
+    globalDecayMs.store(smoothedEnvDecay.getCurrentValue());
+
+    //==============================================================================
+    // UPDATE ALL VOICES WITH CURRENT GLOBAL PARAMETERS
+
+    float semitones = smoothedSemitone.getCurrentValue();
+    float cents = smoothedFineTune.getCurrentValue();
+    float attackMs = smoothedEnvAttack.getCurrentValue();
+    float decayMs = smoothedEnvDecay.getCurrentValue();
+
+    for (int i = 0; i < synthesiser.getNumVoices(); ++i)
+    {
+        if (auto* voice = dynamic_cast<RRVoice*>(synthesiser.getVoice(i)))
+        {
+            voice->updateGlobalParameters(semitones, cents, attackMs, decayMs);
+        }
+    }
+
+    //==============================================================================
     // RENDER AUDIO FROM SYNTHESISER
 
     synthesiser.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());

@@ -27,6 +27,13 @@ bool RRVoice::canPlaySound(juce::SynthesiserSound* sound)
     return dynamic_cast<RRSound*>(sound) != nullptr;
 }
 
+void RRVoice::updateGlobalParameters(float semitones, float cents, float attackMs, float decayMs)
+{
+    currentSemitones = semitones;
+    currentCents = cents;
+    currentAttackMs = attackMs;
+    currentDecayMs = decayMs;
+}
 //==============================================================================
 // Start playing a note
 void RRVoice::startNote(int midiNoteNumber, float velocity,
@@ -38,17 +45,27 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
 
     if (currentSound == nullptr || !currentSound->isLoaded())
     {
-        // No valid sound to play
         isPlaying = false;
         return;
     }
 
-    // UNPITCHED PLAYBACK: Always play at original speed (no pitch shifting)
-    // Round Robin Lite plays all samples at their natural pitch
-    pitchRatio = 1.0;
+    // CALCULATE GLOBAL PITCH SHIFT
+    // Formula: pitchRatio = 2^(semitones/12) * 2^(cents/1200)
+    double semitonePitch = std::pow(2.0, currentSemitones / 12.0);
+    double centsPitch = std::pow(2.0, currentCents / 1200.0);
+    pitchRatio = semitonePitch * centsPitch;
 
     DBG("Starting note " + juce::String(midiNoteNumber) +
-        " - UNPITCHED playback (ratio: 1.0)");
+        " - Pitch: " + juce::String(currentSemitones) + " st + " +
+        juce::String(currentCents) + " cents (ratio: " + juce::String(pitchRatio) + ")");
+
+    // UPDATE ENVELOPE PARAMETERS
+    envelopeParams.attack = currentAttackMs / 1000.0f;   // Convert ms to seconds
+    envelopeParams.decay = 0.1f;                         // Keep decay short
+    envelopeParams.sustain = 1.0f;                       // Full sustain
+    envelopeParams.release = currentDecayMs / 1000.0f;   // Use decay as release time
+
+    envelope.setParameters(envelopeParams);
 
     // Reset playback to beginning of sample
     sourceSamplePosition = 0.0;

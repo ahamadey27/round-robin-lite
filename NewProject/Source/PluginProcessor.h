@@ -70,6 +70,18 @@ private:
      */
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
+    // Audio Engine
+    juce::Synthesiser synthesiser;
+    juce::AudioFormatManager formatManager;
+
+    // Parameter System
+    juce::AudioProcessorValueTreeState apvts;
+
+    // Current global pitch values (updated each block)
+    std::atomic<float> globalSemitones{ 0.0f };
+    std::atomic<float> globalCents{ 0.0f };
+    std::atomic<float> globalAttackMs{ 0.0f };
+    std::atomic<float> globalDecayMs{ 100.0f };
     //==============================================================================
     // PARAMETER SMOOTHING
 

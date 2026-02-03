@@ -28,6 +28,8 @@ public:
     RRVoice();
     ~RRVoice() override;
 
+    void updateGlobalParameters(float semitones, float cents, float attackMs, float decayMs);
+
     //==============================================================================
     // JUCE SynthesiserVoice Required Methods
 
@@ -84,15 +86,21 @@ private:
     // Member Variables
 
     // Playback state
-    double sourceSamplePosition = 0.0;    // Current position in the sample (in samples)
-    double pitchRatio = 1.0;              // Speed multiplier for pitch shifting
-    bool isPlaying = false;                // Is this voice currently active?
+    double sourceSamplePosition = 0.0;
+    double pitchRatio = 1.0;
+    bool isPlaying = false;
+
+    // Global parameters (updated before each note)
+    float currentSemitones = 0.0f;
+    float currentCents = 0.0f;
+    float currentAttackMs = 0.0f;
+    float currentDecayMs = 100.0f;
 
     // ADSR Envelope
-    juce::ADSR envelope;                   // Handles attack, decay, sustain, release
-    juce::ADSR::Parameters envelopeParams; // Envelope settings
+    juce::ADSR envelope;
+    juce::ADSR::Parameters envelopeParams;
 
-    // Reference to current sound (set in startNote)
+    // Reference to current sound
     RRSound* currentSound = nullptr;
 
     //==============================================================================
