@@ -286,10 +286,11 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     //==============================================================================
     // UPDATE ALL VOICES WITH CURRENT GLOBAL PARAMETERS
 
-    float semitones = smoothedSemitone.getCurrentValue();
-    float cents = smoothedFineTune.getCurrentValue();
-    float attackMs = smoothedEnvAttack.getCurrentValue();
-    float decayMs = smoothedEnvDecay.getCurrentValue();
+   // Get INSTANT parameter values (no smoothing for note-start parameters)
+    float semitones = static_cast<float>(apvts.getRawParameterValue(ParameterIDs::semitone)->load());
+    float cents = static_cast<float>(apvts.getRawParameterValue(ParameterIDs::fineTune)->load());
+    float attackMs = apvts.getRawParameterValue(ParameterIDs::envAttack)->load();
+    float decayMs = apvts.getRawParameterValue(ParameterIDs::envDecay)->load();
 
     for (int i = 0; i < synthesiser.getNumVoices(); ++i)
     {
