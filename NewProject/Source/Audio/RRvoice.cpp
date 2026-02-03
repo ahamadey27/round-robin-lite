@@ -51,35 +51,34 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
     }
 
     // CALCULATE GLOBAL PITCH SHIFT
-    // Formula: pitchRatio = 2^(semitones/12) * 2^(cents/1200)
     double semitonePitch = std::pow(2.0, currentSemitones / 12.0);
     double centsPitch = std::pow(2.0, currentCents / 1200.0);
     pitchRatio = semitonePitch * centsPitch;
 
     DBG("Starting note " + juce::String(midiNoteNumber) +
         " - Pitch: " + juce::String(currentSemitones) + " st + " +
-        juce::String(currentCents) + " cents (ratio: " + juce::String(pitchRatio) + ")");
+        juce::String(currentCents) + " cents (ratio: " + juce::String(pitchRatio) +
+        ") | Attack: " + juce::String(currentAttackMs) + "ms, Decay: " + juce::String(currentDecayMs) + "ms");
 
-    // ONE-SHOT ENVELOPE: Attack = fade in, Release = fade out
-    // We immediately call noteOff() after noteOn() so it goes: Attack → Release
-    // This ignores the sustain phase completely
+    // ONE-SHOT ENVELOPE: Attack → Decay → Silent
+    // We use decay to fade out, and sustain at 0 so it stops naturally
 
     envelopeParams.attack = currentAttackMs / 1000.0f;   // Fade in time
-    envelopeParams.decay = 0.001f;                       // Minimal decay (1ms)
-    envelopeParams.sustain = 1.0f;                       // Full level (but we skip this)
-    envelopeParams.release = currentDecayMs / 1000.0f;   // Fade out time (user's "decay")
+    envelopeParams.decay = currentDecayMs / 1000.0f;     // Fade out time  
+    envelopeParams.sustain = 0.0f;                       // Fade to silence
+    envelopeParams.release = 0.001f;                     // Very short release (1ms)
 
     envelope.setParameters(envelopeParams);
 
-    // Reset playback to beginning of sample
+    // Reset playback position
     sourceSamplePosition = 0.0;
 
-    // Trigger envelope attack phase
-    envelope.noteOn();
+    // Reset and start envelope from clean state
+    envelope.reset();      // ← IMPORTANT: Reset first!
+    envelope.noteOn();     // Start attack phase
 
-    // IMMEDIATELY trigger release phase (one-shot behavior)
-    // This makes the envelope go: Attack → Release (skipping sustain)
-    envelope.noteOff();
+    // DON'T call noteOff() here - we'll handle it differently
+    // The envelope will play: Attack → Decay → Sustain (0) → wait
 
     // Mark voice as playing
     isPlaying = true;
@@ -116,7 +115,7 @@ void RRVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer,
 
     // Get the sample data from the RRSound
     const juce::AudioBuffer<float>& sampleBuffer = currentSound->getAudioBuffer();
-    const float* sampleData = sampleBuffer.getReadPointer(0); // Channel 0 (mono)
+    const float* sampleData = sampleBuffer.getReadPointer(0);
     const int sampleLength = sampleBuffer.getNumSamples();
 
     // Process each sample in this block
@@ -125,7 +124,6 @@ void RRVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer,
         // Check if we've reached the end of the sample
         if (sourceSamplePosition >= sampleLength)
         {
-            // Sample finished playing
             clearCurrentNote();
             isPlaying = false;
             break;
@@ -134,19 +132,23 @@ void RRVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer,
         // Get the current envelope level (0.0 to 1.0)
         const float envelopeLevel = envelope.getNextSample();
 
+        // ONE-SHOT BEHAVIOR: If envelope has faded to (near) silence, trigger release to finish
+        if (envelopeLevel < 0.0001f && envelope.isActive())
+        {
+            envelope.noteOff();  // Trigger short release to cleanly finish
+        }
+
         // Linear interpolation for smooth playback
         const int index0 = static_cast<int>(sourceSamplePosition);
         const int index1 = index0 + 1;
 
         if (index1 >= sampleLength)
         {
-            // Near end of sample, no interpolation needed
             clearCurrentNote();
             isPlaying = false;
             break;
         }
 
-        // Linear interpolation formula: y = y0 + (y1 - y0) * fraction
         const float fraction = static_cast<float>(sourceSamplePosition - index0);
         const float sample0 = sampleData[index0];
         const float sample1 = sampleData[index1];
@@ -155,17 +157,16 @@ void RRVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer,
         // Apply envelope to the sample
         const float outputSample = interpolatedSample * envelopeLevel;
 
-        // Write to output buffer (add, don't replace - allows multiple voices)
-        // For stereo output, write to both channels
+        // Write to both channels
         for (int channel = 0; channel < outputBuffer.getNumChannels(); ++channel)
         {
             outputBuffer.addSample(channel, startSample + i, outputSample);
         }
 
-        // Advance the playback position by the pitch ratio
+        // Advance playback position
         sourceSamplePosition += pitchRatio;
 
-        // Check if envelope has finished (release phase complete)
+        // Stop when envelope completely finishes
         if (!envelope.isActive())
         {
             clearCurrentNote();
