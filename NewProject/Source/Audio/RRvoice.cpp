@@ -4,15 +4,15 @@
 // Constructor
 RRVoice::RRVoice()
 {
-    // UPDATE ENVELOPE PARAMETERS (One-shot drum machine style)
-    envelopeParams.attack = currentAttackMs / 1000.0f;   // Fade in
-    envelopeParams.decay = currentDecayMs / 1000.0f;     // Fade out to silence
-    envelopeParams.sustain = 0.0f;                       // Fade to silence (not 1.0!)
-    envelopeParams.release = 0.0f;                       // Not used in one-shot mode
+    // Set up default ADSR envelope parameters
+    envelopeParams.attack = 0.01f;   // 10ms attack
+    envelopeParams.decay = 0.001f;   // 1ms decay
+    envelopeParams.sustain = 1.0f;   // Full sustain
+    envelopeParams.release = 0.1f;   // 100ms release
 
     envelope.setParameters(envelopeParams);
 }
- 
+
 // Destructor
 RRVoice::~RRVoice()
 {
@@ -34,12 +34,32 @@ void RRVoice::updateGlobalParameters(float semitones, float cents, float attackM
     currentAttackMs = attackMs;
     currentDecayMs = decayMs;
 }
+
 //==============================================================================
 // Start playing a note
 void RRVoice::startNote(int midiNoteNumber, float velocity,
     juce::SynthesiserSound* sound,
     int /*currentPitchWheelPosition*/)
 {
+    // Cast the generic sound to our specific RRSound type
+    currentSound = dynamic_cast<RRSound*>(sound);
+
+    if (currentSound == nullptr || !currentSound->isLoaded())
+    {
+        isPlaying = false;
+        return;
+    }
+
+    // CALCULATE GLOBAL PITCH SHIFT
+    // Formula: pitchRatio = 2^(semitones/12) * 2^(cents/1200)
+    double semitonePitch = std::pow(2.0, currentSemitones / 12.0);
+    double centsPitch = std::pow(2.0, currentCents / 1200.0);
+    pitchRatio = semitonePitch * centsPitch;
+
+    DBG("Starting note " + juce::String(midiNoteNumber) +
+        " - Pitch: " + juce::String(currentSemitones) + " st + " +
+        juce::String(currentCents) + " cents (ratio: " + juce::String(pitchRatio) + ")");
+
     // ONE-SHOT ENVELOPE: Attack = fade in, Release = fade out
     // We immediately call noteOff() after noteOn() so it goes: Attack → Release
     // This ignores the sustain phase completely
@@ -143,7 +163,6 @@ void RRVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer,
         }
 
         // Advance the playback position by the pitch ratio
-        // (For now, always 1.0 = original speed/pitch)
         sourceSamplePosition += pitchRatio;
 
         // Check if envelope has finished (release phase complete)
