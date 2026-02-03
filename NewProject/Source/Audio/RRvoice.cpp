@@ -60,22 +60,6 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
     isPlaying = true;
 }
 
-    // SIMPLIFIED: Always play at original pitch (no MIDI-based pitch shifting)
-    // Global pitch controls will be added in Phase 3
-    pitchRatio = 1.0;
-
-    DBG("Starting note " + juce::String(midiNoteNumber) + " at original pitch");
-
-    // Reset playback to beginning of sample
-    sourceSamplePosition = 0.0;
-
-    // Trigger the ADSR envelope's attack phase
-    envelope.noteOn();
-
-    // Mark voice as playing
-    isPlaying = true;
-}
-
 //==============================================================================
 // Stop playing a note
 void RRVoice::stopNote(float /*velocity*/, bool allowTailOff)
