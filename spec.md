@@ -281,6 +281,35 @@ This specification breaks the project into eight distinct phases, each with acti
 - [ ] Verify no clicks, pops, or audio glitches
 - [ ] Test with other parameters as well
 
+### Step 4.1: Configure Unpitched Playback Across All Keys
+**Goal:** Modify the sampler to play uploaded samples at their original pitch across ALL MIDI keys without pitch shifting. C1 (MIDI note 36) is set as the root reference note.
+
+**Context:** Round Robin Lite will trigger samples without pitch modification, allowing natural footstep sounds to play consistently regardless of which key is pressed. This differs from traditional samplers that pitch-shift samples across the keyboard.
+
+**Implementation Tasks:**
+- [ ] Update MidiMapper constants to set C1 (MIDI 36) as ROOT_MIDI_NOTE
+- [ ] Modify RRSound::appliesToNote() to respond to ALL MIDI notes (0-127)
+- [ ] Remove pitch shifting logic from key pair mapping
+- [ ] Update RRSound to store samples without pitch offset calculations
+- [ ] Verify root note reference is C1 for consistency
+- [ ] Update documentation/comments to reflect unpitched behavior
+
+**Quick Test After Step 4.1:**
+- [ ] Build project successfully
+- [ ] Load a test sample into any slot
+- [ ] Play various MIDI notes (low C1, middle C4, high C7)
+- [ ] Verify sample plays at identical pitch for all keys
+- [ ] Confirm monophonic behavior (only one sample plays at a time)
+- [ ] Test with multiple samples - each should play unpitched
+
+**Files to Modify:**
+- MidiMapper.h (update ROOT_MIDI_NOTE constant)
+- RRSound.h and RRSound.cpp (modify appliesToNote method)
+- PluginProcessor comments (update to reflect unpitched design)
+
+**Expected Behavior:**
+After this step, pressing any key on a MIDI controller will trigger the loaded sample at its original, unmodified pitch. The key pair system still groups samples for L/R foot alternation, but no longer applies pitch shifting.
+
 ### Step 5: Connect Parameters to Audio Processing
 - [ ] In processBlock(), retrieve current Semitone value from APVTS
 - [ ] In processBlock(), retrieve current Fine Tune value from APVTS
