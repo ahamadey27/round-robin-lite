@@ -346,25 +346,25 @@ After this step, pressing any key on a MIDI controller will trigger the loaded s
 - [x] Envelope Test
 
 ### Step 6: Implement Preset Save and Load Functionality
-- [x] In getStateInformation() method:
-  - [x] Copy current APVTS state to ValueTree object
-  - [x] Create placeholder for custom data (sample file paths)
-  - [x] Convert ValueTree to XML format
-  - [x] Serialize XML to binary memory block
-  - [x] Store in destData parameter
-- [x] In setStateInformation() method:
-  - [x] Parse binary memory block to XML
-  - [x] Convert XML back to ValueTree
-  - [x] Restore APVTS state from ValueTree
-  - [x] Restore custom data (sample file paths - to implement later)
-  - [x] Update any dependent state or UI
+- [ ] In getStateInformation() method:
+  - [ ] Copy current APVTS state to ValueTree object
+  - [ ] Create placeholder for custom data (sample file paths)
+  - [ ] Convert ValueTree to XML format
+  - [ ] Serialize XML to binary memory block
+  - [ ] Store in destData parameter
+- [ ] In setStateInformation() method:
+  - [ ] Parse binary memory block to XML
+  - [ ] Convert XML back to ValueTree
+  - [ ] Restore APVTS state from ValueTree
+  - [ ] Restore custom data (sample file paths - to implement later)
+  - [ ] Update any dependent state or UI
 
 **Quick Test After Step 6:**
-- [x] Set parameters to specific values (e.g., Volume 50%, Semitone +5)
-- [x] Save DAW project or create a preset in host
-- [x] Change all parameters to different values
-- [x] Reload the project or preset
-- [x] Verify all parameters return to saved values
+- [ ] Set parameters to specific values (e.g., Volume 50%, Semitone +5)
+- [ ] Save DAW project or create a preset in host
+- [ ] Change all parameters to different values
+- [ ] Reload the project or preset
+- [ ] Verify all parameters return to saved values
 
 ### Step 7: Test Parameter Automation in DAW
 - [ ] Build plugin with all parameters defined
