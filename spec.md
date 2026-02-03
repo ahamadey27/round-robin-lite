@@ -311,17 +311,17 @@ This specification breaks the project into eight distinct phases, each with acti
 After this step, pressing any key on a MIDI controller will trigger the loaded sample at its original, unmodified pitch. The key pair system still groups samples for L/R foot alternation, but no longer applies pitch shifting.
 
 ### Step 5: Connect Parameters to Audio Processing
-- [ ] In processBlock(), retrieve current Semitone value from APVTS
-- [ ] In processBlock(), retrieve current Fine Tune value from APVTS
-- [ ] In processBlock(), retrieve current Volume value from APVTS
-- [ ] In processBlock(), retrieve Envelope Attack and Decay values from APVTS
-- [ ] Calculate combined pitch shift from semitone and fine tune parameters
-- [ ] Apply global pitch shift to RRVoice's pitchRatio (modify startNote to accept global pitch)
-- [ ] Pass envelope Attack/Decay values to RRVoice to update ADSR parameters
-- [ ] Apply volume gain to final output buffer
-- [ ] Prepare parameter values for EQ processor (to be connected later)
-- [ ] Prepare parameter values for transient processor (to be connected later)
-- [ ] Ensure parameter changes are smooth and don't cause clicks or pops
+- [x] In processBlock(), retrieve current Semitone value from APVTS
+- [x] In processBlock(), retrieve current Fine Tune value from APVTS
+- [x] In processBlock(), retrieve current Volume value from APVTS
+- [x] In processBlock(), retrieve Envelope Attack and Decay values from APVTS
+- [x] Calculate combined pitch shift from semitone and fine tune parameters
+- [x] Apply global pitch shift to RRVoice's pitchRatio (modify startNote to accept global pitch)
+- [x] Pass envelope Attack/Decay values to RRVoice to update ADSR parameters
+- [x] Apply volume gain to final output buffer
+- [x] Prepare parameter values for EQ processor (to be connected later)
+- [x] Prepare parameter values for transient processor (to be connected later)
+- [x] Ensure parameter changes are smooth and don't cause clicks or pops
 
 **Implementation Note:** To apply global pitch shifting:
 1. Store global pitch offset in AudioProcessor as member variable
@@ -337,12 +337,12 @@ After this step, pressing any key on a MIDI controller will trigger the loaded s
 5. Keep sustain at 1.0 (full) for consistent playback
 
 **Quick Test After Step 5:**
-- [ ] Build and load plugin with a sample loaded
-- [ ] Play C2 or D2 and adjust Volume - verify level changes
-- [ ] Adjust Semitone knob - verify pitch changes in semitone steps
-- [ ] Adjust Fine Tune - verify subtle pitch changes
-- [ ] Test all three parameters together
-- [ ] Verify smooth transitions with no audio artifacts
+- [x] Build and load plugin with a sample loaded
+- [x] Play C2 or D2 and adjust Volume - verify level changes
+- [x] Adjust Semitone knob - verify pitch changes in semitone steps
+- [x] Adjust Fine Tune - verify subtle pitch changes
+- [x] Test all three parameters together
+- [x] Verify smooth transitions with no audio artifacts
 - [ ] Envelope Test
 
 ### Step 6: Implement Preset Save and Load Functionality

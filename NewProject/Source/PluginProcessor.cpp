@@ -426,7 +426,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
         juce::ParameterID(ParameterIDs::envDecay, 1),
         "Env Decay",
         juce::NormalisableRange<float>(0.0f, 5000.0f, 1.0f, 0.4f),
-        100.0f,
+        820.0f, //default amount
         "ms",
         juce::AudioProcessorParameter::genericParameter,
         [](float value, int) { return juce::String(value, 1) + " ms"; }
