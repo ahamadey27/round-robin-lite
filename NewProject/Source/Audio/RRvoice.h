@@ -1,4 +1,4 @@
-/*
+﻿/*
   ==============================================================================
 
     Custom SynthesiserVoice class for Round Robin Lite.
@@ -83,14 +83,14 @@ public:
 
 private:
     //==============================================================================
-    // Member Variables
+   // Member Variables
 
-    // Playback state
+   // Playback state
     double sourceSamplePosition = 0.0;
     double pitchRatio = 1.0;
     bool isPlaying = false;
 
-    // Global parameters (updated before each note)
+    // Global parameters (updated before each note)  ← ADD THESE 4 LINES
     float currentSemitones = 0.0f;
     float currentCents = 0.0f;
     float currentAttackMs = 0.0f;

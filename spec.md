@@ -343,6 +343,7 @@ After this step, pressing any key on a MIDI controller will trigger the loaded s
 - [ ] Adjust Fine Tune - verify subtle pitch changes
 - [ ] Test all three parameters together
 - [ ] Verify smooth transitions with no audio artifacts
+- [ ] Envelope Test
 
 ### Step 6: Implement Preset Save and Load Functionality
 - [ ] In getStateInformation() method:
