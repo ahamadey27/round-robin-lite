@@ -262,21 +262,21 @@ This specification breaks the project into eight distinct phases, each with acti
 - [x] Check default values are as specified
 
 ### Step 4: Implement Parameter Smoothing
-- [ ] In PluginProcessor.h, add SmoothedValue object for Volume parameter
-- [ ] Add SmoothedValue object for Semitone parameter
-- [ ] Add SmoothedValue object for Fine Tune parameter
-- [ ] Add SmoothedValue objects for Envelope Attack and Decay (2 total)
-- [ ] Add SmoothedValue objects for all EQ parameters (6 total)
-- [ ] Add SmoothedValue objects for Transient Attack and Decay (2 total)
-- [ ] In prepareToPlay(), initialize all SmoothedValue objects with sample rate
-- [ ] Set appropriate ramp time for each parameter (typically 20-50ms)
-- [ ] Reset all smoothed values to current parameter values
-- [ ] In processBlock(), update target values from APVTS parameters
-- [ ] Use smoothed values in audio processing instead of raw parameter values
+- [x] In PluginProcessor.h, add SmoothedValue object for Volume parameter
+- [x] Add SmoothedValue object for Semitone parameter
+- [x] Add SmoothedValue object for Fine Tune parameter
+- [x] Add SmoothedValue objects for Envelope Attack and Decay (2 total)
+- [x] Add SmoothedValue objects for all EQ parameters (6 total)
+- [x] Add SmoothedValue objects for Transient Attack and Decay (2 total)
+- [x] In prepareToPlay(), initialize all SmoothedValue objects with sample rate
+- [x] Set appropriate ramp time for each parameter (typically 20-50ms)
+- [x] Reset all smoothed values to current parameter values
+- [x] In processBlock(), update target values from APVTS parameters
+- [x] Use smoothed values in audio processing instead of raw parameter values
 
 **Quick Test After Step 4:**
-- [ ] Build project successfully
-- [ ] Load plugin and play audio through it
+- [x] Build project successfully
+- [x] Load plugin and play audio through it
 - [ ] Rapidly move volume parameter
 - [ ] Verify no clicks, pops, or audio glitches
 - [ ] Test with other parameters as well
