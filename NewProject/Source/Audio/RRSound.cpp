@@ -20,8 +20,16 @@ RRSound::~RRSound()
 
 bool RRSound::appliesToNote(int midiNoteNumber)
 {
-    // All loaded sounds respond to C2 (36) and D2 (38)
-    return MidiMapper::isTriggerNote(midiNoteNumber);
+    // Round Robin Lite plays samples UNPITCHED across ALL keys
+    // Any MIDI note (0-127) will trigger this sample
+    // The sample always plays at its original pitch
+
+    // Validate MIDI note range
+    if (midiNoteNumber < 0 || midiNoteNumber > 127)
+        return false;
+
+    // Accept ALL valid MIDI notes
+    return true;
 }
 
 bool RRSound::appliesToChannel(int midiChannel)
@@ -73,7 +81,8 @@ bool RRSound::loadFromFile(const juce::File& file, juce::AudioFormatManager& for
         audioBuffer.clear();
         for (int channel = 0; channel < reader->numChannels; ++channel)
         {
-            audioBuffer.addFrom(0, 0, tempBuffer, channel, 0, numSamples, 1.0f / reader->numChannels);
+            audioBuffer.addFrom(0, 0, tempBuffer, channel, 0, numSamples,
+                1.0f / reader->numChannels);
         }
     }
 
@@ -88,10 +97,37 @@ bool RRSound::loadFromFile(const juce::File& file, juce::AudioFormatManager& for
 }
 
 //==============================================================================
+// Key Pair Assignment
+
+void RRSound::setKeyPairIndex(int pairIndex)
+{
+    // Validate using MidiMapper
+    if (!MidiMapper::isValidPairIndex(pairIndex))
+    {
+        DBG("Invalid key pair index: " + juce::String(pairIndex));
+        keyPairIndex = -1;
+        return;
+    }
+
+    keyPairIndex = pairIndex;
+
+    // Set root note to C1 (MIDI 36) - the reference pitch
+    // Note: In unpitched mode, rootNote doesn't affect playback,
+    // but we store it for UI display and future features
+    rootNote = MidiMapper::ROOT_MIDI_NOTE;
+
+    DBG("Sound assigned to key pair " + juce::String(pairIndex) +
+        " (" + MidiMapper::getKeyPairName(pairIndex) + ")" +
+        " | Root note: C1 (MIDI 36) - UNPITCHED PLAYBACK");
+}
+
+//==============================================================================
 // Helper Methods
 
 void RRSound::clearSample()
 {
     audioBuffer.setSize(0, 0);
     displayName = "";
+    keyPairIndex = -1;
+    rootNote = 36;  // C1 (MIDI 36) is the root reference
 }
