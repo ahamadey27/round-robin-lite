@@ -1,22 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <FILTERGRAPH>
-  <FILTER uid="9" x="0.5" y="0.1" useARA="0">
-    <PLUGIN name="Audio Input" descriptiveName="" format="Internal" category="I/O devices"
-            manufacturer="JUCE" version="1.0" file="" uniqueId="246006c0"
-            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="0"
-            numOutputs="2" isShell="0" hasARAExtension="0" uid="246006c0"/>
-    <STATE>0.</STATE>
-    <LAYOUT>
-      <INPUTS>
-        <BUS index="0" layout="disabled"/>
-      </INPUTS>
-      <OUTPUTS>
-        <BUS index="0" layout="L R C Lfe Lss Rss Lrs Rrs"/>
-      </OUTPUTS>
-    </LAYOUT>
-  </FILTER>
-  <FILTER uid="10" x="0.24875" y="0.1926977687626775" useARA="0">
+  <FILTER uid="10" x="0.24860853432282" y="0.1906202723146747" useARA="0">
     <PLUGIN name="MIDI Input" descriptiveName="" format="Internal" category="I/O devices"
             manufacturer="JUCE" version="1.0" file="" uniqueId="a9e4f9eb"
             isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="0"
@@ -31,7 +16,7 @@
       </OUTPUTS>
     </LAYOUT>
   </FILTER>
-  <FILTER uid="11" x="0.5" y="0.9" useARA="0">
+  <FILTER uid="11" x="0.2717996289424861" y="0.7715582450832073" useARA="0">
     <PLUGIN name="Audio Output" descriptiveName="" format="Internal" category="I/O devices"
             manufacturer="JUCE" version="1.0" file="" uniqueId="724248cb"
             isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="8"
@@ -46,27 +31,12 @@
       </OUTPUTS>
     </LAYOUT>
   </FILTER>
-  <FILTER uid="12" x="0.25" y="0.9" useARA="0">
-    <PLUGIN name="MIDI Output" descriptiveName="" format="Internal" category="I/O devices"
-            manufacturer="JUCE" version="1.0" file="" uniqueId="9d5bbb00"
-            isInstrument="0" fileTime="0" infoUpdateTime="0" numInputs="0"
-            numOutputs="0" isShell="0" hasARAExtension="0" uid="9d5bbb00"/>
-    <STATE>0.</STATE>
-    <LAYOUT>
-      <INPUTS>
-        <BUS index="0" layout="disabled"/>
-      </INPUTS>
-      <OUTPUTS>
-        <BUS index="0" layout="disabled"/>
-      </OUTPUTS>
-    </LAYOUT>
-  </FILTER>
   <FILTER uid="14" x="0.21125" y="0.4401622718052738" useARA="0" uiLastX_Normal="438"
           uiLastY_Normal="118" uiopen_Normal="0" uiLastX_Generic="133"
           uiLastY_Generic="18" uiopen_Generic="0">
     <PLUGIN name="round-robin-lite" format="VST3" category="Instrument|Synth"
             manufacturer="roundrobinlite" version="1.0.0" file="C:\Program Files\Common Files\VST3\roundrobinlite.vst3\Contents\x86_64-win\roundrobinlite.vst3"
-            uniqueId="1fa6de21" isInstrument="1" fileTime="19c25151a79" infoUpdateTime="19c25156502"
+            uniqueId="1fa6de21" isInstrument="1" fileTime="19c25151a79" infoUpdateTime="19c251c7a04"
             numInputs="0" numOutputs="2" isShell="0" hasARAExtension="0"
             uid="e96804c5"/>
     <STATE>191.VMjLgXK....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOVMEUy.Ea0cVZtMEcgQWY9vSRC8Vav8lak4Fc9XCLt3hKt3hKt3hKt3hYRUUSTEETIckVwTjQisVTTgkdEYjKAQjYPQSPWgUdMcjKAQjct3hdA4hKt3hKt3hKtnTUv.UQAslXuk0UXoWUFE0YQcEV77RRC8Vav8lak4Fc9vyKVMEUy.Ea0cVZtMEcgQWY9..</STATE>

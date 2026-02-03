@@ -277,9 +277,9 @@ This specification breaks the project into eight distinct phases, each with acti
 **Quick Test After Step 4:**
 - [x] Build project successfully
 - [x] Load plugin and play audio through it
-- [ ] Rapidly move volume parameter
-- [ ] Verify no clicks, pops, or audio glitches
-- [ ] Test with other parameters as well
+- [x] Rapidly move volume parameter
+- [x] Verify no clicks, pops, or audio glitches
+- [x] Test with other parameters as well
 
 ### Step 4.1: Configure Unpitched Playback Across All Keys
 **Goal:** Modify the sampler to play uploaded samples at their original pitch across ALL MIDI keys without pitch shifting. C1 (MIDI note 36) is set as the root reference note.
