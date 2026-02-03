@@ -58,18 +58,10 @@ public:
 
 private:
     //==============================================================================
-    // PARAMETER SYSTEM
-
-    /**
-     * AudioProcessorValueTreeState (APVTS) - The parameter management system
-     */
-    juce::AudioProcessorValueTreeState apvts;
-
-    /**
-     * Helper function to create the parameter layout.
-     */
+    // Parameter Layout Creation
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
+    //==============================================================================
     // Audio Engine
     juce::Synthesiser synthesiser;
     juce::AudioFormatManager formatManager;
@@ -82,44 +74,21 @@ private:
     std::atomic<float> globalCents{ 0.0f };
     std::atomic<float> globalAttackMs{ 0.0f };
     std::atomic<float> globalDecayMs{ 100.0f };
-    //==============================================================================
-    // PARAMETER SMOOTHING
 
-    /**
-     * SmoothedValue objects for all parameters.
-     * These prevent clicks/pops when parameters change by ramping gradually
-     * from old value to new value over a short time period (typically 20-50ms).
-     */
-
-     // Pitch Controls
+    // Parameter Smoothing
     juce::LinearSmoothedValue<float> smoothedSemitone;
     juce::LinearSmoothedValue<float> smoothedFineTune;
-
-    // Volume
     juce::LinearSmoothedValue<float> smoothedVolume;
-
-    // Amplitude Envelope
     juce::LinearSmoothedValue<float> smoothedEnvAttack;
     juce::LinearSmoothedValue<float> smoothedEnvDecay;
-
-    // EQ Parameters
     juce::LinearSmoothedValue<float> smoothedLowGain;
     juce::LinearSmoothedValue<float> smoothedLowFreq;
     juce::LinearSmoothedValue<float> smoothedMidGain;
     juce::LinearSmoothedValue<float> smoothedMidFreq;
     juce::LinearSmoothedValue<float> smoothedHighGain;
     juce::LinearSmoothedValue<float> smoothedHighFreq;
-
-    // Transient Master
     juce::LinearSmoothedValue<float> smoothedTransientAttack;
     juce::LinearSmoothedValue<float> smoothedTransientDecay;
-
-    //==============================================================================
-    // SYNTHESISER - The core audio engine
-    juce::Synthesiser synthesiser;
-
-    // Audio format manager for loading samples (we'll use this in Phase 4)
-    juce::AudioFormatManager formatManager;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NewProjectAudioProcessor)
