@@ -317,12 +317,12 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
    // APPLY 3-BAND EQ (AFTER SYNTH, BEFORE VOLUME)
 
    // Get smoothed EQ parameter values
-    float lowGain = smoothedLowGain.getNextValue();
-    float lowFreq = smoothedLowFreq.getNextValue();
-    float midGain = smoothedMidGain.getNextValue();
-    float midFreq = smoothedMidFreq.getNextValue();
-    float highGain = smoothedHighGain.getNextValue();
-    float highFreq = smoothedHighFreq.getNextValue();
+    float lowGain = apvts.getRawParameterValue(ParameterIDs::lowGain)->load();
+    float lowFreq = apvts.getRawParameterValue(ParameterIDs::lowFreq)->load();
+    float midGain = apvts.getRawParameterValue(ParameterIDs::midGain)->load();
+    float midFreq = apvts.getRawParameterValue(ParameterIDs::midFreq)->load();
+    float highGain = apvts.getRawParameterValue(ParameterIDs::highGain)->load();
+    float highFreq = apvts.getRawParameterValue(ParameterIDs::highFreq)->load();
 
     // Update EQ filters with current parameter values
     threeBandEQ.updateFilters(lowGain, lowFreq, midGain, midFreq, highGain, highFreq);

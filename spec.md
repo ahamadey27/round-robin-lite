@@ -380,7 +380,7 @@ After this step, pressing any key on a MIDI controller will trigger the loaded s
 
 ### Step 7: Implement 3-Band EQ Processor
 
-- [ ] **Create EQ Processor Class Structure**
+- [x] **Create EQ Processor Class Structure**
   - [x] Create `ThreeBandEQ.h` in `/Source/DSP/`
   - [x] Create `ThreeBandEQ.cpp` in `/Source/DSP/`
   - [x] Set up class to hold three filter instances (low/mid/high)

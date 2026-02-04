@@ -85,12 +85,12 @@ private:
     juce::LinearSmoothedValue<float> smoothedVolume;
     juce::LinearSmoothedValue<float> smoothedEnvAttack;
     juce::LinearSmoothedValue<float> smoothedEnvDecay;
-    juce::LinearSmoothedValue<float> smoothedLowGain;
+    /*juce::LinearSmoothedValue<float> smoothedLowGain;
     juce::LinearSmoothedValue<float> smoothedLowFreq;
     juce::LinearSmoothedValue<float> smoothedMidGain;
     juce::LinearSmoothedValue<float> smoothedMidFreq;
     juce::LinearSmoothedValue<float> smoothedHighGain;
-    juce::LinearSmoothedValue<float> smoothedHighFreq;
+    juce::LinearSmoothedValue<float> smoothedHighFreq;*/
     juce::LinearSmoothedValue<float> smoothedTransientAttack;
     juce::LinearSmoothedValue<float> smoothedTransientDecay;
 
