@@ -6,12 +6,15 @@
               pluginCode="rrll" pluginFormats="buildStandalone,buildVST3">
   <MAINGROUP id="ayCzMd" name="round-robin-lite">
     <GROUP id="{16DB8BBD-FC25-C9E3-2064-70988F6ACE3E}" name="Source">
+      <GROUP id="{5BB2D9F1-BAFB-C54D-87A0-C718464F3EB2}" name="DSP">
+        <FILE id="ofzOIH" name="ThreeBandEQ.cpp" compile="1" resource="0" file="Source/DSP/ThreeBandEQ.cpp"/>
+        <FILE id="fooOGr" name="ThreeBandEQ.h" compile="0" resource="0" file="Source/DSP/ThreeBandEQ.h"/>
+      </GROUP>
       <GROUP id="{EC1DB31A-427E-015E-7720-1F82BAEEF13A}" name="Parameters">
         <FILE id="iGEoQp" name="ParametersIDs.h" compile="0" resource="0" file="Source/Parameters/ParametersIDs.h"/>
       </GROUP>
       <GROUP id="{99C4D0AE-47D4-3F1B-8AE2-65E1F59C4A25}" name="Data"/>
       <GROUP id="{BE5F3C22-AB0D-49FF-90E9-8DCE18E735F3}" name="UI"/>
-      <GROUP id="{D32DE12E-6532-4C00-71D1-8EC4073A2608}" name="DSP"/>
       <GROUP id="{A9D9CA2D-D0D8-EF05-31D9-D59CA0D4367D}" name="Audio">
         <FILE id="J7YTOR" name="MidiMapper.h" compile="0" resource="0" file="Source/Audio/MidiMapper.h"/>
         <FILE id="g4RxPy" name="RRSound.cpp" compile="1" resource="0" file="Source/Audio/RRSound.cpp"/>

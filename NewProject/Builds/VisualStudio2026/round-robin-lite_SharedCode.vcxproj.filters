@@ -2,6 +2,9 @@
 
 <Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <Filter Include="round-robin-lite\Source\DSP">
+      <UniqueIdentifier>{8103BD05-43D7-E6F7-C50A-79B10CAAA5EE}</UniqueIdentifier>
+    </Filter>
     <Filter Include="round-robin-lite\Source\Parameters">
       <UniqueIdentifier>{B3E605E8-83D3-3F00-90FC-A9E50585AE79}</UniqueIdentifier>
     </Filter>
@@ -685,6 +688,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\DSP\ThreeBandEQ.cpp">
+      <Filter>round-robin-lite\Source\DSP</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\Audio\RRSound.cpp">
       <Filter>round-robin-lite\Source\Audio</Filter>
     </ClCompile>
@@ -3618,6 +3624,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\DSP\ThreeBandEQ.h">
+      <Filter>round-robin-lite\Source\DSP</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\Parameters\ParametersIDs.h">
       <Filter>round-robin-lite\Source\Parameters</Filter>
     </ClInclude>
