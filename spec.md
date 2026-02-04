@@ -377,6 +377,120 @@ After this step, pressing any key on a MIDI controller will trigger the loaded s
 - [ ] Load the preset and verify all parameters recall correctly
 - [ ] Test undo/redo functionality in host (APVTS handles automatically)
 - [ ] Verify parameters update smoothly without audio glitches
+- [ ] 
+- [ ] ## Phase 3, Step 7: Implement 3-Band EQ Processor
+
+**Goal:** Create a working 3-band EQ that responds to the Low/Mid/High gain and frequency parameters.
+
+### Step 7: Implement 3-Band EQ Processor
+
+- [ ] **Create EQ Processor Class Structure**
+  - [ ] Create `ThreeBandEQ.h` in `/Source/DSP/`
+  - [ ] Create `ThreeBandEQ.cpp` in `/Source/DSP/`
+  - [ ] Set up class to hold three filter instances (low/mid/high)
+  - [ ] Use JUCE's `dsp::IIR::Filter` or `dsp::ProcessorDuplicator` for filters
+
+- [ ] **Implement EQ Filter Configuration**
+  - [ ] Create method `prepareToPlay(double sampleRate, int samplesPerBlock)`
+  - [ ] Create method `updateFilters(float lowGain, float lowFreq, float midGain, float midFreq, float highGain, float highFreq)`
+  - [ ] Low band: Low-shelf filter (boost/cut below frequency)
+  - [ ] Mid band: Peaking/bell filter (boost/cut around frequency)
+  - [ ] High band: High-shelf filter (boost/cut above frequency)
+  - [ ] Convert dB gain values to linear gain for filters
+
+- [ ] **Implement EQ Processing Method**
+  - [ ] Create method `processBlock(juce::AudioBuffer<float>& buffer)`
+  - [ ] Apply low-shelf filter to buffer
+  - [ ] Apply mid peaking filter to buffer
+  - [ ] Apply high-shelf filter to buffer
+  - [ ] Process both channels (stereo)
+
+- [ ] **Add EQ to PluginProcessor**
+  - [ ] In `PluginProcessor.h`, add `ThreeBandEQ` member variable
+  - [ ] In `prepareToPlay()`, initialize EQ with sample rate and buffer size
+  - [ ] In `processBlock()`, get EQ parameter values from smoothed parameters
+  - [ ] In `processBlock()`, call `eq.updateFilters()` with current parameter values
+  - [ ] In `processBlock()`, call `eq.processBlock(buffer)` AFTER synthesiser renders but BEFORE volume
+
+**Quick Test After Step 7:**
+- [ ] Build project successfully
+- [ ] Load plugin and play sample
+- [ ] Adjust Low Gain parameter - should hear bass boost/cut
+- [ ] Adjust Mid Gain parameter - should hear midrange boost/cut
+- [ ] Adjust High Gain parameter - should hear treble boost/cut
+- [ ] Adjust frequency parameters - should change where boost/cut occurs
+- [ ] Verify EQ responds smoothly without clicks
+
+### Step 8: Implement Transient Master Processor
+
+- [ ] **Create Transient Processor Class Structure**
+  - [ ] Create `TransientShaper.h` in `/Source/DSP/`
+  - [ ] Create `TransientShaper.cpp` in `/Source/DSP/`
+  - [ ] Set up envelope follower for detecting transients
+  - [ ] Use attack/decay parameters to modify transient portions
+
+- [ ] **Implement Envelope Follower**
+  - [ ] Create method `prepareToPlay(double sampleRate, int samplesPerBlock)`
+  - [ ] Create method `detectEnvelope(const float* input, int numSamples)`
+  - [ ] Implement attack/release time constants for envelope detection
+  - [ ] Return envelope curve representing audio dynamics
+
+- [ ] **Implement Transient Shaping Algorithm**
+  - [ ] Create method `processBlock(juce::AudioBuffer<float>& buffer, float attackAmount, float decayAmount)`
+  - [ ] Split signal into transient (fast) and sustain (slow) components
+  - [ ] Apply gain to transient component based on attackAmount (-127 to +127)
+  - [ ] Apply gain to sustain component based on decayAmount (-127 to +127)
+  - [ ] Recombine components and write to buffer
+  - [ ] Scale parameters: -127 = 0.5x (softer), 0 = 1.0x (unchanged), +127 = 2.0x (louder)
+
+- [ ] **Add Transient Shaper to PluginProcessor**
+  - [ ] In `PluginProcessor.h`, add `TransientShaper` member variable
+  - [ ] In `prepareToPlay()`, initialize transient shaper with sample rate
+  - [ ] In `processBlock()`, get transient parameters from smoothed values
+  - [ ] In `processBlock()`, call `transientShaper.processBlock(buffer, attackVal, decayVal)` AFTER EQ but BEFORE volume
+  - [ ] Convert parameter range (-127 to +127) to gain multipliers (0.5x to 2.0x)
+
+**Quick Test After Step 8:**
+- [ ] Build project successfully
+- [ ] Load plugin and play sample with strong attack (e.g., drum hit)
+- [ ] Set Transient Attack to +100 - should emphasize the initial hit
+- [ ] Set Transient Attack to -100 - should soften the initial hit
+- [ ] Set Transient Decay to +100 - should emphasize the tail/sustain
+- [ ] Set Transient Decay to -100 - should reduce the tail/sustain
+- [ ] Test with Transient Attack at 0 and Decay at 0 - should sound unchanged
+- [ ] Verify transient shaping responds smoothly without clicks
+
+### Step 9: DSP Chain Integration and Testing
+
+- [ ] **Verify DSP Processing Order**
+  - [ ] Confirm order in `processBlock()`: Synthesiser → EQ → Transient Shaper → Volume
+  - [ ] Add debug output showing DSP chain execution
+  - [ ] Document why this order is optimal (frequency shaping before dynamics, gain last)
+
+- [ ] **Test DSP Chain with Combined Effects**
+  - [ ] Load sample and set pitch to +5 semitones
+  - [ ] Add low-end boost (+12dB at 100Hz)
+  - [ ] Add transient attack enhancement (+50)
+  - [ ] Verify all three effects work simultaneously
+  - [ ] Test extreme parameter combinations for stability
+
+- [ ] **Performance and CPU Optimization Check**
+  - [ ] Profile plugin CPU usage with all DSP active
+  - [ ] Check for audio dropouts or glitches
+  - [ ] Verify smooth parameter changes don't cause clicks
+  - [ ] Ensure plugin runs efficiently in release build
+
+- [ ] **Documentation and Comments**
+  - [ ] Add comments explaining DSP chain in `processBlock()`
+  - [ ] Document parameter ranges and their effects
+  - [ ] Update README.md with DSP features
+  - [ ] Note any known limitations or future improvements
+
+**Success Criteria for Step 9:**
+- [ ] All parameters (pitch, volume, envelope, EQ, transient) work correctly
+- [ ] DSP processors can be used in combination without issues
+- [ ] Plugin performs well with minimal CPU usage
+- [ ] Code is well-documented and maintainable
 
 ---
 
