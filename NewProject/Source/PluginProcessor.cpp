@@ -10,6 +10,7 @@
 #include "PluginEditor.h"
 #include "Audio/MidiMapper.h" 
 #include "Parameters/ParametersIDs.h"
+#include "DSP/TransientShaper.h"
 
 //==============================================================================
 NewProjectAudioProcessor::NewProjectAudioProcessor()
@@ -170,6 +171,11 @@ void NewProjectAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBl
     threeBandEQ.prepareToPlay(sampleRate, samplesPerBlock);
 
     //==============================================================================
+    // INITIALIZE TRANSIENT SHAPER
+
+    transientShaper.prepareToPlay(sampleRate, samplesPerBlock);
+
+    //==============================================================================
     // INITIALIZE PARAMETER SMOOTHING
 
     const double rampTimeSeconds = 0.05; // 50 milliseconds
@@ -208,6 +214,7 @@ void NewProjectAudioProcessor::releaseResources()
 
     // Reset EQ filter states
     threeBandEQ.reset();
+    transientShaper.reset();
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -304,6 +311,16 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
 
     // Process the buffer through the EQ
     threeBandEQ.processBlock(buffer);
+
+    //==============================================================================
+    // APPLY TRANSIENT SHAPING (AFTER EQ, BEFORE VOLUME)
+
+    // Get transient parameter values (these are integers -127 to +127)
+    float attackAmount = static_cast<float>(apvts.getRawParameterValue(ParameterIDs::transientAttack)->load());
+    float decayAmount = static_cast<float>(apvts.getRawParameterValue(ParameterIDs::transientDecay)->load());
+
+    // Process transient shaping
+    transientShaper.processBlock(buffer, attackAmount, decayAmount);
 
     //==============================================================================
     // APPLY VOLUME CONTROL

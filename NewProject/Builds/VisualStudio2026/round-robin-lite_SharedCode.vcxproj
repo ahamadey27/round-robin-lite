@@ -147,6 +147,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Source\DSP\ThreeBandEQ.cpp"/>
+    <ClCompile Include="..\..\Source\DSP\TransientShaper.cpp"/>
     <ClCompile Include="..\..\Source\Audio\RRSound.cpp"/>
     <ClCompile Include="..\..\Source\Audio\RRvoice.cpp"/>
     <ClCompile Include="..\..\Source\PluginProcessor.cpp"/>
@@ -3003,6 +3004,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\DSP\ThreeBandEQ.h"/>
+    <ClInclude Include="..\..\Source\DSP\TransientShaper.h"/>
     <ClInclude Include="..\..\Source\Parameters\ParametersIDs.h"/>
     <ClInclude Include="..\..\Source\Audio\MidiMapper.h"/>
     <ClInclude Include="..\..\Source\Audio\RRSound.h"/>

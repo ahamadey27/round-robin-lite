@@ -13,6 +13,7 @@
 #include "Audio/RRSound.h"
 #include "Parameters/ParametersIDs.h"
 #include "DSP/ThreeBandEQ.h" 
+#include "DSP/TransientShaper.h"  
 
 //==============================================================================
 /**
@@ -68,7 +69,8 @@ private:
     juce::AudioFormatManager formatManager;
 
     // DSP Processors
-    ThreeBandEQ threeBandEQ;  // ADD THIS LINE
+    ThreeBandEQ threeBandEQ;  
+    TransientShaper transientShaper;
 
     // Parameter System
     juce::AudioProcessorValueTreeState apvts;

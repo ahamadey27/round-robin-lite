@@ -715,6 +715,9 @@
     <ClCompile Include="..\..\Source\DSP\ThreeBandEQ.cpp">
       <Filter>round-robin-lite\Source\DSP</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\DSP\TransientShaper.cpp">
+      <Filter>round-robin-lite\Source\DSP</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\Audio\RRSound.cpp">
       <Filter>round-robin-lite\Source\Audio</Filter>
     </ClCompile>
@@ -3760,6 +3763,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\DSP\ThreeBandEQ.h">
+      <Filter>round-robin-lite\Source\DSP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\DSP\TransientShaper.h">
       <Filter>round-robin-lite\Source\DSP</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Parameters\ParametersIDs.h">

@@ -9,6 +9,10 @@
       <GROUP id="{5BB2D9F1-BAFB-C54D-87A0-C718464F3EB2}" name="DSP">
         <FILE id="ofzOIH" name="ThreeBandEQ.cpp" compile="1" resource="0" file="Source/DSP/ThreeBandEQ.cpp"/>
         <FILE id="fooOGr" name="ThreeBandEQ.h" compile="0" resource="0" file="Source/DSP/ThreeBandEQ.h"/>
+        <FILE id="j7bTZk" name="TransientShaper.cpp" compile="1" resource="0"
+              file="Source/DSP/TransientShaper.cpp"/>
+        <FILE id="RWaNCu" name="TransientShaper.h" compile="0" resource="0"
+              file="Source/DSP/TransientShaper.h"/>
       </GROUP>
       <GROUP id="{EC1DB31A-427E-015E-7720-1F82BAEEF13A}" name="Parameters">
         <FILE id="iGEoQp" name="ParametersIDs.h" compile="0" resource="0" file="Source/Parameters/ParametersIDs.h"/>
