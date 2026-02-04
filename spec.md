@@ -381,10 +381,10 @@ After this step, pressing any key on a MIDI controller will trigger the loaded s
 ### Step 7: Implement 3-Band EQ Processor
 
 - [ ] **Create EQ Processor Class Structure**
-  - [ ] Create `ThreeBandEQ.h` in `/Source/DSP/`
-  - [ ] Create `ThreeBandEQ.cpp` in `/Source/DSP/`
-  - [ ] Set up class to hold three filter instances (low/mid/high)
-  - [ ] Use JUCE's `dsp::IIR::Filter` or `dsp::ProcessorDuplicator` for filters
+  - [x] Create `ThreeBandEQ.h` in `/Source/DSP/`
+  - [x] Create `ThreeBandEQ.cpp` in `/Source/DSP/`
+  - [x] Set up class to hold three filter instances (low/mid/high)
+  - [x] Use JUCE's `dsp::IIR::Filter` or `dsp::ProcessorDuplicator` for filters
 
 - [ ] **Implement EQ Filter Configuration**
   - [ ] Create method `prepareToPlay(double sampleRate, int samplesPerBlock)`

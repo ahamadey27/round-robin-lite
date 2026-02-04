@@ -12,6 +12,7 @@
 #include "Audio/RRVoice.h"
 #include "Audio/RRSound.h"
 #include "Parameters/ParametersIDs.h"
+#include "DSP/ThreeBandEQ.h" 
 
 //==============================================================================
 /**
@@ -65,6 +66,9 @@ private:
     // Audio Engine
     juce::Synthesiser synthesiser;
     juce::AudioFormatManager formatManager;
+
+    // DSP Processors
+    ThreeBandEQ threeBandEQ;  // ADD THIS LINE
 
     // Parameter System
     juce::AudioProcessorValueTreeState apvts;

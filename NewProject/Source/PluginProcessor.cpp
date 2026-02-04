@@ -165,6 +165,11 @@ void NewProjectAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBl
     synthesiser.setCurrentPlaybackSampleRate(sampleRate);
 
     //==============================================================================
+   // INITIALIZE 3-BAND EQ
+
+    threeBandEQ.prepareToPlay(sampleRate, samplesPerBlock);
+
+    //==============================================================================
     // INITIALIZE PARAMETER SMOOTHING
 
     const double rampTimeSeconds = 0.05; // 50 milliseconds
@@ -218,7 +223,10 @@ void NewProjectAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBl
 
 void NewProjectAudioProcessor::releaseResources()
 {
-    DBG("releaseResources called - Playback stopped");
+    DBG("releaseResources called");
+
+    // Reset EQ filter states
+    threeBandEQ.reset();
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -304,6 +312,23 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     // RENDER AUDIO FROM SYNTHESISER
 
     synthesiser.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+
+    //==============================================================================
+   // APPLY 3-BAND EQ (AFTER SYNTH, BEFORE VOLUME)
+
+   // Get smoothed EQ parameter values
+    float lowGain = smoothedLowGain.getNextValue();
+    float lowFreq = smoothedLowFreq.getNextValue();
+    float midGain = smoothedMidGain.getNextValue();
+    float midFreq = smoothedMidFreq.getNextValue();
+    float highGain = smoothedHighGain.getNextValue();
+    float highFreq = smoothedHighFreq.getNextValue();
+
+    // Update EQ filters with current parameter values
+    threeBandEQ.updateFilters(lowGain, lowFreq, midGain, midFreq, highGain, highFreq);
+
+    // Process the buffer through the EQ
+    threeBandEQ.processBlock(buffer);
 
     //==============================================================================
     // APPLY VOLUME CONTROL
