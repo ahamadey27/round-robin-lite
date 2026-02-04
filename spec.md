@@ -386,75 +386,75 @@ After this step, pressing any key on a MIDI controller will trigger the loaded s
   - [x] Set up class to hold three filter instances (low/mid/high)
   - [x] Use JUCE's `dsp::IIR::Filter` or `dsp::ProcessorDuplicator` for filters
 
-- [ ] **Implement EQ Filter Configuration**
-  - [ ] Create method `prepareToPlay(double sampleRate, int samplesPerBlock)`
-  - [ ] Create method `updateFilters(float lowGain, float lowFreq, float midGain, float midFreq, float highGain, float highFreq)`
-  - [ ] Low band: Low-shelf filter (boost/cut below frequency)
-  - [ ] Mid band: Peaking/bell filter (boost/cut around frequency)
-  - [ ] High band: High-shelf filter (boost/cut above frequency)
-  - [ ] Convert dB gain values to linear gain for filters
+- [x] **Implement EQ Filter Configuration**
+  - [x] Create method `prepareToPlay(double sampleRate, int samplesPerBlock)`
+  - [x] Create method `updateFilters(float lowGain, float lowFreq, float midGain, float midFreq, float highGain, float highFreq)`
+  - [x] Low band: Low-shelf filter (boost/cut below frequency)
+  - [x] Mid band: Peaking/bell filter (boost/cut around frequency)
+  - [x] High band: High-shelf filter (boost/cut above frequency)
+  - [x] Convert dB gain values to linear gain for filters
 
-- [ ] **Implement EQ Processing Method**
-  - [ ] Create method `processBlock(juce::AudioBuffer<float>& buffer)`
-  - [ ] Apply low-shelf filter to buffer
-  - [ ] Apply mid peaking filter to buffer
-  - [ ] Apply high-shelf filter to buffer
-  - [ ] Process both channels (stereo)
+- [x] **Implement EQ Processing Method**
+  - [x] Create method `processBlock(juce::AudioBuffer<float>& buffer)`
+  - [x] Apply low-shelf filter to buffer
+  - [x] Apply mid peaking filter to buffer
+  - [x] Apply high-shelf filter to buffer
+  - [x] Process both channels (stereo)
 
-- [ ] **Add EQ to PluginProcessor**
-  - [ ] In `PluginProcessor.h`, add `ThreeBandEQ` member variable
-  - [ ] In `prepareToPlay()`, initialize EQ with sample rate and buffer size
-  - [ ] In `processBlock()`, get EQ parameter values from smoothed parameters
-  - [ ] In `processBlock()`, call `eq.updateFilters()` with current parameter values
-  - [ ] In `processBlock()`, call `eq.processBlock(buffer)` AFTER synthesiser renders but BEFORE volume
+- [x] **Add EQ to PluginProcessor**
+  - [x] In `PluginProcessor.h`, add `ThreeBandEQ` member variable
+  - [x] In `prepareToPlay()`, initialize EQ with sample rate and buffer size
+  - [x] In `processBlock()`, get EQ parameter values from smoothed parameters
+  - [x] In `processBlock()`, call `eq.updateFilters()` with current parameter values
+  - [x] In `processBlock()`, call `eq.processBlock(buffer)` AFTER synthesiser renders but BEFORE volume
 
 **Quick Test After Step 7:**
-- [ ] Build project successfully
-- [ ] Load plugin and play sample
-- [ ] Adjust Low Gain parameter - should hear bass boost/cut
-- [ ] Adjust Mid Gain parameter - should hear midrange boost/cut
-- [ ] Adjust High Gain parameter - should hear treble boost/cut
-- [ ] Adjust frequency parameters - should change where boost/cut occurs
-- [ ] Verify EQ responds smoothly without clicks
+- [x] Build project successfully
+- [x] Load plugin and play sample
+- [x] Adjust Low Gain parameter - should hear bass boost/cut
+- [x] Adjust Mid Gain parameter - should hear midrange boost/cut
+- [x] Adjust High Gain parameter - should hear treble boost/cut
+- [x] Adjust frequency parameters - should change where boost/cut occurs
+- [x] Verify EQ responds smoothly without clicks
 
 ### Step 8: Implement Transient Master Processor
 
-- [ ] **Create Transient Processor Class Structure**
-  - [ ] Create `TransientShaper.h` in `/Source/DSP/`
-  - [ ] Create `TransientShaper.cpp` in `/Source/DSP/`
-  - [ ] Set up envelope follower for detecting transients
-  - [ ] Use attack/decay parameters to modify transient portions
+- [x] **Create Transient Processor Class Structure**
+  - [x] Create `TransientShaper.h` in `/Source/DSP/`
+  - [x] Create `TransientShaper.cpp` in `/Source/DSP/`
+  - [x] Set up envelope follower for detecting transients
+  - [x] Use attack/decay parameters to modify transient portions
 
-- [ ] **Implement Envelope Follower**
-  - [ ] Create method `prepareToPlay(double sampleRate, int samplesPerBlock)`
-  - [ ] Create method `detectEnvelope(const float* input, int numSamples)`
-  - [ ] Implement attack/release time constants for envelope detection
-  - [ ] Return envelope curve representing audio dynamics
+- [x] **Implement Envelope Follower**
+  - [x] Create method `prepareToPlay(double sampleRate, int samplesPerBlock)`
+  - [x] Create method `detectEnvelope(const float* input, int numSamples)`
+  - [x] Implement attack/release time constants for envelope detection
+  - [x] Return envelope curve representing audio dynamics
 
-- [ ] **Implement Transient Shaping Algorithm**
-  - [ ] Create method `processBlock(juce::AudioBuffer<float>& buffer, float attackAmount, float decayAmount)`
-  - [ ] Split signal into transient (fast) and sustain (slow) components
-  - [ ] Apply gain to transient component based on attackAmount (-127 to +127)
-  - [ ] Apply gain to sustain component based on decayAmount (-127 to +127)
-  - [ ] Recombine components and write to buffer
-  - [ ] Scale parameters: -127 = 0.5x (softer), 0 = 1.0x (unchanged), +127 = 2.0x (louder)
+- [x] **Implement Transient Shaping Algorithm**
+  - [x] Create method `processBlock(juce::AudioBuffer<float>& buffer, float attackAmount, float decayAmount)`
+  - [x] Split signal into transient (fast) and sustain (slow) components
+  - [x] Apply gain to transient component based on attackAmount (-127 to +127)
+  - [x] Apply gain to sustain component based on decayAmount (-127 to +127)
+  - [x] Recombine components and write to buffer
+  - [x] Scale parameters: -127 = 0.5x (softer), 0 = 1.0x (unchanged), +127 = 2.0x (louder)
 
-- [ ] **Add Transient Shaper to PluginProcessor**
-  - [ ] In `PluginProcessor.h`, add `TransientShaper` member variable
-  - [ ] In `prepareToPlay()`, initialize transient shaper with sample rate
-  - [ ] In `processBlock()`, get transient parameters from smoothed values
-  - [ ] In `processBlock()`, call `transientShaper.processBlock(buffer, attackVal, decayVal)` AFTER EQ but BEFORE volume
-  - [ ] Convert parameter range (-127 to +127) to gain multipliers (0.5x to 2.0x)
+- [x] **Add Transient Shaper to PluginProcessor**
+  - [x] In `PluginProcessor.h`, add `TransientShaper` member variable
+  - [x] In `prepareToPlay()`, initialize transient shaper with sample rate
+  - [x] In `processBlock()`, get transient parameters from smoothed values
+  - [x] In `processBlock()`, call `transientShaper.processBlock(buffer, attackVal, decayVal)` AFTER EQ but BEFORE volume
+  - [x] Convert parameter range (-127 to +127) to gain multipliers (0.5x to 2.0x)
 
 **Quick Test After Step 8:**
-- [ ] Build project successfully
-- [ ] Load plugin and play sample with strong attack (e.g., drum hit)
-- [ ] Set Transient Attack to +100 - should emphasize the initial hit
-- [ ] Set Transient Attack to -100 - should soften the initial hit
-- [ ] Set Transient Decay to +100 - should emphasize the tail/sustain
-- [ ] Set Transient Decay to -100 - should reduce the tail/sustain
-- [ ] Test with Transient Attack at 0 and Decay at 0 - should sound unchanged
-- [ ] Verify transient shaping responds smoothly without clicks
+- [x] Build project successfully
+- [x] Load plugin and play sample with strong attack (e.g., drum hit)
+- [x] Set Transient Attack to +100 - should emphasize the initial hit
+- [x] Set Transient Attack to -100 - should soften the initial hit
+- [x] Set Transient Decay to +100 - should emphasize the tail/sustain
+- [x] Set Transient Decay to -100 - should reduce the tail/sustain
+- [x] Test with Transient Attack at 0 and Decay at 0 - should sound unchanged
+- [x] Verify transient shaping responds smoothly without clicks
 
 ### Step 9: DSP Chain Integration and Testing
 
