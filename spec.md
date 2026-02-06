@@ -367,16 +367,16 @@ After this step, pressing any key on a MIDI controller will trigger the loaded s
 - [x] Verify all parameters return to saved values
 
 ### Step 7: Test Parameter Automation in DAW
-- [ ] Build plugin with all parameters defined
-- [ ] Load plugin in AudioPluginHost or actual DAW
-- [ ] Verify all 13 parameters appear in host's parameter list
-- [ ] Test moving each parameter and hearing the effect
-- [ ] Test Envelope Attack/Decay parameters affect sample fade-in and fade-out
-- [ ] Test parameter automation by recording parameter movements
-- [ ] Save a preset with specific parameter values
-- [ ] Load the preset and verify all parameters recall correctly
-- [ ] Test undo/redo functionality in host (APVTS handles automatically)
-- [ ] Verify parameters update smoothly without audio glitches
+- [x] Build plugin with all parameters defined
+- [x] Load plugin in AudioPluginHost or actual DAW
+- [x] Verify all 13 parameters appear in host's parameter list
+- [x] Test moving each parameter and hearing the effect
+- [x] Test Envelope Attack/Decay parameters affect sample fade-in and fade-out
+- [x] Test parameter automation by recording parameter movements
+- [x] Save a preset with specific parameter values
+- [x] Load the preset and verify all parameters recall correctly
+- [x] Test undo/redo functionality in host (APVTS handles automatically)
+- [x] Verify parameters update smoothly without audio glitches
 
 ### Step 7: Implement 3-Band EQ Processor
 
