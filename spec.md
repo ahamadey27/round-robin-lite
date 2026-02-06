@@ -490,7 +490,144 @@ After this step, pressing any key on a MIDI controller will trigger the loaded s
 
 ---
 
-## Phase 4: Sample Management System (Estimated Time: 1 Week)
+## Phase 4: Parameter Randomization System (Estimated Time: 1 Week)
+**Goal:** Implement per-note parameter randomization with independent positive and negative range controls for all parameters.
+
+### Overview
+Each parameter has TWO randomization controls:
+- **Negative Range:** How far below current value to randomize
+- **Positive Range:** How far above current value to randomize
+- **Trigger:** Randomization occurs on each MIDI note-on event
+- **Example:** Fine Tune at 0 cents with Neg=-4, Pos=+10 → random value from -4 to +10 cents
+
+**Parameters to Randomize (11 total):**
+1. Pitch Semitone
+2. Pitch Fine
+3. Volume
+4. EQ Low Gain
+5. EQ Low Frequency
+6. EQ Mid Gain
+7. EQ Mid Frequency
+8. EQ High Gain
+9. EQ High Frequency
+10. Transient Attack
+11. Transient Decay
+
+### Step 1: Add Randomization Parameters (22 new params)
+- [ ] Create RandomizationParams.h in /Source/Parameters/
+- [ ] Add 2 parameters per randomizable param (negative + positive range)
+- [ ] Define parameter IDs with "_RND_NEG" and "_RND_POS" suffixes
+- [ ] Set all randomization ranges to match their target parameter ranges
+- [ ] Default all randomization parameters to 0 (no randomization)
+- [ ] Add all 22 parameters to AudioProcessorValueTreeState
+- [ ] Update total parameter count in comments (was 13, now 35)
+
+**Parameter Naming Convention:**
+```cpp
+// Example for Fine Tune:
+"pitchFine_rnd_neg"  // Negative randomization range
+"pitchFine_rnd_pos"  // Positive randomization range
+```
+
+### Step 2: Create RandomizationEngine Class
+- [ ] Create RandomizationEngine.h/.cpp in /Source/DSP/
+- [ ] Add Random member variable (juce::Random)
+- [ ] Seed random generator in constructor
+- [ ] Implement generateRandomValue() method:
+  - [ ] Takes: base value, negative range, positive range
+  - [ ] Returns: randomized value within bounds
+  - [ ] Handle case where both ranges are 0 (return base value)
+- [ ] Add method to generate all randomized parameter values at once
+- [ ] Add method to reset random seed if needed
+
+**Core Algorithm:**
+```cpp
+float generateRandomValue(float baseValue, float negRange, float posRange)
+{
+    if (negRange == 0.0f && posRange == 0.0f)
+        return baseValue;
+    
+    float totalRange = negRange + posRange;
+    float randomOffset = random.nextFloat() * totalRange - negRange;
+    return baseValue + randomOffset;
+}
+```
+
+### Step 3: Implement Note-Triggered Randomization
+- [ ] Add RandomizationEngine instance to PluginProcessor
+- [ ] In RRVoice::startNote(), access randomization parameters
+- [ ] Generate randomized values for all 11 parameters
+- [ ] Store randomized values in RRVoice for this note's duration
+- [ ] Apply randomized values during renderNextBlock()
+- [ ] Ensure randomization doesn't affect base parameter values (non-destructive)
+
+**Implementation Notes:**
+- Randomization is per-note, not global
+- Each note gets its own random parameter set
+- Base parameter values remain unchanged
+- Randomization happens BEFORE any DSP processing
+
+### Step 4: Handle Parameter Value Application
+- [ ] Create temporary "effective" parameter values in RRVoice
+- [ ] On note start, calculate: effectiveValue = baseValue + randomOffset
+- [ ] Clamp effective values to valid parameter ranges
+- [ ] Use effective values for all DSP processing (pitch, volume, EQ, etc.)
+- [ ] Add getEffectiveParameterValue() helper method
+
+**Parameter Application Order:**
+1. Read base parameter from APVTS
+2. Read positive/negative randomization ranges
+3. Generate random offset
+4. Calculate effective value = base + offset
+5. Clamp to valid range
+6. Use for DSP processing
+
+### Step 5: Optimize Randomization Performance
+- [ ] Profile randomization overhead per note
+- [ ] Pre-calculate random values if needed
+- [ ] Avoid calling Random::nextFloat() excessively
+- [ ] Consider caching randomization ranges if they don't change often
+- [ ] Ensure no audio dropouts during randomization
+
+**Performance Targets:**
+- Randomization should add <1% CPU overhead
+- No perceivable latency on note trigger
+- Smooth operation even with rapid note sequences
+
+### Step 6: Add Randomization Validation & Testing
+- [ ] Test with all randomization ranges at 0 (should sound identical to base)
+- [ ] Test with only negative randomization (Fine: -10 to 0)
+- [ ] Test with only positive randomization (Fine: 0 to +10)
+- [ ] Test with asymmetric ranges (Fine: -4 to +10)
+- [ ] Verify each parameter randomizes independently
+- [ ] Test extreme values don't cause crashes or artifacts
+- [ ] Verify randomization is truly random (not repeating patterns)
+
+**Test Cases:**
+```
+Volume: Base=0dB, Neg=-6dB, Pos=+3dB → expect -6 to +3dB variation
+Semitone: Base=0, Neg=-2, Pos=+5 → expect -2 to +5 semitone variation
+EQ Low Gain: Base=0dB, Neg=-12dB, Pos=0dB → expect -12 to 0dB (only cuts)
+```
+
+### Step 7: Document Randomization Behavior
+- [ ] Add comments explaining randomization algorithm
+- [ ] Document parameter interaction (randomization + base value)
+- [ ] Note that randomization is per-note, not per-plugin-instance
+- [ ] Explain clamping behavior for out-of-range values
+- [ ] Update README.md with randomization feature description
+
+**Success Criteria for Phase 4:**
+- [ ] All 11 parameters can be randomized independently
+- [ ] Positive and negative ranges work correctly
+- [ ] Randomization triggers on every MIDI note
+- [ ] No audio artifacts or performance issues
+- [ ] Base parameter values remain unchanged
+- [ ] Randomization ranges are saved/loaded with presets
+
+---
+
+## Phase 5: Sample Management System (Estimated Time: 1 Week)
 **Goal:** Implement comprehensive sample loading, storage, and management with proper file handling, error checking, and multiple sample support.
 
 ### Step 1: Create Sample Slot Data Structure
@@ -665,7 +802,7 @@ if (!loadedSampleIndices.empty())
 
 ---
 
-## Phase 5-11: [Remaining phases unchanged from original spec]
+## Phase 6-12: [Remaining phases unchanged from original spec]
 
 ---
 
