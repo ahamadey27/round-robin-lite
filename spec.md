@@ -514,7 +514,7 @@ Each parameter has TWO randomization controls:
 11. Transient Decay
 
 ### Step 1: Add Randomization Parameters (22 new params)
-- [ ] Create RandomizationParams.h in /Source/Parameters/
+- [x] Create RandomizationParams.h in /Source/Parameters/
 - [ ] Add 2 parameters per randomizable param (negative + positive range)
 - [ ] Define parameter IDs with "_RND_NEG" and "_RND_POS" suffixes
 - [ ] Set all randomization ranges to match their target parameter ranges

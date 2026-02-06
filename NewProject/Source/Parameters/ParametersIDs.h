@@ -184,6 +184,30 @@ namespace ParameterIDs
      */
     inline constexpr auto transientDecay = "transientDecay";
 
+    // RANDOMIZATION PARAMETER IDs (22 total: 2 per randomizable param)
+    const juce::String semitoneRndNeg = "semitoneRndNeg";
+    const juce::String semitoneRndPos = "semitoneRndPos";
+    const juce::String fineTuneRndNeg = "fineTuneRndNeg";
+    const juce::String fineTuneRndPos = "fineTuneRndPos";
+    const juce::String volumeRndNeg = "volumeRndNeg";
+    const juce::String volumeRndPos = "volumeRndPos";
+    const juce::String lowGainRndNeg = "lowGainRndNeg";
+    const juce::String lowGainRndPos = "lowGainRndPos";
+    const juce::String lowFreqRndNeg = "lowFreqRndNeg";
+    const juce::String lowFreqRndPos = "lowFreqRndPos";
+    const juce::String midGainRndNeg = "midGainRndNeg";
+    const juce::String midGainRndPos = "midGainRndPos";
+    const juce::String midFreqRndNeg = "midFreqRndNeg";
+    const juce::String midFreqRndPos = "midFreqRndPos";
+    const juce::String highGainRndNeg = "highGainRndNeg";
+    const juce::String highGainRndPos = "highGainRndPos";
+    const juce::String highFreqRndNeg = "highFreqRndNeg";
+    const juce::String highFreqRndPos = "highFreqRndPos";
+    const juce::String transientAttackRndNeg = "transientAttackRndNeg";
+    const juce::String transientAttackRndPos = "transientAttackRndPos";
+    const juce::String transientDecayRndNeg = "transientDecayRndNeg";
+    const juce::String transientDecayRndPos = "transientDecayRndPos";
+
     //==============================================================================
     // PARAMETER COUNT (useful for validation)
 
@@ -191,6 +215,6 @@ namespace ParameterIDs
      * Total number of parameters in the plugin.
      * Update this if you add/remove parameters!
      */
-    inline constexpr int totalParameters = 13;
+    inline constexpr int totalParameters = 35;
 
-} // namespace ParameterIDs
+} 

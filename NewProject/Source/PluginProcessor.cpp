@@ -619,6 +619,108 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
     DBG("Parameter layout created with " + juce::String(ParameterIDs::totalParameters) + " parameters");
 
     return layout;
+
+    //==============================================================================
+    // RANDOMIZATION PARAMETERS (22 total: 2 per randomizable parameter)
+
+    // Semitone Randomization
+    layout.add(std::make_unique<juce::AudioParameterInt>(
+        juce::ParameterID(ParameterIDs::semitoneRndNeg, 1),
+        "Semitone Rnd Neg", 0, 12, 0));
+
+    layout.add(std::make_unique<juce::AudioParameterInt>(
+        juce::ParameterID(ParameterIDs::semitoneRndPos, 1),
+        "Semitone Rnd Pos", 0, 12, 0));
+
+    // Fine Tune Randomization
+    layout.add(std::make_unique<juce::AudioParameterInt>(
+        juce::ParameterID(ParameterIDs::fineTuneRndNeg, 1),
+        "Fine Tune Rnd Neg", 0, 100, 0));
+
+    layout.add(std::make_unique<juce::AudioParameterInt>(
+        juce::ParameterID(ParameterIDs::fineTuneRndPos, 1),
+        "Fine Tune Rnd Pos", 0, 100, 0));
+
+    // Volume Randomization
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::volumeRndNeg, 1),
+        "Volume Rnd Neg", 0.0f, 1.0f, 0.0f));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::volumeRndPos, 1),
+        "Volume Rnd Pos", 0.0f, 1.0f, 0.0f));
+
+    // Low EQ Gain Randomization
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::lowGainRndNeg, 1),
+        "Low Gain Rnd Neg", 0.0f, 24.0f, 0.0f));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::lowGainRndPos, 1),
+        "Low Gain Rnd Pos", 0.0f, 24.0f, 0.0f));
+
+    // Low EQ Frequency Randomization
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::lowFreqRndNeg, 1),
+        "Low Freq Rnd Neg", 0.0f, 480.0f, 0.0f));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::lowFreqRndPos, 1),
+        "Low Freq Rnd Pos", 0.0f, 480.0f, 0.0f));
+
+    // Mid EQ Gain Randomization
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::midGainRndNeg, 1),
+        "Mid Gain Rnd Neg", 0.0f, 24.0f, 0.0f));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::midGainRndPos, 1),
+        "Mid Gain Rnd Pos", 0.0f, 24.0f, 0.0f));
+
+    // Mid EQ Frequency Randomization
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::midFreqRndNeg, 1),
+        "Mid Freq Rnd Neg", 0.0f, 4800.0f, 0.0f));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::midFreqRndPos, 1),
+        "Mid Freq Rnd Pos", 0.0f, 4800.0f, 0.0f));
+
+    // High EQ Gain Randomization
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::highGainRndNeg, 1),
+        "High Gain Rnd Neg", 0.0f, 24.0f, 0.0f));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::highGainRndPos, 1),
+        "High Gain Rnd Pos", 0.0f, 24.0f, 0.0f));
+
+    // High EQ Frequency Randomization
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::highFreqRndNeg, 1),
+        "High Freq Rnd Neg", 0.0f, 18000.0f, 0.0f));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::highFreqRndPos, 1),
+        "High Freq Rnd Pos", 0.0f, 18000.0f, 0.0f));
+
+    // Transient Attack Randomization
+    layout.add(std::make_unique<juce::AudioParameterInt>(
+        juce::ParameterID(ParameterIDs::transientAttackRndNeg, 1),
+        "Trans Atk Rnd Neg", 0, 127, 0));
+
+    layout.add(std::make_unique<juce::AudioParameterInt>(
+        juce::ParameterID(ParameterIDs::transientAttackRndPos, 1),
+        "Trans Atk Rnd Pos", 0, 127, 0));
+
+    // Transient Decay Randomization
+    layout.add(std::make_unique<juce::AudioParameterInt>(
+        juce::ParameterID(ParameterIDs::transientDecayRndNeg, 1),
+        "Trans Dec Rnd Neg", 0, 127, 0));
+
+    layout.add(std::make_unique<juce::AudioParameterInt>(
+        juce::ParameterID(ParameterIDs::transientDecayRndPos, 1),
+        "Trans Dec Rnd Pos", 0, 127, 0));
 }
 
 //==============================================================================

@@ -3771,6 +3771,9 @@
     <ClInclude Include="..\..\Source\Parameters\ParametersIDs.h">
       <Filter>round-robin-lite\Source\Parameters</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\Parameters\RandomizationParams.h">
+      <Filter>round-robin-lite\Source\Parameters</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\Audio\MidiMapper.h">
       <Filter>round-robin-lite\Source\Audio</Filter>
     </ClInclude>

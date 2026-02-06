@@ -3006,6 +3006,7 @@
     <ClInclude Include="..\..\Source\DSP\ThreeBandEQ.h"/>
     <ClInclude Include="..\..\Source\DSP\TransientShaper.h"/>
     <ClInclude Include="..\..\Source\Parameters\ParametersIDs.h"/>
+    <ClInclude Include="..\..\Source\Parameters\RandomizationParams.h"/>
     <ClInclude Include="..\..\Source\Audio\MidiMapper.h"/>
     <ClInclude Include="..\..\Source\Audio\RRSound.h"/>
     <ClInclude Include="..\..\Source\Audio\RRvoice.h"/>
