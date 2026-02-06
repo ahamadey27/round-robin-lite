@@ -618,8 +618,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
 
     DBG("Parameter layout created with " + juce::String(ParameterIDs::totalParameters) + " parameters");
 
-    return layout;
-
     //==============================================================================
     // RANDOMIZATION PARAMETERS (22 total: 2 per randomizable parameter)
 
@@ -721,6 +719,10 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
     layout.add(std::make_unique<juce::AudioParameterInt>(
         juce::ParameterID(ParameterIDs::transientDecayRndPos, 1),
         "Trans Dec Rnd Pos", 0, 127, 0));
+
+    return layout;
+
+    
 }
 
 //==============================================================================
