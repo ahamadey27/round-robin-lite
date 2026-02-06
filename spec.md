@@ -515,12 +515,12 @@ Each parameter has TWO randomization controls:
 
 ### Step 1: Add Randomization Parameters (22 new params)
 - [x] Create RandomizationParams.h in /Source/Parameters/
-- [ ] Add 2 parameters per randomizable param (negative + positive range)
-- [ ] Define parameter IDs with "_RND_NEG" and "_RND_POS" suffixes
-- [ ] Set all randomization ranges to match their target parameter ranges
-- [ ] Default all randomization parameters to 0 (no randomization)
-- [ ] Add all 22 parameters to AudioProcessorValueTreeState
-- [ ] Update total parameter count in comments (was 13, now 35)
+- [x] Add 2 parameters per randomizable param (negative + positive range)
+- [x] Define parameter IDs with "_RND_NEG" and "_RND_POS" suffixes
+- [x] Set all randomization ranges to match their target parameter ranges
+- [x] Default all randomization parameters to 0 (no randomization)
+- [x] Add all 22 parameters to AudioProcessorValueTreeState
+- [x] Update total parameter count in comments (was 13, now 35)
 
 **Parameter Naming Convention:**
 ```cpp
