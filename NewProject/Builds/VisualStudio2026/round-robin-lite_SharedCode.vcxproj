@@ -146,6 +146,7 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\DSP\RandomizationEngine.cpp"/>
     <ClCompile Include="..\..\Source\DSP\ThreeBandEQ.cpp"/>
     <ClCompile Include="..\..\Source\DSP\TransientShaper.cpp"/>
     <ClCompile Include="..\..\Source\Audio\RRSound.cpp"/>

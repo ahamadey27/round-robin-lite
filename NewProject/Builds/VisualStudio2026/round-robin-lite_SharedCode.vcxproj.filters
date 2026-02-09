@@ -712,6 +712,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\DSP\RandomizationEngine.cpp">
+      <Filter>round-robin-lite\Source\DSP</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\DSP\ThreeBandEQ.cpp">
       <Filter>round-robin-lite\Source\DSP</Filter>
     </ClCompile>

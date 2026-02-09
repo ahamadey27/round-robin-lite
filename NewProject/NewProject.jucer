@@ -7,6 +7,8 @@
   <MAINGROUP id="ayCzMd" name="round-robin-lite">
     <GROUP id="{16DB8BBD-FC25-C9E3-2064-70988F6ACE3E}" name="Source">
       <GROUP id="{5BB2D9F1-BAFB-C54D-87A0-C718464F3EB2}" name="DSP">
+        <FILE id="JvhuqK" name="RandomizationEngine.cpp" compile="1" resource="0"
+              file="Source/DSP/RandomizationEngine.cpp"/>
         <FILE id="Iw5sIK" name="RandomizationEngine.h" compile="0" resource="0"
               file="Source/DSP/RandomizationEngine.h"/>
         <FILE id="ofzOIH" name="ThreeBandEQ.cpp" compile="1" resource="0" file="Source/DSP/ThreeBandEQ.cpp"/>
