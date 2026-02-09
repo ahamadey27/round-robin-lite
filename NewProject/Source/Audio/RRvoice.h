@@ -86,6 +86,16 @@ public:
     void setRandomizationReferences(RandomizationEngine* engine,
         juce::AudioProcessorValueTreeState* params);
 
+    float getRandomizedVolume() const { return randomizedVolume; }
+    float getRandomizedLowGain() const { return randomizedLowGain; }
+    float getRandomizedLowFreq() const { return randomizedLowFreq; }
+    float getRandomizedMidGain() const { return randomizedMidGain; }
+    float getRandomizedMidFreq() const { return randomizedMidFreq; }
+    float getRandomizedHighGain() const { return randomizedHighGain; }
+    float getRandomizedHighFreq() const { return randomizedHighFreq; }
+    float getRandomizedTransientAttack() const { return randomizedTransientAttack; }
+    float getRandomizedTransientDecay() const { return randomizedTransientDecay; }
+
 private:
     //==============================================================================
    // Member Variables
@@ -119,6 +129,15 @@ private:
     float randomizedCents = 0.0f;
     float randomizedAttackMs = 0.0f;
     float randomizedDecayMs = 0.0f;
+    float randomizedVolume = 0.75f;
+    float randomizedLowGain = 0.0f;
+    float randomizedLowFreq = 100.0f;
+    float randomizedMidGain = 0.0f;
+    float randomizedMidFreq = 1000.0f;
+    float randomizedHighGain = 0.0f;
+    float randomizedHighFreq = 5000.0f;
+    float randomizedTransientAttack = 0.0f;
+    float randomizedTransientDecay = 0.0f;
 
     // Reference to randomization engine and parameters
     RandomizationEngine* randEngine = nullptr;

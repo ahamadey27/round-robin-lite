@@ -554,12 +554,12 @@ float generateRandomValue(float baseValue, float negRange, float posRange)
 ```
 
 ### Step 3: Implement Note-Triggered Randomization
-- [ ] Add RandomizationEngine instance to PluginProcessor
-- [ ] In RRVoice::startNote(), access randomization parameters
-- [ ] Generate randomized values for all 11 parameters
-- [ ] Store randomized values in RRVoice for this note's duration
-- [ ] Apply randomized values during renderNextBlock()
-- [ ] Ensure randomization doesn't affect base parameter values (non-destructive)
+- [x] Add RandomizationEngine instance to PluginProcessor
+- [x] In RRVoice::startNote(), access randomization parameters
+- [x] Generate randomized values for all 11 parameters
+- [x] Store randomized values in RRVoice for this note's duration
+- [x] Apply randomized values during renderNextBlock()
+- [x] Ensure randomization doesn't affect base parameter values (non-destructive)
 
 **Implementation Notes:**
 - Randomization is per-note, not global

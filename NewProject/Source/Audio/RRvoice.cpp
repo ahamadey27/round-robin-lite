@@ -79,14 +79,77 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
         float decayNeg = apvts->getRawParameterValue(ParameterIDs::envDecayRndNeg)->load();
         float decayPos = apvts->getRawParameterValue(ParameterIDs::envDecayRndPos)->load();
         randomizedDecayMs = randEngine->generateRandomValue(globalDecayMs, decayNeg, decayPos);
+
+        // Volume randomization
+        float baseVolume = apvts->getRawParameterValue(ParameterIDs::volume)->load();
+        float volumeNeg = apvts->getRawParameterValue(ParameterIDs::volumeRndNeg)->load();
+        float volumePos = apvts->getRawParameterValue(ParameterIDs::volumeRndPos)->load();
+        randomizedVolume = randEngine->generateRandomValue(baseVolume, volumeNeg, volumePos);
+        randomizedVolume = juce::jlimit(0.0f, 1.0f, randomizedVolume); // Clamp
+
+        // Low EQ randomization
+        float baseLowGain = apvts->getRawParameterValue(ParameterIDs::lowGain)->load();
+        float lowGainNeg = apvts->getRawParameterValue(ParameterIDs::lowGainRndNeg)->load();
+        float lowGainPos = apvts->getRawParameterValue(ParameterIDs::lowGainRndPos)->load();
+        randomizedLowGain = randEngine->generateRandomValue(baseLowGain, lowGainNeg, lowGainPos);
+        randomizedLowGain = juce::jlimit(-24.0f, 24.0f, randomizedLowGain);
+
+        float baseLowFreq = apvts->getRawParameterValue(ParameterIDs::lowFreq)->load();
+        float lowFreqNeg = apvts->getRawParameterValue(ParameterIDs::lowFreqRndNeg)->load();
+        float lowFreqPos = apvts->getRawParameterValue(ParameterIDs::lowFreqRndPos)->load();
+        randomizedLowFreq = randEngine->generateRandomValue(baseLowFreq, lowFreqNeg, lowFreqPos);
+        randomizedLowFreq = juce::jlimit(20.0f, 500.0f, randomizedLowFreq);
+
+        // Mid EQ randomization
+        float baseMidGain = apvts->getRawParameterValue(ParameterIDs::midGain)->load();
+        float midGainNeg = apvts->getRawParameterValue(ParameterIDs::midGainRndNeg)->load();
+        float midGainPos = apvts->getRawParameterValue(ParameterIDs::midGainRndPos)->load();
+        randomizedMidGain = randEngine->generateRandomValue(baseMidGain, midGainNeg, midGainPos);
+        randomizedMidGain = juce::jlimit(-24.0f, 24.0f, randomizedMidGain);
+
+        float baseMidFreq = apvts->getRawParameterValue(ParameterIDs::midFreq)->load();
+        float midFreqNeg = apvts->getRawParameterValue(ParameterIDs::midFreqRndNeg)->load();
+        float midFreqPos = apvts->getRawParameterValue(ParameterIDs::midFreqRndPos)->load();
+        randomizedMidFreq = randEngine->generateRandomValue(baseMidFreq, midFreqNeg, midFreqPos);
+        randomizedMidFreq = juce::jlimit(200.0f, 5000.0f, randomizedMidFreq);
+
+        // High EQ randomization
+        float baseHighGain = apvts->getRawParameterValue(ParameterIDs::highGain)->load();
+        float highGainNeg = apvts->getRawParameterValue(ParameterIDs::highGainRndNeg)->load();
+        float highGainPos = apvts->getRawParameterValue(ParameterIDs::highGainRndPos)->load();
+        randomizedHighGain = randEngine->generateRandomValue(baseHighGain, highGainNeg, highGainPos);
+        randomizedHighGain = juce::jlimit(-24.0f, 24.0f, randomizedHighGain);
+
+        float baseHighFreq = apvts->getRawParameterValue(ParameterIDs::highFreq)->load();
+        float highFreqNeg = apvts->getRawParameterValue(ParameterIDs::highFreqRndNeg)->load();
+        float highFreqPos = apvts->getRawParameterValue(ParameterIDs::highFreqRndPos)->load();
+        randomizedHighFreq = randEngine->generateRandomValue(baseHighFreq, highFreqNeg, highFreqPos);
+        randomizedHighFreq = juce::jlimit(2000.0f, 20000.0f, randomizedHighFreq);
+
+        // Transient randomization
+        float baseTransAtk = static_cast<float>(apvts->getRawParameterValue(ParameterIDs::transientAttack)->load());
+        float transAtkNeg = static_cast<float>(apvts->getRawParameterValue(ParameterIDs::transientAttackRndNeg)->load());
+        float transAtkPos = static_cast<float>(apvts->getRawParameterValue(ParameterIDs::transientAttackRndPos)->load());
+        randomizedTransientAttack = randEngine->generateRandomValue(baseTransAtk, transAtkNeg, transAtkPos);
+        randomizedTransientAttack = juce::jlimit(-127.0f, 127.0f, randomizedTransientAttack);
+
+        float baseTransDec = static_cast<float>(apvts->getRawParameterValue(ParameterIDs::transientDecay)->load());
+        float transDecNeg = static_cast<float>(apvts->getRawParameterValue(ParameterIDs::transientDecayRndNeg)->load());
+        float transDecPos = static_cast<float>(apvts->getRawParameterValue(ParameterIDs::transientDecayRndPos)->load());
+        randomizedTransientDecay = randEngine->generateRandomValue(baseTransDec, transDecNeg, transDecPos);
+        randomizedTransientDecay = juce::jlimit(-127.0f, 127.0f, randomizedTransientDecay);
     }
     else
     {
-        // No randomization - use base values
-        randomizedSemitones = globalSemitones;
-        randomizedCents = globalCents;
-        randomizedAttackMs = globalAttackMs;
-        randomizedDecayMs = globalDecayMs;
+        randomizedVolume = 0.75f;
+        randomizedLowGain = 0.0f;
+        randomizedLowFreq = 100.0f;
+        randomizedMidGain = 0.0f;
+        randomizedMidFreq = 1000.0f;
+        randomizedHighGain = 0.0f;
+        randomizedHighFreq = 5000.0f;
+        randomizedTransientAttack = 0.0f;
+        randomizedTransientDecay = 0.0f;
     }
     
     //==========================================================================
@@ -184,8 +247,8 @@ void RRVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer,
         const float sample1 = sampleData[index1];
         const float interpolatedSample = sample0 + (sample1 - sample0) * fraction;
 
-        // Apply envelope to the sample
-        const float outputSample = interpolatedSample * envelopeLevel;
+        // Apply envelope AND per-voice volume to the sample
+        const float outputSample = interpolatedSample * envelopeLevel * randomizedVolume;
 
         // Write to both channels
         for (int channel = 0; channel < outputBuffer.getNumChannels(); ++channel)
