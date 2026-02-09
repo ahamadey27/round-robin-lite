@@ -207,6 +207,10 @@ namespace ParameterIDs
     const juce::String transientAttackRndPos = "transientAttackRndPos";
     const juce::String transientDecayRndNeg = "transientDecayRndNeg";
     const juce::String transientDecayRndPos = "transientDecayRndPos";
+    const juce::String envAttackRndNeg = "envAttackRndNeg";
+    const juce::String envAttackRndPos = "envAttackRndPos";
+    const juce::String envDecayRndNeg = "envDecayRndNeg";
+    const juce::String envDecayRndPos = "envDecayRndPos";
 
     //==============================================================================
     // PARAMETER COUNT (useful for validation)

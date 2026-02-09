@@ -14,6 +14,7 @@
 #include "Parameters/ParametersIDs.h"
 #include "DSP/ThreeBandEQ.h" 
 #include "DSP/TransientShaper.h"  
+#include "DSP/RandomizationEngine.h"
 
 //==============================================================================
 /**
@@ -87,14 +88,10 @@ private:
     juce::LinearSmoothedValue<float> smoothedVolume;
     juce::LinearSmoothedValue<float> smoothedEnvAttack;
     juce::LinearSmoothedValue<float> smoothedEnvDecay;
-    /*juce::LinearSmoothedValue<float> smoothedLowGain;
-    juce::LinearSmoothedValue<float> smoothedLowFreq;
-    juce::LinearSmoothedValue<float> smoothedMidGain;
-    juce::LinearSmoothedValue<float> smoothedMidFreq;
-    juce::LinearSmoothedValue<float> smoothedHighGain;
-    juce::LinearSmoothedValue<float> smoothedHighFreq;*/
     juce::LinearSmoothedValue<float> smoothedTransientAttack;
     juce::LinearSmoothedValue<float> smoothedTransientDecay;
+
+    RandomizationEngine randomizationEngine;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NewProjectAudioProcessor)

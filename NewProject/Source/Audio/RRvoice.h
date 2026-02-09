@@ -11,6 +11,8 @@
 #include <JuceHeader.h>
 #include "RRSound.h"
 
+#include "../DSP/RandomizationEngine.h"
+#include "../Parameters/ParametersIDs.h"
 //==============================================================================
 /**
  * RRVoice - Plays back RRSound samples when triggered by MIDI notes.
@@ -81,6 +83,9 @@ public:
      */
     void controllerMoved(int controllerNumber, int newControllerValue) override;
 
+    void setRandomizationReferences(RandomizationEngine* engine,
+        juce::AudioProcessorValueTreeState* params);
+
 private:
     //==============================================================================
    // Member Variables
@@ -102,6 +107,22 @@ private:
 
     // Reference to current sound
     RRSound* currentSound = nullptr;
+
+    // Global parameters (non-randomized base values)
+    float globalSemitones = 0.0f;
+    float globalCents = 0.0f;
+    float globalAttackMs = 0.0f;
+    float globalDecayMs = 0.0f;
+
+    // Per-note randomized values
+    float randomizedSemitones = 0.0f;
+    float randomizedCents = 0.0f;
+    float randomizedAttackMs = 0.0f;
+    float randomizedDecayMs = 0.0f;
+
+    // Reference to randomization engine and parameters
+    RandomizationEngine* randEngine = nullptr;
+    juce::AudioProcessorValueTreeState* apvts = nullptr;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(RRVoice)

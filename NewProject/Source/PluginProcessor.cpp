@@ -290,6 +290,14 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
         }
     }
 
+    for (int i = 0; i < synthesiser.getNumVoices(); ++i)
+    {
+        if (auto* voice = dynamic_cast<RRVoice*>(synthesiser.getVoice(i)))
+        {
+            voice->setRandomizationReferences(&randomizationEngine, &apvts);
+        }
+    }
+
     //==============================================================================
     // RENDER AUDIO FROM SYNTHESISER
 
@@ -600,6 +608,26 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
         5000.0f,
         "Hz"
     ));
+
+    // Envelope Attack Randomization
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::envAttackRndNeg, 1),
+        "Env Attack Rnd Neg", 0.0f, 1000.0f, 0.0f));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::envAttackRndPos, 1),
+        "Env Attack Rnd Pos", 0.0f, 1000.0f, 0.0f));
+
+    // Envelope Decay Randomization  
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::envDecayRndNeg, 1),
+        "Env Decay Rnd Neg", 0.0f, 5000.0f, 0.0f));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::envDecayRndPos, 1),
+        "Env Decay Rnd Pos", 0.0f, 5000.0f, 0.0f));
+
+    // Transient Attack Randomization (existing code below)
 
     //==============================================================================
     // TRANSIENT MASTER

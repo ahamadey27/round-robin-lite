@@ -1,4 +1,7 @@
-﻿#include "RRVoice.h"
+﻿#include "RRvoice.h"
+#include "../DSP/RandomizationEngine.h"
+#include "../Parameters/ParametersIDs.h"
+
 
 //==============================================================================
 // Constructor
@@ -11,6 +14,13 @@ RRVoice::RRVoice()
     envelopeParams.release = 0.1f;   // 100ms release
 
     envelope.setParameters(envelopeParams);
+}
+
+void RRVoice::setRandomizationReferences(RandomizationEngine* engine,
+                                         juce::AudioProcessorValueTreeState* params)
+{
+    randEngine = engine;
+    apvts = params;
 }
 
 // Destructor
@@ -38,49 +48,69 @@ void RRVoice::updateGlobalParameters(float semitones, float cents, float attackM
 //==============================================================================
 // Start playing a note
 void RRVoice::startNote(int midiNoteNumber, float velocity,
-    juce::SynthesiserSound* sound,
-    int /*currentPitchWheelPosition*/)
+    juce::SynthesiserSound* sound, int /*currentPitchWheelPosition*/)
 {
-    // Cast the generic sound to our specific RRSound type
     currentSound = dynamic_cast<RRSound*>(sound);
-
-    if (currentSound == nullptr || !currentSound->isLoaded())
-    {
-        isPlaying = false;
+    
+    if (currentSound == nullptr)
         return;
+
+    //==========================================================================
+    // GENERATE RANDOMIZED PARAMETER VALUES
+    
+    if (randEngine != nullptr && apvts != nullptr)
+    {
+        // Semitone randomization
+        float semitoneNeg = apvts->getRawParameterValue(ParameterIDs::semitoneRndNeg)->load();
+        float semitonePos = apvts->getRawParameterValue(ParameterIDs::semitoneRndPos)->load();
+        randomizedSemitones = randEngine->generateRandomValue(globalSemitones, semitoneNeg, semitonePos);
+        
+        // Fine tune randomization
+        float fineNeg = apvts->getRawParameterValue(ParameterIDs::fineTuneRndNeg)->load();
+        float finePos = apvts->getRawParameterValue(ParameterIDs::fineTuneRndPos)->load();
+        randomizedCents = randEngine->generateRandomValue(globalCents, fineNeg, finePos);
+        
+        // Envelope attack randomization
+        float attackNeg = apvts->getRawParameterValue(ParameterIDs::envAttackRndNeg)->load();
+        float attackPos = apvts->getRawParameterValue(ParameterIDs::envAttackRndPos)->load();
+        randomizedAttackMs = randEngine->generateRandomValue(globalAttackMs, attackNeg, attackPos);
+        
+        // Envelope decay randomization
+        float decayNeg = apvts->getRawParameterValue(ParameterIDs::envDecayRndNeg)->load();
+        float decayPos = apvts->getRawParameterValue(ParameterIDs::envDecayRndPos)->load();
+        randomizedDecayMs = randEngine->generateRandomValue(globalDecayMs, decayNeg, decayPos);
     }
+    else
+    {
+        // No randomization - use base values
+        randomizedSemitones = globalSemitones;
+        randomizedCents = globalCents;
+        randomizedAttackMs = globalAttackMs;
+        randomizedDecayMs = globalDecayMs;
+    }
+    
+    //==========================================================================
+    // CALCULATE PITCH RATIO (using randomized values)
+    
+    float semitoneShift = std::pow(2.0f, randomizedSemitones / 12.0f);
+    float centShift = std::pow(2.0f, randomizedCents / 1200.0f);
+    pitchRatio = semitoneShift * centShift;
 
-    // CALCULATE GLOBAL PITCH SHIFT
-    double semitonePitch = std::pow(2.0, currentSemitones / 12.0);
-    double centsPitch = std::pow(2.0, currentCents / 1200.0);
-    pitchRatio = semitonePitch * centsPitch;
+    //==========================================================================
+    // CONFIGURE ENVELOPE (using randomized values)
+    
+    juce::ADSR::Parameters envParams;
+    envParams.attack = randomizedAttackMs / 1000.0f;
+    envParams.decay = 0.0f;
+    envParams.sustain = 1.0f;
+    envParams.release = randomizedDecayMs / 1000.0f;
+    envelope.setParameters(envParams);
+    envelope.noteOn();
 
-    DBG("Starting note " + juce::String(midiNoteNumber) +
-        " - Pitch: " + juce::String(currentSemitones) + " st + " +
-        juce::String(currentCents) + " cents (ratio: " + juce::String(pitchRatio) +
-        ") | Attack: " + juce::String(currentAttackMs) + "ms, Decay: " + juce::String(currentDecayMs) + "ms");
-
-    // ONE-SHOT ENVELOPE: Attack → Decay → Silent
-    // We use decay to fade out, and sustain at 0 so it stops naturally
-
-    envelopeParams.attack = currentAttackMs / 1000.0f;   // Fade in time
-    envelopeParams.decay = currentDecayMs / 1000.0f;     // Fade out time  
-    envelopeParams.sustain = 0.0f;                       // Fade to silence
-    envelopeParams.release = 0.001f;                     // Very short release (1ms)
-
-    envelope.setParameters(envelopeParams);
-
-    // Reset playback position
+    //==========================================================================
+    // START PLAYBACK
+    
     sourceSamplePosition = 0.0;
-
-    // Reset and start envelope from clean state
-    envelope.reset();      // ← IMPORTANT: Reset first!
-    envelope.noteOn();     // Start attack phase
-
-    // DON'T call noteOff() here - we'll handle it differently
-    // The envelope will play: Attack → Decay → Sustain (0) → wait
-
-    // Mark voice as playing
     isPlaying = true;
 }
 

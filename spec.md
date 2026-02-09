@@ -531,14 +531,14 @@ Each parameter has TWO randomization controls:
 
 ### Step 2: Create RandomizationEngine Class
 - [x] Create RandomizationEngine.h/.cpp in /Source/DSP/
-- [ ] Add Random member variable (juce::Random)
-- [ ] Seed random generator in constructor
-- [ ] Implement generateRandomValue() method:
-  - [ ] Takes: base value, negative range, positive range
-  - [ ] Returns: randomized value within bounds
-  - [ ] Handle case where both ranges are 0 (return base value)
-- [ ] Add method to generate all randomized parameter values at once
-- [ ] Add method to reset random seed if needed
+- [x] Add Random member variable (juce::Random)
+- [x] Seed random generator in constructor
+- [x] Implement generateRandomValue() method:
+  - [x] Takes: base value, negative range, positive range
+  - [x] Returns: randomized value within bounds
+  - [x] Handle case where both ranges are 0 (return base value)
+- [x] Add method to generate all randomized parameter values at once
+- [x] Add method to reset random seed if needed
 
 **Core Algorithm:**
 ```cpp
