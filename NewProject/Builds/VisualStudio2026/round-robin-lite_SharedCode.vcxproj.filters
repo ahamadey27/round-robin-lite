@@ -3762,6 +3762,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\DSP\RandomizationEngine.h">
+      <Filter>round-robin-lite\Source\DSP</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\DSP\ThreeBandEQ.h">
       <Filter>round-robin-lite\Source\DSP</Filter>
     </ClInclude>

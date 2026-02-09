@@ -3003,6 +3003,7 @@
     <ClCompile Include="..\..\JuceLibraryCode\include_juce_gui_extra.cpp"/>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\DSP\RandomizationEngine.h"/>
     <ClInclude Include="..\..\Source\DSP\ThreeBandEQ.h"/>
     <ClInclude Include="..\..\Source\DSP\TransientShaper.h"/>
     <ClInclude Include="..\..\Source\Parameters\ParametersIDs.h"/>

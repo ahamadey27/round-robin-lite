@@ -530,7 +530,7 @@ Each parameter has TWO randomization controls:
 ```
 
 ### Step 2: Create RandomizationEngine Class
-- [ ] Create RandomizationEngine.h/.cpp in /Source/DSP/
+- [x] Create RandomizationEngine.h/.cpp in /Source/DSP/
 - [ ] Add Random member variable (juce::Random)
 - [ ] Seed random generator in constructor
 - [ ] Implement generateRandomValue() method:
