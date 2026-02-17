@@ -139,6 +139,40 @@ private:
     float randomizedTransientAttack = 0.0f;
     float randomizedTransientDecay = 0.0f;
 
+    // Cached parameter pointers (set once, read many times)
+    struct RandomizationPointers
+    {
+        // Base values
+        std::atomic<float>* semitone = nullptr;
+        std::atomic<float>* fineTune = nullptr;
+        std::atomic<float>* volume = nullptr;
+        std::atomic<float>* envAttack = nullptr;
+        std::atomic<float>* envDecay = nullptr;
+        std::atomic<float>* lowGain = nullptr;
+        std::atomic<float>* lowFreq = nullptr;
+        std::atomic<float>* midGain = nullptr;
+        std::atomic<float>* midFreq = nullptr;
+        std::atomic<float>* highGain = nullptr;
+        std::atomic<float>* highFreq = nullptr;
+        std::atomic<float>* transAtk = nullptr;
+        std::atomic<float>* transDec = nullptr;
+
+        // Randomization ranges
+        std::atomic<float>* semitoneNeg = nullptr;  std::atomic<float>* semitonePos = nullptr;
+        std::atomic<float>* fineNeg = nullptr;      std::atomic<float>* finePos = nullptr;
+        std::atomic<float>* volumeNeg = nullptr;    std::atomic<float>* volumePos = nullptr;
+        std::atomic<float>* atkNeg = nullptr;       std::atomic<float>* atkPos = nullptr;
+        std::atomic<float>* decNeg = nullptr;       std::atomic<float>* decPos = nullptr;
+        std::atomic<float>* lowGainNeg = nullptr;   std::atomic<float>* lowGainPos = nullptr;
+        std::atomic<float>* lowFreqNeg = nullptr;   std::atomic<float>* lowFreqPos = nullptr;
+        std::atomic<float>* midGainNeg = nullptr;   std::atomic<float>* midGainPos = nullptr;
+        std::atomic<float>* midFreqNeg = nullptr;   std::atomic<float>* midFreqPos = nullptr;
+        std::atomic<float>* highGainNeg = nullptr;  std::atomic<float>* highGainPos = nullptr;
+        std::atomic<float>* highFreqNeg = nullptr;  std::atomic<float>* highFreqPos = nullptr;
+        std::atomic<float>* transAtkNeg = nullptr;  std::atomic<float>* transAtkPos = nullptr;
+        std::atomic<float>* transDecNeg = nullptr;  std::atomic<float>* transDecPos = nullptr;
+    } rndPtrs;
+
     // Reference to randomization engine and parameters
     RandomizationEngine* randEngine = nullptr;
     juce::AudioProcessorValueTreeState* apvts = nullptr;

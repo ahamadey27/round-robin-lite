@@ -21,6 +21,48 @@ void RRVoice::setRandomizationReferences(RandomizationEngine* engine,
 {
     randEngine = engine;
     apvts = params;
+
+    // Cache all pointers — hash lookup happens ONCE here, not per note
+    rndPtrs.semitone = params->getRawParameterValue(ParameterIDs::semitone);
+    rndPtrs.fineTune = params->getRawParameterValue(ParameterIDs::fineTune);
+    rndPtrs.volume = params->getRawParameterValue(ParameterIDs::volume);
+    rndPtrs.envAttack = params->getRawParameterValue(ParameterIDs::envAttack);
+    rndPtrs.envDecay = params->getRawParameterValue(ParameterIDs::envDecay);
+    rndPtrs.lowGain = params->getRawParameterValue(ParameterIDs::lowGain);
+    rndPtrs.lowFreq = params->getRawParameterValue(ParameterIDs::lowFreq);
+    rndPtrs.midGain = params->getRawParameterValue(ParameterIDs::midGain);
+    rndPtrs.midFreq = params->getRawParameterValue(ParameterIDs::midFreq);
+    rndPtrs.highGain = params->getRawParameterValue(ParameterIDs::highGain);
+    rndPtrs.highFreq = params->getRawParameterValue(ParameterIDs::highFreq);
+    rndPtrs.transAtk = params->getRawParameterValue(ParameterIDs::transientAttack);
+    rndPtrs.transDec = params->getRawParameterValue(ParameterIDs::transientDecay);
+
+    rndPtrs.semitoneNeg = params->getRawParameterValue(ParameterIDs::semitoneRndNeg);
+    rndPtrs.semitonePos = params->getRawParameterValue(ParameterIDs::semitoneRndPos);
+    rndPtrs.fineNeg = params->getRawParameterValue(ParameterIDs::fineTuneRndNeg);
+    rndPtrs.finePos = params->getRawParameterValue(ParameterIDs::fineTuneRndPos);
+    rndPtrs.volumeNeg = params->getRawParameterValue(ParameterIDs::volumeRndNeg);
+    rndPtrs.volumePos = params->getRawParameterValue(ParameterIDs::volumeRndPos);
+    rndPtrs.atkNeg = params->getRawParameterValue(ParameterIDs::envAttackRndNeg);
+    rndPtrs.atkPos = params->getRawParameterValue(ParameterIDs::envAttackRndPos);
+    rndPtrs.decNeg = params->getRawParameterValue(ParameterIDs::envDecayRndNeg);
+    rndPtrs.decPos = params->getRawParameterValue(ParameterIDs::envDecayRndPos);
+    rndPtrs.lowGainNeg = params->getRawParameterValue(ParameterIDs::lowGainRndNeg);
+    rndPtrs.lowGainPos = params->getRawParameterValue(ParameterIDs::lowGainRndPos);
+    rndPtrs.lowFreqNeg = params->getRawParameterValue(ParameterIDs::lowFreqRndNeg);
+    rndPtrs.lowFreqPos = params->getRawParameterValue(ParameterIDs::lowFreqRndPos);
+    rndPtrs.midGainNeg = params->getRawParameterValue(ParameterIDs::midGainRndNeg);
+    rndPtrs.midGainPos = params->getRawParameterValue(ParameterIDs::midGainRndPos);
+    rndPtrs.midFreqNeg = params->getRawParameterValue(ParameterIDs::midFreqRndNeg);
+    rndPtrs.midFreqPos = params->getRawParameterValue(ParameterIDs::midFreqRndPos);
+    rndPtrs.highGainNeg = params->getRawParameterValue(ParameterIDs::highGainRndNeg);
+    rndPtrs.highGainPos = params->getRawParameterValue(ParameterIDs::highGainRndPos);
+    rndPtrs.highFreqNeg = params->getRawParameterValue(ParameterIDs::highFreqRndNeg);
+    rndPtrs.highFreqPos = params->getRawParameterValue(ParameterIDs::highFreqRndPos);
+    rndPtrs.transAtkNeg = params->getRawParameterValue(ParameterIDs::transientAttackRndNeg);
+    rndPtrs.transAtkPos = params->getRawParameterValue(ParameterIDs::transientAttackRndPos);
+    rndPtrs.transDecNeg = params->getRawParameterValue(ParameterIDs::transientDecayRndNeg);
+    rndPtrs.transDecPos = params->getRawParameterValue(ParameterIDs::transientDecayRndPos);
 }
 
 // Destructor
@@ -51,92 +93,96 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
     juce::SynthesiserSound* sound, int /*currentPitchWheelPosition*/)
 {
     currentSound = dynamic_cast<RRSound*>(sound);
-    
+
     if (currentSound == nullptr)
         return;
 
     //==========================================================================
     // GENERATE RANDOMIZED PARAMETER VALUES
-    
+
     if (randEngine != nullptr && apvts != nullptr)
     {
         // Semitone randomization
-        float semitoneNeg = apvts->getRawParameterValue(ParameterIDs::semitoneRndNeg)->load();
-        float semitonePos = apvts->getRawParameterValue(ParameterIDs::semitoneRndPos)->load();
-        randomizedSemitones = randEngine->generateRandomValue(globalSemitones, semitoneNeg, semitonePos);
-        
+        randomizedSemitones = randEngine->generateRandomValue(
+            rndPtrs.semitone->load(),
+            rndPtrs.semitoneNeg->load(),
+            rndPtrs.semitonePos->load());
+
         // Fine tune randomization
-        float fineNeg = apvts->getRawParameterValue(ParameterIDs::fineTuneRndNeg)->load();
-        float finePos = apvts->getRawParameterValue(ParameterIDs::fineTuneRndPos)->load();
-        randomizedCents = randEngine->generateRandomValue(globalCents, fineNeg, finePos);
-        
+        randomizedCents = randEngine->generateRandomValue(
+            rndPtrs.fineTune->load(),
+            rndPtrs.fineNeg->load(),
+            rndPtrs.finePos->load());
+
         // Envelope attack randomization
-        float attackNeg = apvts->getRawParameterValue(ParameterIDs::envAttackRndNeg)->load();
-        float attackPos = apvts->getRawParameterValue(ParameterIDs::envAttackRndPos)->load();
-        randomizedAttackMs = randEngine->generateRandomValue(globalAttackMs, attackNeg, attackPos);
-        
+        randomizedAttackMs = randEngine->generateRandomValue(
+            rndPtrs.envAttack->load(),
+            rndPtrs.atkNeg->load(),
+            rndPtrs.atkPos->load());
+
         // Envelope decay randomization
-        float decayNeg = apvts->getRawParameterValue(ParameterIDs::envDecayRndNeg)->load();
-        float decayPos = apvts->getRawParameterValue(ParameterIDs::envDecayRndPos)->load();
-        randomizedDecayMs = randEngine->generateRandomValue(globalDecayMs, decayNeg, decayPos);
+        randomizedDecayMs = randEngine->generateRandomValue(
+            rndPtrs.envDecay->load(),
+            rndPtrs.decNeg->load(),
+            rndPtrs.decPos->load());
 
         // Volume randomization
-        float baseVolume = apvts->getRawParameterValue(ParameterIDs::volume)->load();
-        float volumeNeg = apvts->getRawParameterValue(ParameterIDs::volumeRndNeg)->load();
-        float volumePos = apvts->getRawParameterValue(ParameterIDs::volumeRndPos)->load();
-        randomizedVolume = randEngine->generateRandomValue(baseVolume, volumeNeg, volumePos);
-        randomizedVolume = juce::jlimit(0.0f, 1.0f, randomizedVolume); // Clamp
+        randomizedVolume = randEngine->generateRandomValue(
+            rndPtrs.volume->load(),
+            rndPtrs.volumeNeg->load(),
+            rndPtrs.volumePos->load());
+        randomizedVolume = juce::jlimit(0.0f, 1.0f, randomizedVolume);
 
         // Low EQ randomization
-        float baseLowGain = apvts->getRawParameterValue(ParameterIDs::lowGain)->load();
-        float lowGainNeg = apvts->getRawParameterValue(ParameterIDs::lowGainRndNeg)->load();
-        float lowGainPos = apvts->getRawParameterValue(ParameterIDs::lowGainRndPos)->load();
-        randomizedLowGain = randEngine->generateRandomValue(baseLowGain, lowGainNeg, lowGainPos);
+        randomizedLowGain = randEngine->generateRandomValue(
+            rndPtrs.lowGain->load(),
+            rndPtrs.lowGainNeg->load(),
+            rndPtrs.lowGainPos->load());
         randomizedLowGain = juce::jlimit(-24.0f, 24.0f, randomizedLowGain);
 
-        float baseLowFreq = apvts->getRawParameterValue(ParameterIDs::lowFreq)->load();
-        float lowFreqNeg = apvts->getRawParameterValue(ParameterIDs::lowFreqRndNeg)->load();
-        float lowFreqPos = apvts->getRawParameterValue(ParameterIDs::lowFreqRndPos)->load();
-        randomizedLowFreq = randEngine->generateRandomValue(baseLowFreq, lowFreqNeg, lowFreqPos);
+        randomizedLowFreq = randEngine->generateRandomValue(
+            rndPtrs.lowFreq->load(),
+            rndPtrs.lowFreqNeg->load(),
+            rndPtrs.lowFreqPos->load());
         randomizedLowFreq = juce::jlimit(20.0f, 500.0f, randomizedLowFreq);
 
         // Mid EQ randomization
-        float baseMidGain = apvts->getRawParameterValue(ParameterIDs::midGain)->load();
-        float midGainNeg = apvts->getRawParameterValue(ParameterIDs::midGainRndNeg)->load();
-        float midGainPos = apvts->getRawParameterValue(ParameterIDs::midGainRndPos)->load();
-        randomizedMidGain = randEngine->generateRandomValue(baseMidGain, midGainNeg, midGainPos);
+        randomizedMidGain = randEngine->generateRandomValue(
+            rndPtrs.midGain->load(),
+            rndPtrs.midGainNeg->load(),
+            rndPtrs.midGainPos->load());
         randomizedMidGain = juce::jlimit(-24.0f, 24.0f, randomizedMidGain);
 
-        float baseMidFreq = apvts->getRawParameterValue(ParameterIDs::midFreq)->load();
-        float midFreqNeg = apvts->getRawParameterValue(ParameterIDs::midFreqRndNeg)->load();
-        float midFreqPos = apvts->getRawParameterValue(ParameterIDs::midFreqRndPos)->load();
-        randomizedMidFreq = randEngine->generateRandomValue(baseMidFreq, midFreqNeg, midFreqPos);
+        randomizedMidFreq = randEngine->generateRandomValue(
+            rndPtrs.midFreq->load(),
+            rndPtrs.midFreqNeg->load(),
+            rndPtrs.midFreqPos->load());
         randomizedMidFreq = juce::jlimit(200.0f, 5000.0f, randomizedMidFreq);
 
         // High EQ randomization
-        float baseHighGain = apvts->getRawParameterValue(ParameterIDs::highGain)->load();
-        float highGainNeg = apvts->getRawParameterValue(ParameterIDs::highGainRndNeg)->load();
-        float highGainPos = apvts->getRawParameterValue(ParameterIDs::highGainRndPos)->load();
-        randomizedHighGain = randEngine->generateRandomValue(baseHighGain, highGainNeg, highGainPos);
+        randomizedHighGain = randEngine->generateRandomValue(
+            rndPtrs.highGain->load(),
+            rndPtrs.highGainNeg->load(),
+            rndPtrs.highGainPos->load());
         randomizedHighGain = juce::jlimit(-24.0f, 24.0f, randomizedHighGain);
 
-        float baseHighFreq = apvts->getRawParameterValue(ParameterIDs::highFreq)->load();
-        float highFreqNeg = apvts->getRawParameterValue(ParameterIDs::highFreqRndNeg)->load();
-        float highFreqPos = apvts->getRawParameterValue(ParameterIDs::highFreqRndPos)->load();
-        randomizedHighFreq = randEngine->generateRandomValue(baseHighFreq, highFreqNeg, highFreqPos);
+        randomizedHighFreq = randEngine->generateRandomValue(
+            rndPtrs.highFreq->load(),
+            rndPtrs.highFreqNeg->load(),
+            rndPtrs.highFreqPos->load());
         randomizedHighFreq = juce::jlimit(2000.0f, 20000.0f, randomizedHighFreq);
 
         // Transient randomization
-        float baseTransAtk = static_cast<float>(apvts->getRawParameterValue(ParameterIDs::transientAttack)->load());
-        float transAtkNeg = static_cast<float>(apvts->getRawParameterValue(ParameterIDs::transientAttackRndNeg)->load());
-        float transAtkPos = static_cast<float>(apvts->getRawParameterValue(ParameterIDs::transientAttackRndPos)->load());
-        randomizedTransientAttack = randEngine->generateRandomValue(baseTransAtk, transAtkNeg, transAtkPos);
+        randomizedTransientAttack = randEngine->generateRandomValue(
+            rndPtrs.transAtk->load(),
+            rndPtrs.transAtkNeg->load(),
+            rndPtrs.transAtkPos->load());
         randomizedTransientAttack = juce::jlimit(-127.0f, 127.0f, randomizedTransientAttack);
 
-        float baseTransDec = static_cast<float>(apvts->getRawParameterValue(ParameterIDs::transientDecay)->load());
-        float transDecNeg = static_cast<float>(apvts->getRawParameterValue(ParameterIDs::transientDecayRndNeg)->load());
-        float transDecPos = static_cast<float>(apvts->getRawParameterValue(ParameterIDs::transientDecayRndPos)->load());
-        randomizedTransientDecay = randEngine->generateRandomValue(baseTransDec, transDecNeg, transDecPos);
+        randomizedTransientDecay = randEngine->generateRandomValue(
+            rndPtrs.transDec->load(),
+            rndPtrs.transDecNeg->load(),
+            rndPtrs.transDecPos->load());
         randomizedTransientDecay = juce::jlimit(-127.0f, 127.0f, randomizedTransientDecay);
     }
     else
@@ -151,17 +197,17 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
         randomizedTransientAttack = 0.0f;
         randomizedTransientDecay = 0.0f;
     }
-    
+
     //==========================================================================
     // CALCULATE PITCH RATIO (using randomized values)
-    
+
     float semitoneShift = std::pow(2.0f, randomizedSemitones / 12.0f);
     float centShift = std::pow(2.0f, randomizedCents / 1200.0f);
     pitchRatio = semitoneShift * centShift;
 
     //==========================================================================
     // CONFIGURE ENVELOPE (using randomized values)
-    
+
     juce::ADSR::Parameters envParams;
     envParams.attack = randomizedAttackMs / 1000.0f;
     envParams.decay = 0.0f;
@@ -172,7 +218,7 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
 
     //==========================================================================
     // START PLAYBACK
-    
+
     sourceSamplePosition = 0.0;
     isPlaying = true;
 }
