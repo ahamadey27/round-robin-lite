@@ -120,7 +120,7 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
         float volNegdB = rndPtrs.volumeNeg->load() * 24.0f;  // scale 0-1 → 0-24dB
         float volPosdB = rndPtrs.volumePos->load() * 24.0f;  // scale 0-1 → 0-24dB
         float randomizeddB = randEngine->generateRandomValue(baseVolumedB, volNegdB, volPosdB);
-        randomizeddB = juce::jlimit(-60.0f, 0.0f, randomizeddB);
+        randomizeddB = juce::jlimit(-60.0f, 12.0f, randomizeddB);
         randomizedVolume = juce::Decibels::decibelsToGain(randomizeddB);
 
         // Envelope attack randomization
