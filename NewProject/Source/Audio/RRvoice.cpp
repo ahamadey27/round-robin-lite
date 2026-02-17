@@ -17,12 +17,11 @@ RRVoice::RRVoice()
 }
 
 void RRVoice::setRandomizationReferences(RandomizationEngine* engine,
-                                         juce::AudioProcessorValueTreeState* params)
+    juce::AudioProcessorValueTreeState* params)
 {
     randEngine = engine;
     apvts = params;
 
-    // Cache all pointers — hash lookup happens ONCE here, not per note
     rndPtrs.semitone = params->getRawParameterValue(ParameterIDs::semitone);
     rndPtrs.fineTune = params->getRawParameterValue(ParameterIDs::fineTune);
     rndPtrs.volume = params->getRawParameterValue(ParameterIDs::volume);
@@ -78,6 +77,7 @@ bool RRVoice::canPlaySound(juce::SynthesiserSound* sound)
     // We can only play RRSound objects
     return dynamic_cast<RRSound*>(sound) != nullptr;
 }
+
 
 void RRVoice::updateGlobalParameters(float semitones, float cents, float attackMs, float decayMs)
 {

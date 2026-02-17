@@ -142,7 +142,6 @@ private:
     // Cached parameter pointers (set once, read many times)
     struct RandomizationPointers
     {
-        // Base values
         std::atomic<float>* semitone = nullptr;
         std::atomic<float>* fineTune = nullptr;
         std::atomic<float>* volume = nullptr;
@@ -157,7 +156,6 @@ private:
         std::atomic<float>* transAtk = nullptr;
         std::atomic<float>* transDec = nullptr;
 
-        // Randomization ranges
         std::atomic<float>* semitoneNeg = nullptr;  std::atomic<float>* semitonePos = nullptr;
         std::atomic<float>* fineNeg = nullptr;      std::atomic<float>* finePos = nullptr;
         std::atomic<float>* volumeNeg = nullptr;    std::atomic<float>* volumePos = nullptr;
