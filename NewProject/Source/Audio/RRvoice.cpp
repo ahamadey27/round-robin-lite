@@ -216,6 +216,8 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
     envParams.sustain = 1.0f;
     envParams.release = randomizedDecayMs / 1000.0f;
     envelope.setParameters(envParams);
+   
+    envelope.reset();
     envelope.noteOn();
 
     //==========================================================================
@@ -265,9 +267,18 @@ void RRVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer,
         // Check if we've reached the end of the sample
         if (sourceSamplePosition >= sampleLength)
         {
-            clearCurrentNote();
-            isPlaying = false;
-            break;
+            // Trigger release stage instead of hard stopping
+            // This allows the Env Decay parameter to fade out naturally
+            if (envelope.isActive())
+                envelope.noteOff();
+
+            // If release has also finished, stop the voice
+            if (!envelope.isActive())
+            {
+                clearCurrentNote();
+                isPlaying = false;
+                break;
+            }
         }
 
         // Get the current envelope level (0.0 to 1.0)
