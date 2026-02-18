@@ -252,73 +252,45 @@ void RRVoice::stopNote(float /*velocity*/, bool allowTailOff)
 void RRVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer,
     int startSample, int numSamples)
 {
-    // If we're not playing, nothing to do
     if (!isPlaying || currentSound == nullptr)
         return;
 
-    // Get the sample data from the RRSound
     const juce::AudioBuffer<float>& sampleBuffer = currentSound->getAudioBuffer();
     const float* sampleData = sampleBuffer.getReadPointer(0);
     const int sampleLength = sampleBuffer.getNumSamples();
 
-    // Process each sample in this block
     for (int i = 0; i < numSamples; ++i)
     {
-        // Check if we've reached the end of the sample
-        if (sourceSamplePosition >= sampleLength)
-        {
-            // Trigger release stage instead of hard stopping
-            // This allows the Env Decay parameter to fade out naturally
-            if (envelope.isActive())
-                envelope.noteOff();
+        const float envelopeLevel = envelope.getNextSample();
 
-            // If release has also finished, stop the voice
-            if (!envelope.isActive())
+        float outputSample = 0.0f;
+
+        if (sourceSamplePosition < sampleLength - 1)
+        {
+            // Normal playback — sample data still available
+            const int index0 = static_cast<int>(sourceSamplePosition);
+            const int index1 = index0 + 1;
+            const float fraction = static_cast<float>(sourceSamplePosition - index0);
+            const float sample0 = sampleData[index0];
+            const float sample1 = sampleData[index1];
+            outputSample = (sample0 + (sample1 - sample0) * fraction) * envelopeLevel * randomizedVolume;
+
+            sourceSamplePosition += pitchRatio;
+        }
+        else
+        {
+            // Sample data exhausted — trigger release and output silence through envelope
+            if (envelope.isActive())
             {
-                clearCurrentNote();
-                isPlaying = false;
-                break;
+                envelope.noteOff();   // start release stage
+                outputSample = 0.0f * envelopeLevel * randomizedVolume;
             }
         }
 
-        // Get the current envelope level (0.0 to 1.0)
-        const float envelopeLevel = envelope.getNextSample();
-
-        // ONE-SHOT BEHAVIOR: If envelope has faded to (near) silence, trigger release to finish
-        if (envelopeLevel < 0.0001f && envelope.isActive())
-        {
-            envelope.noteOff();  // Trigger short release to cleanly finish
-        }
-
-        // Linear interpolation for smooth playback
-        const int index0 = static_cast<int>(sourceSamplePosition);
-        const int index1 = index0 + 1;
-
-        if (index1 >= sampleLength)
-        {
-            clearCurrentNote();
-            isPlaying = false;
-            break;
-        }
-
-        const float fraction = static_cast<float>(sourceSamplePosition - index0);
-        const float sample0 = sampleData[index0];
-        const float sample1 = sampleData[index1];
-        const float interpolatedSample = sample0 + (sample1 - sample0) * fraction;
-
-        // Apply envelope AND per-voice volume to the sample
-        const float outputSample = interpolatedSample * envelopeLevel * randomizedVolume;
-
-        // Write to both channels
         for (int channel = 0; channel < outputBuffer.getNumChannels(); ++channel)
-        {
             outputBuffer.addSample(channel, startSample + i, outputSample);
-        }
 
-        // Advance playback position
-        sourceSamplePosition += pitchRatio;
-
-        // Stop when envelope completely finishes
+        // Stop voice once envelope fully finishes
         if (!envelope.isActive())
         {
             clearCurrentNote();
