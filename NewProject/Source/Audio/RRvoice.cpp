@@ -219,6 +219,7 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
    
     envelope.reset();
     envelope.noteOn();
+    envelope.noteOff();   //— triggers immediate release/decay 
 
     //==========================================================================
     // START PLAYBACK
@@ -279,12 +280,9 @@ void RRVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer,
         }
         else
         {
-            // Sample data exhausted — trigger release and output silence through envelope
-            if (envelope.isActive())
-            {
-                envelope.noteOff();   // start release stage
-                outputSample = 0.0f * envelopeLevel * randomizedVolume;
-            }
+            // Sample data exhausted, just output silence
+            // Envelope is already in release stage from startNote()
+            outputSample = 0.0f;
         }
 
         for (int channel = 0; channel < outputBuffer.getNumChannels(); ++channel)
