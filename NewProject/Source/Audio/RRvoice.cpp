@@ -2,6 +2,12 @@
 #include "../DSP/RandomizationEngine.h"
 #include "../Parameters/ParametersIDs.h"
 
+void RRSound::setFromSlot(const SampleSlot& slot)
+{
+    audioBuffer = slot.audioBuffer;     // copies the buffer
+    originalSampleRate = slot.sampleRate;
+    displayName = slot.displayName;
+}
 
 //==============================================================================
 // Constructor

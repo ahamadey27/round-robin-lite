@@ -9,6 +9,7 @@
 
 #pragma once
 #include <JuceHeader.h>
+#include "../Data/SampleSlot.h"
 
 //==============================================================================
 /**
@@ -65,6 +66,7 @@ public:
      * @return true if loading was successful, false otherwise
      */
     bool loadFromFile(const juce::File& file, juce::AudioFormatManager& formatManager);
+    void setFromSlot(const SampleSlot& slot);
 
     /**
     * Gets a reference to the audio buffer containing the sample data.

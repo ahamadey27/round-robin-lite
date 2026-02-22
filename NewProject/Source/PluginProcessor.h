@@ -12,6 +12,7 @@
 #include "Audio/RRVoice.h"
 #include "Audio/RRSound.h"
 #include "Data/SampleSlot.h"
+#include "Data/SampleLoader.h"
 #include "Parameters/ParametersIDs.h"
 #include "DSP/ThreeBandEQ.h" 
 #include "DSP/TransientShaper.h"  
@@ -74,6 +75,7 @@ private:
 
     static constexpr int NUM_SAMPLE_SLOTS = 20;
     SampleSlot sampleSlots[NUM_SAMPLE_SLOTS];
+    SampleLoader sampleLoader{ formatManager, synthesiser, sampleSlots, NUM_SAMPLE_SLOTS };
 
     // DSP Processors
     ThreeBandEQ threeBandEQ;  
