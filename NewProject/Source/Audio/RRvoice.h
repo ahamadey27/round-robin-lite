@@ -136,6 +136,7 @@ private:
     float randomizedAttackMs = 0.0f;
     float randomizedDecayMs = 0.0f;
     float randomizedVolume = 0.75f;
+    float randomizedPan = 0.0f;
     float randomizedLowGain = 0.0f;
     float randomizedLowFreq = 100.0f;
     float randomizedMidGain = 0.0f;
@@ -153,6 +154,9 @@ private:
         std::atomic<float>* semitone = nullptr;
         std::atomic<float>* fineTune = nullptr;
         std::atomic<float>* volume = nullptr;
+        std::atomic<float>* pan = nullptr;
+        std::atomic<float>* panNeg = nullptr;
+        std::atomic<float>* panPos = nullptr;
         std::atomic<float>* envAttack = nullptr;
         std::atomic<float>* envDecay = nullptr;
         std::atomic<float>* lowGain = nullptr;

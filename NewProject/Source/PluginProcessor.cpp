@@ -558,6 +558,31 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
     ));
 
     //==============================================================================
+    // Pan
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::pan, 1),
+        "Pan",
+        juce::NormalisableRange<float>(-1.0f, 1.0f, 0.01f),
+        0.0f,
+        juce::String(),
+        juce::AudioProcessorParameter::genericParameter,
+        [](float value, int) {
+            if (value < -0.01f) return juce::String(int(std::abs(value) * 100)) + "% L";
+            if (value > 0.01f) return juce::String(int(value * 100)) + "% R";
+            return juce::String("Center");
+        }
+    ));
+
+    // ADD PAN RANDOMIZATION (near other randomization params)
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::panRndNeg, 1),
+        "Pan Rnd Neg", 0.0f, 1.0f, 0.0f));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::panRndPos, 1),
+        "Pan Rnd Pos", 0.0f, 1.0f, 0.0f));
+
+    //==============================================================================
     // AMPLITUDE ENVELOPE
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(

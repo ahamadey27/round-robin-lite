@@ -65,6 +65,15 @@ namespace ParameterIDs
     inline constexpr auto volume = "volume";
 
     //==============================================================================
+    // Pan
+    inline constexpr auto pan = "pan";
+    inline constexpr auto panRndNeg = "panRndNeg";
+    inline constexpr auto panRndPos = "panRndPos";
+
+
+
+
+    //==============================================================================
     // 3-BAND EQ
 
     /**

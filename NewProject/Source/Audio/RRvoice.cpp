@@ -42,6 +42,9 @@ void RRVoice::setRandomizationReferences(RandomizationEngine* engine,
     rndPtrs.finePos = params->getRawParameterValue(ParameterIDs::fineTuneRndPos);
     rndPtrs.volumeNeg = params->getRawParameterValue(ParameterIDs::volumeRndNeg);
     rndPtrs.volumePos = params->getRawParameterValue(ParameterIDs::volumeRndPos);
+    rndPtrs.pan = params->getRawParameterValue(ParameterIDs::pan);
+    rndPtrs.panNeg = params->getRawParameterValue(ParameterIDs::panRndNeg);
+    rndPtrs.panPos = params->getRawParameterValue(ParameterIDs::panRndPos);
     rndPtrs.atkNeg = params->getRawParameterValue(ParameterIDs::envAttackRndNeg);
     rndPtrs.atkPos = params->getRawParameterValue(ParameterIDs::envAttackRndPos);
     rndPtrs.decNeg = params->getRawParameterValue(ParameterIDs::envDecayRndNeg);
@@ -122,6 +125,13 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
         float randomizeddB = randEngine->generateRandomValue(baseVolumedB, volNegdB, volPosdB);
         randomizeddB = juce::jlimit(-60.0f, 12.0f, randomizeddB);
         randomizedVolume = juce::Decibels::decibelsToGain(randomizeddB);
+
+        //Pan Randomization
+        randomizedPan = randEngine->generateRandomValue(
+            rndPtrs.pan->load(),
+            rndPtrs.panNeg->load(),
+            rndPtrs.panPos->load());
+        randomizedPan = juce::jlimit(-1.0f, 1.0f, randomizedPan);
 
         // Envelope attack randomization
         randomizedAttackMs = randEngine->generateRandomValue(
@@ -305,15 +315,18 @@ void RRVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer,
             }  
         }  
 
-        for (int channel = 0; channel < outputBuffer.getNumChannels(); ++channel)
-            outputBuffer.addSample(channel, startSample + i, outputSample);
+        float panAngle = (randomizedPan + 1.0f) * 0.5f * juce::MathConstants<float>::halfPi;
+        float leftGain = std::cos(panAngle);
+        float rightGain = std::sin(panAngle);
 
-        // Stop voice once envelope fully finishes
-        if (!envelope.isActive())
+        if (outputBuffer.getNumChannels() >= 2)
         {
-            clearCurrentNote();
-            isPlaying = false;
-            break;
+            outputBuffer.addSample(0, startSample + i, outputSample * leftGain);
+            outputBuffer.addSample(1, startSample + i, outputSample * rightGain);
+        }
+        else
+        {
+            outputBuffer.addSample(0, startSample + i, outputSample);
         }
     }
 }
