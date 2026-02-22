@@ -24,6 +24,9 @@
               file="Source/Parameters/RandomizationParams.h"/>
       </GROUP>
       <GROUP id="{99C4D0AE-47D4-3F1B-8AE2-65E1F59C4A25}" name="Data">
+        <FILE id="mNiiKs" name="SampleLoader.cpp" compile="1" resource="0"
+              file="Source/Data/SampleLoader.cpp"/>
+        <FILE id="djXge6" name="SampleLoader.h" compile="0" resource="0" file="Source/Data/SampleLoader.h"/>
         <FILE id="ZD14EG" name="SampleSlot.h" compile="0" resource="0" file="Source/Data/SampleSlot.h"/>
       </GROUP>
       <GROUP id="{BE5F3C22-AB0D-49FF-90E9-8DCE18E735F3}" name="UI"/>

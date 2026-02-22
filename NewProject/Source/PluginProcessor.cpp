@@ -53,7 +53,7 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
 
         DBG("=== Sample Slots Initialized ===");
         DBG("Slots available: " + juce::String(NUM_SAMPLE_SLOTS));
-        DBG("All slots empty on startup — load via UI");
+        DBG("All slots empty on startup â€” load via UI");
         DBG("================================");
 
         

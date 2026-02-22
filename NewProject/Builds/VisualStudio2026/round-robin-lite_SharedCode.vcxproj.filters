@@ -724,6 +724,9 @@
     <ClCompile Include="..\..\Source\DSP\TransientShaper.cpp">
       <Filter>round-robin-lite\Source\DSP</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\Data\SampleLoader.cpp">
+      <Filter>round-robin-lite\Source\Data</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\Audio\RRSound.cpp">
       <Filter>round-robin-lite\Source\Audio</Filter>
     </ClCompile>
@@ -3782,6 +3785,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\Parameters\RandomizationParams.h">
       <Filter>round-robin-lite\Source\Parameters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Data\SampleLoader.h">
+      <Filter>round-robin-lite\Source\Data</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Data\SampleSlot.h">
       <Filter>round-robin-lite\Source\Data</Filter>
