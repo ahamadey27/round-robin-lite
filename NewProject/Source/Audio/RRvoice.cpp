@@ -211,15 +211,20 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
     // CONFIGURE ENVELOPE (using randomized values)
 
     juce::ADSR::Parameters envParams;
-    envParams.attack = randomizedAttackMs / 1000.0f;
+    envParams.attack = juce::jlimit(0.001f, 5.0f, randomizedAttackMs / 1000.0f);
     envParams.decay = 0.0f;
     envParams.sustain = 1.0f;
-    envParams.release = randomizedDecayMs / 1000.0f;
+    envParams.release = 0.15f;   // Fixed 150ms anti-click fade (not user-controlled here)
     envelope.setParameters(envParams);
-   
     envelope.reset();
     envelope.noteOn();
-    releaseTriggered = false;
+
+    // Schedule decay gate: trigger noteOff() DURING sample playback so
+    // the fade-out is applied to real audio, not silence.
+    samplesPlayed = 0;
+    decayTriggered = false;
+    float decaySec = juce::jlimit(0.01f, 30.0f, randomizedDecayMs / 1000.0f);
+    decayTriggerSample = static_cast<int>(decaySec * getSampleRate());
 
     //==========================================================================
     // START PLAYBACK
@@ -262,6 +267,13 @@ void RRVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer,
 
     for (int i = 0; i < numSamples; ++i)
     {
+
+        ++samplesPlayed;
+        if (!decayTriggered && samplesPlayed >= decayTriggerSample)
+        {
+            envelope.noteOff();    // fade-out starts NOW while sample audio still available
+            decayTriggered = true;
+        }
         const float envelopeLevel = envelope.getNextSample();
 
         float outputSample = 0.0f;
@@ -282,13 +294,16 @@ void RRVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer,
         else
         {
             // Sample fully exhausted
-            if (!releaseTriggered)
+            if (envelope.isActive())
             {
-                envelope.noteOff();
-                releaseTriggered = true;
-            }
-            outputSample = 0.0f;
-        }
+                if (!decayTriggered)
+                {
+                    envelope.noteOff();
+                    decayTriggered = true;
+                }
+                outputSample = 0.0f;
+            }  
+        }  
 
         for (int channel = 0; channel < outputBuffer.getNumChannels(); ++channel)
             outputBuffer.addSample(channel, startSample + i, outputSample);
