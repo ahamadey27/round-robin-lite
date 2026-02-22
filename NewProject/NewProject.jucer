@@ -23,7 +23,9 @@
         <FILE id="en809x" name="RandomizationParams.h" compile="0" resource="0"
               file="Source/Parameters/RandomizationParams.h"/>
       </GROUP>
-      <GROUP id="{99C4D0AE-47D4-3F1B-8AE2-65E1F59C4A25}" name="Data"/>
+      <GROUP id="{99C4D0AE-47D4-3F1B-8AE2-65E1F59C4A25}" name="Data">
+        <FILE id="ZD14EG" name="SampleSlot.h" compile="0" resource="0" file="Source/Data/SampleSlot.h"/>
+      </GROUP>
       <GROUP id="{BE5F3C22-AB0D-49FF-90E9-8DCE18E735F3}" name="UI"/>
       <GROUP id="{A9D9CA2D-D0D8-EF05-31D9-D59CA0D4367D}" name="Audio">
         <FILE id="J7YTOR" name="MidiMapper.h" compile="0" resource="0" file="Source/Audio/MidiMapper.h"/>

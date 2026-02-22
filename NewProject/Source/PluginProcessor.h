@@ -11,10 +11,13 @@
 #include <JuceHeader.h>
 #include "Audio/RRVoice.h"
 #include "Audio/RRSound.h"
+#include "Data/SampleSlot.h"
 #include "Parameters/ParametersIDs.h"
 #include "DSP/ThreeBandEQ.h" 
 #include "DSP/TransientShaper.h"  
 #include "DSP/RandomizationEngine.h"
+
+
 
 //==============================================================================
 /**
@@ -68,6 +71,9 @@ private:
     // Audio Engine
     juce::Synthesiser synthesiser;
     juce::AudioFormatManager formatManager;
+
+    static constexpr int NUM_SAMPLE_SLOTS = 20;
+    SampleSlot sampleSlots[NUM_SAMPLE_SLOTS];
 
     // DSP Processors
     ThreeBandEQ threeBandEQ;  
