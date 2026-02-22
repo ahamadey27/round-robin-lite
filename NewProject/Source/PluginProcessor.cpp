@@ -32,63 +32,32 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
     // Register basic audio formats for sample loading
     formatManager.registerBasicFormats();
 
-    DBG("=== Round Robin Lite Initialized ===");
-    DBG("Synthesiser ready with " + juce::String(synthesiser.getNumVoices()) + " voice(s)");
-    DBG("UNPITCHED PLAYBACK MODE - All samples play at original pitch");
-    DBG("Root reference note: C1 (MIDI 36)");
-    DBG("===================================");
+        DBG("=== Round Robin Lite Initialized ===");
+        DBG("Synthesiser ready with " + juce::String(synthesiser.getNumVoices()) + " voice(s)");
+        DBG("UNPITCHED PLAYBACK MODE - All samples play at original pitch");
+        DBG("Root reference note: C1 (MIDI 36)");
+        DBG("===================================");
 
-    // TEST: Verify parameter IDs are accessible
-    DBG("\n=== Testing Parameter IDs ===");
-    DBG("Semitone ID: " + juce::String(ParameterIDs::semitone));
-    DBG("Volume ID: " + juce::String(ParameterIDs::volume));
-    DBG("Total parameters: " + juce::String(ParameterIDs::totalParameters));
-    DBG("============================\n");
+        // TEST: Verify parameter IDs are accessible
+        DBG("\n=== Testing Parameter IDs ===");
+        DBG("Semitone ID: " + juce::String(ParameterIDs::semitone));
+        DBG("Volume ID: " + juce::String(ParameterIDs::volume));
+        DBG("Total parameters: " + juce::String(ParameterIDs::totalParameters));
+        DBG("============================\n");
 
-    // TEST: Verify APVTS is initialized
-    DBG("\n=== Testing APVTS ===");
-    DBG("APVTS initialized: " + juce::String(apvts.state.isValid() ? "YES" : "NO"));
-    DBG("Current parameter count: " + juce::String(apvts.state.getNumChildren()));
-    DBG("=====================\n");
+        // TEST: Verify APVTS is initialized
+        DBG("\n=== Testing APVTS ===");
+        DBG("APVTS initialized: " + juce::String(apvts.state.isValid() ? "YES" : "NO"));
+        DBG("Current parameter count: " + juce::String(apvts.state.getNumChildren()));
+        DBG("=====================\n");
 
-    // ============================================================
-    // TEST: Load single sample
-    // ============================================================
+        DBG("=== Sample Slots Initialized ===");
+        DBG("Slots available: " + juce::String(NUM_SAMPLE_SLOTS));
+        DBG("All slots empty on startup — load via UI");
+        DBG("================================");
 
-    juce::File testFile("C:\\Users\\hamad\\OneDrive\\Desktop\\snd_surf_hard_dirt_01.wav");
-
-    DBG("\n=== LOADING TEST SAMPLE ===");
-
-    if (!testFile.existsAsFile())
-    {
-        DBG("ERROR: Test file not found at: " + testFile.getFullPathName());
-        DBG("Please update the file path in PluginProcessor.cpp constructor");
-        return;
+        
     }
-
-    // Create and load sound
-    RRSound* testSound = new RRSound();
-
-    if (testSound->loadFromFile(testFile, formatManager))
-    {
-        DBG("Sample loaded: " + testSound->getDisplayName());
-        DBG("  Samples: " + juce::String(testSound->getNumSamples()));
-        DBG("  Rate: " + juce::String(testSound->getOriginalSampleRate()) + " Hz");
-
-        // Add to synthesiser
-        synthesiser.addSound(testSound);
-
-        DBG("\n=== READY TO PLAY ===");
-        DBG("Press ANY MIDI key to hear the sample");
-        DBG("All keys play at original pitch (unpitched mode)");
-        DBG("=============================\n");
-    }
-    else
-    {
-        DBG("Failed to load sample");
-        delete testSound;
-    }
-}
 
 NewProjectAudioProcessor::~NewProjectAudioProcessor()
 {
