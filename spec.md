@@ -595,13 +595,17 @@ float generateRandomValue(float baseValue, float negRange, float posRange)
 - Smooth operation even with rapid note sequences
 
 ### Step 6: Add Randomization Validation & Testing
-- [ ] Test with all randomization ranges at 0 (should sound identical to base)
-- [ ] Test with only negative randomization (Fine: -10 to 0)
-- [ ] Test with only positive randomization (Fine: 0 to +10)
-- [ ] Test with asymmetric ranges (Fine: -4 to +10)
-- [ ] Verify each parameter randomizes independently
-- [ ] Test extreme values don't cause crashes or artifacts
-- [ ] Verify randomization is truly random (not repeating patterns)
+- [x] Test with all randomization ranges at 0 (should sound identical to base)
+- [x] Test with only negative randomization (Fine: -10 to 0)
+- [x] Test with only positive randomization (Fine: 0 to +10)
+- [x] Test with asymmetric ranges (Fine: -4 to +10)
+- [x] Verify each parameter randomizes independently
+- [x] Test extreme values don't cause crashes or artifacts
+- [x] Verify randomization is truly random (not repeating patterns)
+
+### Step 6.1: Add Pan Parameter and Randomization 
+- [ ] Add Pan Parameter
+- [ ] Add pos/neg randomization for pan
 
 **Test Cases:**
 ```
@@ -611,11 +615,11 @@ EQ Low Gain: Base=0dB, Neg=-12dB, Pos=0dB → expect -12 to 0dB (only cuts)
 ```
 
 ### Step 7: Document Randomization Behavior
-- [ ] Add comments explaining randomization algorithm
-- [ ] Document parameter interaction (randomization + base value)
-- [ ] Note that randomization is per-note, not per-plugin-instance
-- [ ] Explain clamping behavior for out-of-range values
-- [ ] Update README.md with randomization feature description
+- [x] Add comments explaining randomization algorithm
+- [x] Document parameter interaction (randomization + base value)
+- [x] Note that randomization is per-note, not per-plugin-instance
+- [x] Explain clamping behavior for out-of-range values
+- [x] Update README.md with randomization feature description
 
 **Success Criteria for Phase 4:**
 - [ ] All 11 parameters can be randomized independently
