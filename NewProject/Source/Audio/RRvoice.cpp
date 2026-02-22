@@ -219,7 +219,7 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
    
     envelope.reset();
     envelope.noteOn();
-    envelope.noteOff();   //— triggers immediate release/decay 
+    releaseTriggered = false;
 
     //==========================================================================
     // START PLAYBACK
@@ -268,7 +268,7 @@ void RRVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer,
 
         if (sourceSamplePosition < sampleLength - 1)
         {
-            // Normal playback — sample data still available
+            // Normal playback
             const int index0 = static_cast<int>(sourceSamplePosition);
             const int index1 = index0 + 1;
             const float fraction = static_cast<float>(sourceSamplePosition - index0);
@@ -278,10 +278,15 @@ void RRVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer,
 
             sourceSamplePosition += pitchRatio;
         }
+
         else
         {
-            // Sample data exhausted, just output silence
-            // Envelope is already in release stage from startNote()
+            // Sample fully exhausted
+            if (!releaseTriggered)
+            {
+                envelope.noteOff();
+                releaseTriggered = true;
+            }
             outputSample = 0.0f;
         }
 

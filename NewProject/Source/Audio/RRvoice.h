@@ -139,6 +139,8 @@ private:
     float randomizedTransientAttack = 0.0f;
     float randomizedTransientDecay = 0.0f;
 
+    bool releaseTriggered = false;
+
     // Cached parameter pointers (set once, read many times)
     struct RandomizationPointers
     {

@@ -573,7 +573,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::envDecay, 1),
         "Env Decay",
-        juce::NormalisableRange<float>(0.0f, 5000.0f, 1.0f, 0.4f),
+        juce::NormalisableRange<float>(20.0f, 5000.0f, 1.0f, 0.4f),
         820.0f, //default amount
         "ms",
         juce::AudioProcessorParameter::genericParameter,
