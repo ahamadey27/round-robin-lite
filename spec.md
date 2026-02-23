@@ -695,16 +695,16 @@ EQ Low Gain: Base=0dB, Neg=-12dB, Pos=0dB → expect -12 to 0dB (only cuts)
 - [ ] Verify error messages are clear and helpful
 
 ### Step 4: Implement Sample Rate Conversion (Resampling)
-- [ ] Add resampling utility function to SampleLoader
-- [ ] Use JUCE's LagrangeInterpolator for high-quality resampling
-- [ ] Implement resampleToPluginSampleRate() method
-- [ ] Calculate resampling ratio (plugin rate / original rate)
-- [ ] Create temporary buffer for resampled audio
-- [ ] Process audio through interpolator
-- [ ] Replace original buffer with resampled version
-- [ ] Call resampling when plugin sample rate changes in prepareToPlay()
-- [ ] Ensure resampling maintains audio quality
-- [ ] Test with various source sample rates (44.1kHz, 48kHz, 96kHz)
+- [x] Add resampling utility function to SampleLoader
+- [x] Use JUCE's LagrangeInterpolator for high-quality resampling
+- [x] Implement resampleToPluginSampleRate() method
+- [x] Calculate resampling ratio (plugin rate / original rate)
+- [x] Create temporary buffer for resampled audio
+- [x] Process audio through interpolator
+- [x] Replace original buffer with resampled version
+- [x] Call resampling when plugin sample rate changes in prepareToPlay()
+- [x] Ensure resampling maintains audio quality
+- [x] Test with various source sample rates (44.1kHz, 48kHz, 96kHz)
 
 **Quick Test After Step 4:**
 - [ ] Load samples recorded at 44.1kHz into plugin running at 48kHz
@@ -714,16 +714,16 @@ EQ Low Gain: Base=0dB, Neg=-12dB, Pos=0dB → expect -12 to 0dB (only cuts)
 - [ ] Test that samples play at correct pitch regardless of source sample rate
 
 ### Step 5: Connect Loaded Samples to Synthesiser
-- [ ] Implement updateSynthesiserSounds() method in PluginProcessor
-- [ ] Clear all existing sounds from synthesiser before updating
-- [ ] Loop through all 20 sample slots
-- [ ] For each loaded sample:
-  - [ ] Create new RRSound object
-  - [ ] Copy audio buffer from slot to sound
-  - [ ] Set display name
-  - [ ] Add sound to synthesiser (will automatically respond to C2/D2)
-- [ ] Call updateSynthesiserSounds() whenever samples change
-- [ ] All loaded samples will be available and trigger on C2/D2
+- [x] Implement updateSynthesiserSounds() method in PluginProcessor
+- [x] Clear all existing sounds from synthesiser before updating
+- [x] Loop through all 20 sample slots
+- [x] For each loaded sample:
+  - [x] Create new RRSound object
+  - [x] Copy audio buffer from slot to sound
+  - [x] Set display name
+  - [x] Add sound to synthesiser (will automatically respond to C2/D2)
+- [x] Call updateSynthesiserSounds() whenever samples change
+- [x] All loaded samples will be available and trigger on C2/D2
 
 **Note:** With this design, pressing C2 or D2 will cycle through or layer loaded samples. Consider implementing sample selection logic (which sample plays) in Phase 4 Step 6.
 
