@@ -12,7 +12,7 @@ struct SampleSlot
     // Data Members
 
     juce::AudioBuffer<float> audioBuffer;   // Raw audio data (mono)
-    double sampleRate = 44100.0;
+    double sampleRate = 44100.0; // Set this when loading the file
     bool isLoaded = false;
     juce::File sourceFile;    // Original file location
     juce::String displayName;   // Filename shown in UI (no extension)

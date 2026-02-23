@@ -134,6 +134,9 @@ void NewProjectAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBl
     // Tell the synthesiser what sample rate we're running at
     synthesiser.setCurrentPlaybackSampleRate(sampleRate);
 
+    // Resample any loaded samples if sample rate changed
+    sampleLoader.setSampleRate(sampleRate);
+
     //==============================================================================
    // INITIALIZE 3-BAND EQ
 
@@ -175,6 +178,8 @@ void NewProjectAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBl
     smoothedTransientDecay.setCurrentAndTargetValue(apvts.getRawParameterValue(ParameterIDs::transientDecay)->load());
 
     DBG("All parameter smoothing initialized");
+
+    sampleLoader.setSampleRate(sampleRate);
 }
 
 void NewProjectAudioProcessor::releaseResources()

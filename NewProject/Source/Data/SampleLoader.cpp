@@ -86,6 +86,10 @@ bool SampleLoader::loadSample(int slotIndex, const juce::File& file)
 
         lastErrorMessage.clear();
         DBG("Slot " + juce::String(slotIndex) + " loaded: " + slots[slotIndex].displayName);
+
+        // --- Step 4: Resample to plugin sample rate if needed ---
+        resampleBuffer(slots[slotIndex].audioBuffer, slots[slotIndex].sampleRate);  // not originalSampleRate
+
         updateSynthesiserSounds();
     }
     else
@@ -99,16 +103,57 @@ bool SampleLoader::loadSample(int slotIndex, const juce::File& file)
     return success;
 }
 
-void SampleLoader::clearSlot(int slotIndex)
+void SampleLoader::setSampleRate(double newSampleRate)
 {
-    if (slotIndex < 0 || slotIndex >= numSlots)
+    if (juce::exactlyEqual(newSampleRate, currentSampleRate))
         return;
 
-    slots[slotIndex].clear();
-    lastErrorMessage.clear();
-    DBG("Slot " + juce::String(slotIndex) + " cleared");
+    currentSampleRate = newSampleRate;
+    DBG("SampleLoader: Sample rate set to " + juce::String(newSampleRate));
+
+    // Resample all currently loaded slots to the new rate
+    for (int i = 0; i < numSlots; ++i)
+    {
+        if (!slots[i].isLoaded)
+            continue;
+
+        resampleBuffer(slots[i].audioBuffer, slots[i].sampleRate);  // not originalSampleRate
+    }
+
     updateSynthesiserSounds();
 }
+
+void SampleLoader::resampleBuffer(juce::AudioBuffer<float>& buffer, double sourceSampleRate)
+{
+    if (juce::exactlyEqual(sourceSampleRate, currentSampleRate))
+        return;  // No resampling needed
+
+    const double ratio = sourceSampleRate / currentSampleRate;
+    const int numChannels = buffer.getNumChannels();
+    const int originalNumSamples = buffer.getNumSamples();
+    const int resampledNumSamples = juce::roundToInt((double)originalNumSamples / ratio);
+
+    juce::AudioBuffer<float> resampledBuffer(numChannels, resampledNumSamples);
+
+    for (int ch = 0; ch < numChannels; ++ch)
+    {
+        juce::LagrangeInterpolator interpolator;
+        interpolator.reset();
+
+        const float* source = buffer.getReadPointer(ch);
+        float* dest = resampledBuffer.getWritePointer(ch);
+
+        interpolator.process(ratio, source, dest, resampledNumSamples);
+    }
+
+    buffer = std::move(resampledBuffer);
+
+    DBG("SampleLoader: Resampled " + juce::String(originalNumSamples) + " -> "
+        + juce::String(resampledNumSamples) + " samples ("
+        + juce::String(sourceSampleRate) + "Hz -> "
+        + juce::String(currentSampleRate) + "Hz)");
+}
+
 
 void SampleLoader::updateSynthesiserSounds()
 {

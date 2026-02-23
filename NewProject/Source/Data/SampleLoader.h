@@ -29,10 +29,16 @@ public:
     /** Rebuilds all synthesiser sounds from current slot state. */
     void updateSynthesiserSounds();
 
+    void setSampleRate(double newSampleRate);
+
 private:
     juce::AudioFormatManager&formatManager;
     juce::Synthesiser& synthesiser;
     SampleSlot* slots;
     int numSlots;
     juce::String lastErrorMessage;
+    double currentSampleRate = 44100.0;
+
+    /** Resamples a buffer from sourceSampleRate to currentSampleRate in-place. */
+    void resampleBuffer(juce::AudioBuffer<float>& buffer, double sourceSampleRate);
 };
