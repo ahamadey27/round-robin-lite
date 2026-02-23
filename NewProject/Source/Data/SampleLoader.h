@@ -10,10 +10,12 @@
 class SampleLoader
 {
 public:
-    SampleLoader(juce::AudioFormatManager& formatManager,
-        juce::Synthesiser& synthesiser,
-        SampleSlot* slots,
-        int                       numSlots);
+    SampleLoader(juce::AudioFormatManager&formatManager,
+                 juce::Synthesiser&synthesiser,
+                 SampleSlot*slots,
+                 int numSlots);
+
+    const juce::String& getLastError() const { return lastErrorMessage; }
 
     /**
      * Loads a file into the given slot index and refreshes synthesiser sounds.
@@ -28,8 +30,9 @@ public:
     void updateSynthesiserSounds();
 
 private:
-    juce::AudioFormatManager& formatManager;
+    juce::AudioFormatManager&formatManager;
     juce::Synthesiser& synthesiser;
     SampleSlot* slots;
-    int                       numSlots;
+    int numSlots;
+    juce::String lastErrorMessage;
 };
