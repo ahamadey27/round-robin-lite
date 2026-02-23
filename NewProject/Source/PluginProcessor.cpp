@@ -178,8 +178,6 @@ void NewProjectAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBl
     smoothedTransientDecay.setCurrentAndTargetValue(apvts.getRawParameterValue(ParameterIDs::transientDecay)->load());
 
     DBG("All parameter smoothing initialized");
-
-    sampleLoader.setSampleRate(sampleRate);
 }
 
 void NewProjectAudioProcessor::releaseResources()

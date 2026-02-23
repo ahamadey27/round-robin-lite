@@ -8,44 +8,44 @@ class NewProjectAudioProcessorEditor : public juce::AudioProcessorEditor
 public:
     NewProjectAudioProcessorEditor(NewProjectAudioProcessor&);
     ~NewProjectAudioProcessorEditor() override;
-
     void paint(juce::Graphics&) override;
     void resized() override;
 
 private:
     NewProjectAudioProcessor& audioProcessor;
-
     using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
 
-    // --- Pitch ---
+    //==========================================================================
+    // Viewport for scrolling
+    juce::Viewport viewport;
+    juce::Component contentComponent;
+
+    //==========================================================================
+    // Sample slot load buttons (20 slots)
+    juce::TextButton loadButtons[20];
+    std::unique_ptr<juce::FileChooser> fileChooser;
+
+    //==========================================================================
+    // Base parameter sliders — declared BEFORE attachments
     juce::Slider semitoneSlider, fineTuneSlider;
-    SliderAttachment semitoneAttachment, fineTuneAttachment;
-
-    // --- Volume ---
-    juce::Slider volumeSlider;
-    SliderAttachment volumeAttachment;
-
-    // --- EQ ---
+    juce::Slider volumeSlider, panSlider;
     juce::Slider lowGainSlider, lowFreqSlider;
     juce::Slider midGainSlider, midFreqSlider;
     juce::Slider highGainSlider, highFreqSlider;
+    juce::Slider transientAttackSlider, transientDecaySlider;
+    juce::Slider envAttackSlider, envDecaySlider;
+
+    // Attachments AFTER their sliders (destroyed before sliders — required by JUCE)
+    SliderAttachment semitoneAttachment, fineTuneAttachment;
+    SliderAttachment volumeAttachment, panAttachment;
     SliderAttachment lowGainAttachment, lowFreqAttachment;
     SliderAttachment midGainAttachment, midFreqAttachment;
     SliderAttachment highGainAttachment, highFreqAttachment;
-
-    // --- Transient ---
-    juce::Slider transientAttackSlider, transientDecaySlider;
     SliderAttachment transientAttackAttachment, transientDecayAttachment;
-
-    // --- Envelope ---
-    juce::Slider envAttackSlider, envDecaySlider;
     SliderAttachment envAttackAttachment, envDecayAttachment;
 
-    // --- Pan ---
-    juce::Slider panSlider;
-    SliderAttachment panAttachment;
-
-    // --- Randomization ---
+    //==========================================================================
+    // Randomization sliders — declared BEFORE attachments
     juce::Slider semitoneRndNegSlider, semitoneRndPosSlider;
     juce::Slider fineTuneRndNegSlider, fineTuneRndPosSlider;
     juce::Slider volumeRndNegSlider, volumeRndPosSlider;
@@ -59,6 +59,7 @@ private:
     juce::Slider transAtkRndNegSlider, transAtkRndPosSlider;
     juce::Slider transDecRndNegSlider, transDecRndPosSlider;
 
+    // Attachments AFTER their sliders
     SliderAttachment semitoneRndNegAttachment, semitoneRndPosAttachment;
     SliderAttachment fineTuneRndNegAttachment, fineTuneRndPosAttachment;
     SliderAttachment volumeRndNegAttachment, volumeRndPosAttachment;
@@ -72,8 +73,10 @@ private:
     SliderAttachment transAtkRndNegAttachment, transAtkRndPosAttachment;
     SliderAttachment transDecRndNegAttachment, transDecRndPosAttachment;
 
-    // Helper to configure a basic slider
-    void setupSlider(juce::Slider& slider);
+    //==========================================================================
+    void setupSlider(juce::Slider& s);
+    void loadSampleForSlot(int slotIndex);
+    void updateSlotLabels();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NewProjectAudioProcessorEditor)
 };

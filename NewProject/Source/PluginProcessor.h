@@ -65,6 +65,10 @@ public:
 
     juce::AudioProcessorValueTreeState apvts;
 
+    static constexpr int NUM_SAMPLE_SLOTS = 20;
+    SampleSlot sampleSlots[NUM_SAMPLE_SLOTS];
+    SampleLoader sampleLoader{ formatManager, synthesiser, sampleSlots, NUM_SAMPLE_SLOTS };
+
 private:
     //==============================================================================
     // Parameter Layout Creation
@@ -75,9 +79,7 @@ private:
     juce::Synthesiser synthesiser;
     juce::AudioFormatManager formatManager;
 
-    static constexpr int NUM_SAMPLE_SLOTS = 20;
-    SampleSlot sampleSlots[NUM_SAMPLE_SLOTS];
-    SampleLoader sampleLoader{ formatManager, synthesiser, sampleSlots, NUM_SAMPLE_SLOTS };
+    
 
     // DSP Processors
     ThreeBandEQ threeBandEQ;  

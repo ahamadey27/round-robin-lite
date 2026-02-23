@@ -3,7 +3,7 @@
 
 NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioProcessor& p)
     : AudioProcessorEditor(&p), audioProcessor(p),
-    // --- Base parameters ---
+    // Base parameters
     semitoneAttachment(p.apvts, ParameterIDs::semitone, semitoneSlider),
     fineTuneAttachment(p.apvts, ParameterIDs::fineTune, fineTuneSlider),
     volumeAttachment(p.apvts, ParameterIDs::volume, volumeSlider),
@@ -18,7 +18,7 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
     transientDecayAttachment(p.apvts, ParameterIDs::transientDecay, transientDecaySlider),
     envAttackAttachment(p.apvts, ParameterIDs::envAttack, envAttackSlider),
     envDecayAttachment(p.apvts, ParameterIDs::envDecay, envDecaySlider),
-    // --- Randomization parameters ---
+    // Randomization parameters
     semitoneRndNegAttachment(p.apvts, ParameterIDs::semitoneRndNeg, semitoneRndNegSlider),
     semitoneRndPosAttachment(p.apvts, ParameterIDs::semitoneRndPos, semitoneRndPosSlider),
     fineTuneRndNegAttachment(p.apvts, ParameterIDs::fineTuneRndNeg, fineTuneRndNegSlider),
@@ -44,7 +44,17 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
     transDecRndNegAttachment(p.apvts, ParameterIDs::transientDecayRndNeg, transDecRndNegSlider),
     transDecRndPosAttachment(p.apvts, ParameterIDs::transientDecayRndPos, transDecRndPosSlider)
 {
-    // Configure base sliders
+    //==========================================================================
+    // Setup load buttons and add to contentComponent
+    for (int i = 0; i < 20; ++i)
+    {
+        loadButtons[i].setButtonText("Slot " + juce::String(i + 1) + ": Empty");
+        loadButtons[i].onClick = [this, i]() { loadSampleForSlot(i); };
+        contentComponent.addAndMakeVisible(loadButtons[i]);
+    }
+
+    //==========================================================================
+    // Setup base sliders and add to contentComponent
     for (auto* s : { &semitoneSlider, &fineTuneSlider, &volumeSlider, &panSlider,
                      &lowGainSlider,  &lowFreqSlider,
                      &midGainSlider,  &midFreqSlider,
@@ -55,110 +65,176 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
         setupSlider(*s);
     }
 
-    // Configure randomization sliders
-    for (auto* s : { &semitoneRndNegSlider, &semitoneRndPosSlider,
-                     &fineTuneRndNegSlider, &fineTuneRndPosSlider,
-                     &volumeRndNegSlider,   &volumeRndPosSlider,
-                     &panRndNegSlider,      &panRndPosSlider,
-                     &lowGainRndNegSlider,  &lowGainRndPosSlider,
-                     &lowFreqRndNegSlider,  &lowFreqRndPosSlider,
-                     &midGainRndNegSlider,  &midGainRndPosSlider,
-                     &midFreqRndNegSlider,  &midFreqRndPosSlider,
-                     &highGainRndNegSlider, &highGainRndPosSlider,
-                     &highFreqRndNegSlider, &highFreqRndPosSlider,
-                     &transAtkRndNegSlider, &transAtkRndPosSlider,
-                     &transDecRndNegSlider, &transDecRndPosSlider })
+    //==========================================================================
+    // Setup randomization sliders and add to contentComponent
+    for (auto* s : { &semitoneRndNegSlider,  &semitoneRndPosSlider,
+                     &fineTuneRndNegSlider,  &fineTuneRndPosSlider,
+                     &volumeRndNegSlider,    &volumeRndPosSlider,
+                     &panRndNegSlider,       &panRndPosSlider,
+                     &lowGainRndNegSlider,   &lowGainRndPosSlider,
+                     &lowFreqRndNegSlider,   &lowFreqRndPosSlider,
+                     &midGainRndNegSlider,   &midGainRndPosSlider,
+                     &midFreqRndNegSlider,   &midFreqRndPosSlider,
+                     &highGainRndNegSlider,  &highGainRndPosSlider,
+                     &highFreqRndNegSlider,  &highFreqRndPosSlider,
+                     &transAtkRndNegSlider,  &transAtkRndPosSlider,
+                     &transDecRndNegSlider,  &transDecRndPosSlider })
     {
         setupSlider(*s);
     }
 
-    // Total rows: 14 base + 24 rnd = 38 rows * 40px + 10px top margin
-    setSize(500, 38 * 40 + 10);
+    //==========================================================================
+    // Setup viewport
+    viewport.setViewedComponent(&contentComponent, false);
+    viewport.setScrollBarsShown(true, false);
+    addAndMakeVisible(viewport);
+
+    // Content width (window - scrollbar), content height calculated below:
+    // Slots: 30 header + 5 rows*35 + 20 padding = 225
+    // Base params: 25 header + 14 rows*35 + 20 padding = 535
+    // Rnd params: 25 header + 12 rows*35 + 10 padding = 455
+    // Total ~ 1215
+    contentComponent.setSize(680, 1215);
+
+    setSize(700, 750);
 }
 
 NewProjectAudioProcessorEditor::~NewProjectAudioProcessorEditor() {}
 
-void NewProjectAudioProcessorEditor::setupSlider(juce::Slider& slider)
+//==============================================================================
+void NewProjectAudioProcessorEditor::setupSlider(juce::Slider& s)
 {
-    slider.setSliderStyle(juce::Slider::LinearHorizontal);
-    slider.setTextBoxStyle(juce::Slider::TextBoxRight, false, 60, 20);
-    addAndMakeVisible(slider);
+    s.setSliderStyle(juce::Slider::LinearHorizontal);
+    s.setTextBoxStyle(juce::Slider::TextBoxRight, false, 55, 20);
+    contentComponent.addAndMakeVisible(s);
 }
 
-void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
+//==============================================================================
+void NewProjectAudioProcessorEditor::loadSampleForSlot(int slotIndex)
 {
-    g.fillAll(juce::Colours::darkgrey);
-    g.setColour(juce::Colours::white);
-    g.setFont(12.0f);
+    fileChooser = std::make_unique<juce::FileChooser>(
+        "Load Sample for Slot " + juce::String(slotIndex + 1),
+        juce::File{},
+        "*.wav;*.aif;*.aiff;*.flac;*.ogg"
+    );
 
-    int y = 10;
-    for (auto& label : { "Semitone",      "Fine Tune",     "Volume",        "Pan",
-                         "EQ Low Gain",   "EQ Low Freq",   "EQ Mid Gain",   "EQ Mid Freq",
-                         "EQ High Gain",  "EQ High Freq",
-                         "Trans Attack",  "Trans Decay",
-                         "Env Attack",    "Env Decay",
-        // Randomization labels
-        "Semitone Rnd-", "Semitone Rnd+",
-        "FineTune Rnd-", "FineTune Rnd+",
-        "Volume Rnd-",   "Volume Rnd+",
-        "Pan Rnd-",      "Pan Rnd+",
-        "LowGain Rnd-",  "LowGain Rnd+",
-        "LowFreq Rnd-",  "LowFreq Rnd+",
-        "MidGain Rnd-",  "MidGain Rnd+",
-        "MidFreq Rnd-",  "MidFreq Rnd+",
-        "HiGain Rnd-",   "HiGain Rnd+",
-        "HiFreq Rnd-",   "HiFreq Rnd+",
-        "TransAtk Rnd-", "TransAtk Rnd+",
-        "TransDec Rnd-", "TransDec Rnd+" })
+    fileChooser->launchAsync(
+        juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles,
+        [this, slotIndex](const juce::FileChooser& fc)
+        {
+            auto result = fc.getResult();
+            if (result.existsAsFile())
+            {
+                audioProcessor.sampleLoader.loadSample(slotIndex, result);
+                updateSlotLabels();
+            }
+        }
+    );
+}
+
+void NewProjectAudioProcessorEditor::updateSlotLabels()
+{
+    for (int i = 0; i < 20; ++i)
     {
-        g.drawText(label, 10, y + 3, 100, 20, juce::Justification::left);
-        y += 40;
+        if (audioProcessor.sampleSlots[i].isLoaded)
+            loadButtons[i].setButtonText(audioProcessor.sampleSlots[i].displayName);
+        else
+            loadButtons[i].setButtonText("Slot " + juce::String(i + 1) + ": Empty");
     }
 }
 
+//==============================================================================
+void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
+{
+    g.fillAll(juce::Colours::darkgrey);
+}
+
+//==============================================================================
 void NewProjectAudioProcessorEditor::resized()
 {
-    int x = 115, width = 360, height = 25, y = 10, gap = 40;
+    // Viewport fills the entire editor
+    viewport.setBounds(getLocalBounds());
+    contentComponent.setSize(680, 1215);
 
-    // --- Base parameters ---
-    semitoneSlider.setBounds(x, y, width, height); y += gap;
-    fineTuneSlider.setBounds(x, y, width, height); y += gap;
-    volumeSlider.setBounds(x, y, width, height); y += gap;
-    panSlider.setBounds(x, y, width, height); y += gap;
-    lowGainSlider.setBounds(x, y, width, height); y += gap;
-    lowFreqSlider.setBounds(x, y, width, height); y += gap;
-    midGainSlider.setBounds(x, y, width, height); y += gap;
-    midFreqSlider.setBounds(x, y, width, height); y += gap;
-    highGainSlider.setBounds(x, y, width, height); y += gap;
-    highFreqSlider.setBounds(x, y, width, height); y += gap;
-    transientAttackSlider.setBounds(x, y, width, height); y += gap;
-    transientDecaySlider.setBounds(x, y, width, height); y += gap;
-    envAttackSlider.setBounds(x, y, width, height); y += gap;
-    envDecaySlider.setBounds(x, y, width, height); y += gap;
+    const int margin = 10;
+    const int rowH = 28;
+    const int gap = 35;
+    const int labelW = 110;
+    const int contentW = 660;
 
-    // --- Randomization parameters ---
-    semitoneRndNegSlider.setBounds(x, y, width, height); y += gap;
-    semitoneRndPosSlider.setBounds(x, y, width, height); y += gap;
-    fineTuneRndNegSlider.setBounds(x, y, width, height); y += gap;
-    fineTuneRndPosSlider.setBounds(x, y, width, height); y += gap;
-    volumeRndNegSlider.setBounds(x, y, width, height); y += gap;
-    volumeRndPosSlider.setBounds(x, y, width, height); y += gap;
-    panRndNegSlider.setBounds(x, y, width, height); y += gap;
-    panRndPosSlider.setBounds(x, y, width, height); y += gap;
-    lowGainRndNegSlider.setBounds(x, y, width, height); y += gap;
-    lowGainRndPosSlider.setBounds(x, y, width, height); y += gap;
-    lowFreqRndNegSlider.setBounds(x, y, width, height); y += gap;
-    lowFreqRndPosSlider.setBounds(x, y, width, height); y += gap;
-    midGainRndNegSlider.setBounds(x, y, width, height); y += gap;
-    midGainRndPosSlider.setBounds(x, y, width, height); y += gap;
-    midFreqRndNegSlider.setBounds(x, y, width, height); y += gap;
-    midFreqRndPosSlider.setBounds(x, y, width, height); y += gap;
-    highGainRndNegSlider.setBounds(x, y, width, height); y += gap;
-    highGainRndPosSlider.setBounds(x, y, width, height); y += gap;
-    highFreqRndNegSlider.setBounds(x, y, width, height); y += gap;
-    highFreqRndPosSlider.setBounds(x, y, width, height); y += gap;
-    transAtkRndNegSlider.setBounds(x, y, width, height); y += gap;
-    transAtkRndPosSlider.setBounds(x, y, width, height); y += gap;
-    transDecRndNegSlider.setBounds(x, y, width, height); y += gap;
-    transDecRndPosSlider.setBounds(x, y, width, height);
+    int y = margin;
+
+    //==========================================================================
+    // SAMPLE SLOTS SECTION
+    // Draw 4 columns x 5 rows of load buttons
+    {
+        const int cols = 4;
+        const int btnW = (contentW - margin * (cols - 1)) / cols;
+        const int btnH = 30;
+        const int btnGap = 5;
+
+        for (int i = 0; i < 20; ++i)
+        {
+            int col = i % cols;
+            int row = i / cols;
+            loadButtons[i].setBounds(margin + col * (btnW + btnGap),
+                y + row * (btnH + btnGap),
+                btnW, btnH);
+        }
+        y += 5 * (30 + 5) + 20; // 5 rows + padding
+    }
+
+    //==========================================================================
+    // BASE PARAMETERS SECTION
+    // Layout: label(110) | slider(fills rest)
+    const int sliderW = contentW - labelW - margin;
+
+    auto addRow = [&](juce::Slider& s)
+        {
+            s.setBounds(margin + labelW, y, sliderW, rowH);
+            y += gap;
+        };
+
+    y += 25; // section header space
+    addRow(semitoneSlider);
+    addRow(fineTuneSlider);
+    addRow(volumeSlider);
+    addRow(panSlider);
+    addRow(lowGainSlider);
+    addRow(lowFreqSlider);
+    addRow(midGainSlider);
+    addRow(midFreqSlider);
+    addRow(highGainSlider);
+    addRow(highFreqSlider);
+    addRow(transientAttackSlider);
+    addRow(transientDecaySlider);
+    addRow(envAttackSlider);
+    addRow(envDecaySlider);
+
+    //==========================================================================
+    // RANDOMIZATION SECTION
+    // Layout: label(110) | neg slider(half) | pos slider(half)
+    const int halfW = (sliderW - 5) / 2;
+
+    y += 25; // section header space
+
+    auto addRndRow = [&](juce::Slider& neg, juce::Slider& pos)
+        {
+            neg.setBounds(margin + labelW, y, halfW, rowH);
+            pos.setBounds(margin + labelW + halfW + 5, y, halfW, rowH);
+            y += gap;
+        };
+
+    addRndRow(semitoneRndNegSlider, semitoneRndPosSlider);
+    addRndRow(fineTuneRndNegSlider, fineTuneRndPosSlider);
+    addRndRow(volumeRndNegSlider, volumeRndPosSlider);
+    addRndRow(panRndNegSlider, panRndPosSlider);
+    addRndRow(lowGainRndNegSlider, lowGainRndPosSlider);
+    addRndRow(lowFreqRndNegSlider, lowFreqRndPosSlider);
+    addRndRow(midGainRndNegSlider, midGainRndPosSlider);
+    addRndRow(midFreqRndNegSlider, midFreqRndPosSlider);
+    addRndRow(highGainRndNegSlider, highGainRndPosSlider);
+    addRndRow(highFreqRndNegSlider, highFreqRndPosSlider);
+    addRndRow(transAtkRndNegSlider, transAtkRndPosSlider);
+    addRndRow(transDecRndNegSlider, transDecRndPosSlider);
 }
