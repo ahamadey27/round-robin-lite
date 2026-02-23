@@ -63,6 +63,8 @@ public:
     void getStateInformation(juce::MemoryBlock& destData) override;
     void setStateInformation(const void* data, int sizeInBytes) override;
 
+    juce::AudioProcessorValueTreeState apvts;
+
 private:
     //==============================================================================
     // Parameter Layout Creation
@@ -80,9 +82,6 @@ private:
     // DSP Processors
     ThreeBandEQ threeBandEQ;  
     TransientShaper transientShaper;
-
-    // Parameter System
-    juce::AudioProcessorValueTreeState apvts;
 
     // Current global pitch values (updated each block)
     std::atomic<float> globalSemitones{ 0.0f };
