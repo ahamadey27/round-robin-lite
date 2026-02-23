@@ -656,17 +656,17 @@ EQ Low Gain: Base=0dB, Neg=-12dB, Pos=0dB → expect -12 to 0dB (only cuts)
 
 ### Step 2: Implement Audio File Loading System
 - [x] Create SampleLoader.h and SampleLoader.cpp in /Source/Data/
-- [ ] Set up juce::AudioFormatManager member variable
-- [ ] Register basic audio formats (WAV, AIFF, FLAC, OGG)
-- [ ] Implement loadSample() function that takes File and SampleSlot reference
-- [ ] Create AudioFormatReader from file
-- [ ] Validate that file is a supported audio format
-- [ ] Read entire audio file into temporary buffer
-- [ ] Store original sample rate from file
-- [ ] Handle stereo-to-mono conversion (mix both channels)
-- [ ] Copy processed audio into SampleSlot buffer
-- [ ] Set isLoaded flag to true on success
-- [ ] Return success/failure status for error handling
+- [x] Set up juce::AudioFormatManager member variable
+- [x] Register basic audio formats (WAV, AIFF, FLAC, OGG)
+- [x] Implement loadSample() function that takes File and SampleSlot reference
+- [x] Create AudioFormatReader from file
+- [x] Validate that file is a supported audio format
+- [x] Read entire audio file into temporary buffer
+- [x] Store original sample rate from file
+- [x] Handle stereo-to-mono conversion (mix both channels)
+- [x] Copy processed audio into SampleSlot buffer
+- [x] Set isLoaded flag to true on success
+- [x] Return success/failure status for error handling
 
 **Quick Test After Step 2:**
 - [ ] Build project successfully
