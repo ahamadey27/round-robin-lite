@@ -69,6 +69,12 @@ public:
     SampleSlot sampleSlots[NUM_SAMPLE_SLOTS];
     SampleLoader sampleLoader{ formatManager, synthesiser, sampleSlots, NUM_SAMPLE_SLOTS };
 
+    std::vector<int> loadedSlotIndices;   // indices of non-empty slots
+    int roundRobinIndex = 0;
+
+    void advanceRoundRobin();
+    void rebuildLoadedIndices();
+
 private:
     //==============================================================================
     // Parameter Layout Creation

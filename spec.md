@@ -669,12 +669,12 @@ EQ Low Gain: Base=0dB, Neg=-12dB, Pos=0dB → expect -12 to 0dB (only cuts)
 - [x] Return success/failure status for error handling
 
 **Quick Test After Step 2:**
-- [ ] Build project successfully
-- [ ] Manually call loadSample() with a test WAV file in PluginProcessor
-- [ ] Add DBG() statements to confirm loading succeeds
-- [ ] Verify file loads into SampleSlot correctly
-- [ ] Test with both mono and stereo files
-- [ ] Test with different sample rates (44.1kHz, 48kHz)
+- [x] Build project successfully
+- [x] Manually call loadSample() with a test WAV file in PluginProcessor
+- [x] Add DBG() statements to confirm loading succeeds
+- [x] Verify file loads into SampleSlot correctly
+- [x] Test with both mono and stereo files
+- [x] Test with different sample rates (44.1kHz, 48kHz)
 
 ### Step 3: Add Comprehensive Error Handling
 - [x] Add error checking for invalid file formats
@@ -688,11 +688,11 @@ EQ Low Gain: Base=0dB, Neg=-12dB, Pos=0dB → expect -12 to 0dB (only cuts)
 - [x] Consider adding file size limits to prevent memory issues
 
 **Quick Test After Step 3:**
-- [ ] Try loading a non-audio file (e.g., .txt) - verify error message
-- [ ] Try loading a file that doesn't exist - verify error message
-- [ ] Try loading a very large file - verify behavior is acceptable
-- [ ] Check that failed loads don't crash the plugin
-- [ ] Verify error messages are clear and helpful
+- [x] Try loading a non-audio file (e.g., .txt) - verify error message
+- [x] Try loading a file that doesn't exist - verify error message
+- [x] Try loading a very large file - verify behavior is acceptable
+- [x] Check that failed loads don't crash the plugin
+- [x] Verify error messages are clear and helpful
 
 ### Step 4: Implement Sample Rate Conversion (Resampling)
 - [x] Add resampling utility function to SampleLoader
@@ -707,11 +707,11 @@ EQ Low Gain: Base=0dB, Neg=-12dB, Pos=0dB → expect -12 to 0dB (only cuts)
 - [x] Test with various source sample rates (44.1kHz, 48kHz, 96kHz)
 
 **Quick Test After Step 4:**
-- [ ] Load samples recorded at 44.1kHz into plugin running at 48kHz
-- [ ] Load samples recorded at 96kHz into plugin running at 48kHz
-- [ ] Play samples and listen for pitch accuracy
-- [ ] Verify no audio artifacts from resampling
-- [ ] Test that samples play at correct pitch regardless of source sample rate
+- [x] Load samples recorded at 44.1kHz into plugin running at 48kHz
+- [x] Load samples recorded at 96kHz into plugin running at 48kHz
+- [x] Play samples and listen for pitch accuracy
+- [x] Verify no audio artifacts from resampling
+- [x] Test that samples play at correct pitch regardless of source sample rate
 
 ### Step 5: Connect Loaded Samples to Synthesiser
 - [x] Implement updateSynthesiserSounds() method in PluginProcessor
@@ -728,10 +728,10 @@ EQ Low Gain: Base=0dB, Neg=-12dB, Pos=0dB → expect -12 to 0dB (only cuts)
 **Note:** With this design, pressing C2 or D2 will cycle through or layer loaded samples. Consider implementing sample selection logic (which sample plays) in Phase 4 Step 6.
 
 **Quick Test After Step 5:**
-- [ ] Load 2-3 test samples into different slots
-- [ ] Call updateSynthesiserSounds()
-- [ ] Play C2/D2 and verify samples trigger
-- [ ] Verify only one sample plays at a time (monophonic)
+- [x] Load 2-3 test samples into different slots
+- [x] Call updateSynthesiserSounds()
+- [x] Play C2/D2 and verify samples trigger
+- [x] Verify only one sample plays at a time (monophonic)
 
 ### Step 6: Implement Sample Selection Logic
 - [ ] Decide on sample selection method:
