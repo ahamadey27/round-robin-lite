@@ -262,11 +262,15 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
         }
     }
 
-    for (int i = 0; i < synthesiser.getNumVoices(); ++i)
+    //==============================================================================
+    // ROUND ROBIN: advance sample on each note-on before rendering
+
+    for (const auto metadata : midiMessages)
     {
-        if (auto* voice = dynamic_cast<RRVoice*>(synthesiser.getVoice(i)))
+        if (metadata.getMessage().isNoteOn())
         {
-            voice->setRandomizationReferences(&randomizationEngine, &apvts);
+            advanceRoundRobin();
+            break; // monophonic — only one note-on per block matters
         }
     }
 
@@ -770,6 +774,38 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
     return layout;
 
     
+}
+
+//==============================================================================
+void NewProjectAudioProcessor::rebuildLoadedIndices()
+{
+    loadedSlotIndices.clear();
+    for (int i = 0; i < NUM_SAMPLE_SLOTS; ++i)
+        if (sampleSlots[i].isLoaded)
+            loadedSlotIndices.push_back(i);
+
+    if (loadedSlotIndices.empty())
+        roundRobinIndex = 0;
+    else
+        roundRobinIndex = roundRobinIndex % (int)loadedSlotIndices.size();
+}
+
+void NewProjectAudioProcessor::advanceRoundRobin()
+{
+    if (loadedSlotIndices.empty())
+        return;
+
+    synthesiser.clearSounds();
+    int slotIndex = loadedSlotIndices[roundRobinIndex];
+    auto* sound = new RRSound();
+    sound->setFromSlot(sampleSlots[slotIndex]);
+    synthesiser.addSound(sound);
+
+    DBG("Round Robin: playing slot " + juce::String(slotIndex) +
+        " (" + juce::String(roundRobinIndex + 1) + "/" +
+        juce::String(loadedSlotIndices.size()) + ")");
+
+    roundRobinIndex = (roundRobinIndex + 1) % (int)loadedSlotIndices.size();
 }
 
 //==============================================================================

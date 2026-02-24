@@ -3,6 +3,22 @@
 #include "PluginProcessor.h"
 #include "Parameters/ParametersIDs.h"
 
+/= ============================================================================ =
+class LabelledContent : public juce::Component
+{
+public:
+    std::vector<std::pair<int, juce::String>> labelPositions; // y -> label text
+
+    void paint(juce::Graphics& g) override
+    {
+        g.fillAll(juce::Colours::darkgrey);
+        g.setColour(juce::Colours::white);
+        g.setFont(11.5f);
+        for (auto& [y, text] : labelPositions)
+            g.drawText(text, 5, y + 4, 108, 20, juce::Justification::left, true);
+    }
+};
+
 class NewProjectAudioProcessorEditor : public juce::AudioProcessorEditor
 {
 public:

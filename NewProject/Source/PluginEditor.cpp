@@ -126,6 +126,7 @@ void NewProjectAudioProcessorEditor::loadSampleForSlot(int slotIndex)
             if (result.existsAsFile())
             {
                 audioProcessor.sampleLoader.loadSample(slotIndex, result);
+                audioProcessor.rebuildLoadedIndices();  // <-- ADD THIS
                 updateSlotLabels();
             }
         }
