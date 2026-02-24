@@ -34,7 +34,7 @@ private:
     //==========================================================================
     // Viewport for scrolling
     juce::Viewport viewport;
-    juce::Component contentComponent;
+    LabelledContent contentComponent;
 
     //==========================================================================
     // Sample slot load buttons (20 slots)

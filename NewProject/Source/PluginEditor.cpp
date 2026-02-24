@@ -165,6 +165,36 @@ void NewProjectAudioProcessorEditor::resized()
 
     int y = margin;
 
+    // Clear and rebuild labels
+    contentComponent.labelPositions.clear();
+
+    int labelY = y + 25; // matches where base params start
+
+    // Base parameter labels
+    for (auto& name : { "Semitone",     "Fine Tune",    "Volume",       "Pan",
+                        "EQ Low Gain",  "EQ Low Freq",  "EQ Mid Gain",  "EQ Mid Freq",
+                        "EQ High Gain", "EQ High Freq",
+                        "Trans Attack", "Trans Decay",
+                        "Env Attack",   "Env Decay" })
+    {
+        contentComponent.labelPositions.push_back({ labelY, name });
+        labelY += gap;
+    }
+
+    labelY += 25; // rnd section header gap
+
+    // Randomization labels
+    for (auto& name : { "Semitone Rnd",  "Fine Tune Rnd", "Volume Rnd",
+                        "Pan Rnd",       "LowGain Rnd",   "LowFreq Rnd",
+                        "MidGain Rnd",   "MidFreq Rnd",   "HiGain Rnd",
+                        "HiFreq Rnd",    "Trans Atk Rnd", "Trans Dec Rnd" })
+    {
+        contentComponent.labelPositions.push_back({ labelY, name });
+        labelY += gap;
+    }
+
+    contentComponent.repaint();
+
     //==========================================================================
     // SAMPLE SLOTS SECTION
     // Draw 4 columns x 5 rows of load buttons
