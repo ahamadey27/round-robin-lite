@@ -3,7 +3,7 @@
 #include "PluginProcessor.h"
 #include "Parameters/ParametersIDs.h"
 
-/= ============================================================================ =
+//= ============================================================================ =
 class LabelledContent : public juce::Component
 {
 public:
