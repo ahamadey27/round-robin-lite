@@ -815,16 +815,16 @@ void NewProjectAudioProcessor::advanceRoundRobin()
     if (loadedSlotIndices.empty())
         return;
 
+    synthesiser.allNotesOff(0, false);  // <-- ADD THIS LINE
     synthesiser.clearSounds();
+
     int slotIndex = loadedSlotIndices[roundRobinIndex];
     auto* sound = new RRSound();
     sound->setFromSlot(sampleSlots[slotIndex]);
     synthesiser.addSound(sound);
-
     DBG("Round Robin: playing slot " + juce::String(slotIndex) +
         " (" + juce::String(roundRobinIndex + 1) + "/" +
         juce::String(loadedSlotIndices.size()) + ")");
-
     roundRobinIndex = (roundRobinIndex + 1) % (int)loadedSlotIndices.size();
 }
 
