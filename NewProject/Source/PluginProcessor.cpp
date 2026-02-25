@@ -28,8 +28,7 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
 {
     // Initialize the synthesiser with one voice for monophonic playback
     synthesiser.addVoice(new RRVoice());
-    activeSound = new RRSound();
-    synthesiser.addSound(activeSound);
+    synthesiser.addSound(new RRSound());
 
     // Register basic audio formats for sample loading
     formatManager.registerBasicFormats();
@@ -137,7 +136,7 @@ void NewProjectAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBl
     synthesiser.setCurrentPlaybackSampleRate(sampleRate);
 
     // Resample any loaded samples if sample rate changed
-    sampleLoader.setSampleRate(sampleRate);
+    //sampleLoader.setSampleRate(sampleRate);
 
     //==============================================================================
    // INITIALIZE 3-BAND EQ
@@ -818,15 +817,17 @@ void NewProjectAudioProcessor::advanceRoundRobin()
 
     int slotIndex = loadedSlotIndices[roundRobinIndex];
 
-    // Update the existing sound's buffer in place — no clearSounds() needed
-    if (activeSound != nullptr)
-        activeSound->setFromSlot(sampleSlots[slotIndex]);
-
-    // ADD: safety check
-    if (activeSound->getAudioBuffer().getNumSamples() == 0)
+    // Safely get sound directly from synthesiser — no raw pointer needed
+    if (synthesiser.getNumSounds() == 0)
     {
-        DBG("WARNING: slot " + juce::String(slotIndex) + " has empty buffer!");
-        return;
+        auto* newSound = new RRSound();
+        newSound->setFromSlot(sampleSlots[slotIndex]);
+        synthesiser.addSound(newSound);
+    }
+    else
+    {
+        if (auto* sound = dynamic_cast<RRSound*>(synthesiser.getSound(0).get()))
+            sound->setFromSlot(sampleSlots[slotIndex]);
     }
 
     DBG("Round Robin: playing slot " + juce::String(slotIndex) +
@@ -835,7 +836,6 @@ void NewProjectAudioProcessor::advanceRoundRobin()
 
     roundRobinIndex = (roundRobinIndex + 1) % (int)loadedSlotIndices.size();
 }
-
 //==============================================================================
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
