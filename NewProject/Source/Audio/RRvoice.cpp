@@ -250,9 +250,8 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
 
     // cache audio data so buffer swaps can't corrupt playback
     const auto& buf = currentSound->getAudioBuffer();
-    cachedSampleData = (buf.getNumChannels() > 0 && buf.getNumSamples() > 0)
-        ? buf.getReadPointer(0) : nullptr;
-    cachedSampleLength = buf.getNumSamples();
+    voiceBuffer.makeCopyOf(buf);           // deep copy — safe from buffer swaps
+    cachedSampleLength = voiceBuffer.getNumSamples();
 
     // SET ALL envelope params on the MEMBER variable (not a local)
     envelopeParams.attack = juce::jlimit(0.001f, 5.0f, randomizedAttackMs / 1000.0f);
@@ -282,12 +281,11 @@ void RRVoice::stopNote(float /*velocity*/, bool allowTailOff)
 
     if (!allowTailOff)
     {
-        // Hard stop (only for emergency voice stealing)
         clearCurrentNote();
         envelope.reset();
         isPlaying = false;
-        cachedSampleData = nullptr;   
-        cachedSampleLength = 0;      
+        voiceBuffer.setSize(0, 0);   // REPLACE cachedSampleData = nullptr
+        cachedSampleLength = 0;
     }
 
     // If allowTailOff is true, do NOTHING - let the envelope play through!
@@ -299,10 +297,10 @@ void RRVoice::stopNote(float /*velocity*/, bool allowTailOff)
 void RRVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer,
     int startSample, int numSamples)
 {
-    if (!isPlaying || cachedSampleData == nullptr || cachedSampleLength == 0)
+    if (!isPlaying || voiceBuffer.getNumSamples() == 0 || cachedSampleLength == 0)
         return;
 
-    const float* sampleData = cachedSampleData;
+    const float* sampleData = voiceBuffer.getReadPointer(0);  // safe local pointer
     const int sampleLength = cachedSampleLength;
 
     for (int i = 0; i < numSamples; ++i)
@@ -347,7 +345,7 @@ void RRVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer,
             {
                 // ADD THIS BLOCK — envelope done, release the voice
                 isPlaying = false;
-                cachedSampleData = nullptr;
+                voiceBuffer.setSize(0, 0);
                 cachedSampleLength = 0;
                 clearCurrentNote();   // tells JUCE this voice is available
                 return;               // exit renderNextBlock immediately

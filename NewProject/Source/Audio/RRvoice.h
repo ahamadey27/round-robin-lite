@@ -124,7 +124,7 @@ private:
     // Reference to current sound
     RRSound* currentSound = nullptr;
 
-    const float* cachedSampleData = nullptr;
+    juce::AudioBuffer<float> voiceBuffer;   // voice owns its own copy
     int cachedSampleLength = 0;
 
     // Global parameters (non-randomized base values)
