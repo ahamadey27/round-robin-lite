@@ -278,6 +278,15 @@ void RRVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer,
         return;
 
     const juce::AudioBuffer<float>& sampleBuffer = currentSound->getAudioBuffer();
+
+    // ADD THESE SAFETY CHECKS before any getReadPointer call
+    if (sampleBuffer.getNumChannels() == 0 || sampleBuffer.getNumSamples() == 0)
+    {
+        isPlaying = false;
+        clearCurrentNote();
+        return;
+    }
+
     const float* sampleData = sampleBuffer.getReadPointer(0);
     const int sampleLength = sampleBuffer.getNumSamples();
 

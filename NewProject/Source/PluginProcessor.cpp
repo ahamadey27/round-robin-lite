@@ -822,6 +822,13 @@ void NewProjectAudioProcessor::advanceRoundRobin()
     if (activeSound != nullptr)
         activeSound->setFromSlot(sampleSlots[slotIndex]);
 
+    // ADD: safety check
+    if (activeSound->getAudioBuffer().getNumSamples() == 0)
+    {
+        DBG("WARNING: slot " + juce::String(slotIndex) + " has empty buffer!");
+        return;
+    }
+
     DBG("Round Robin: playing slot " + juce::String(slotIndex) +
         " (" + juce::String(roundRobinIndex + 1) + "/" +
         juce::String(loadedSlotIndices.size()) + ")");
