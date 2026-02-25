@@ -283,33 +283,33 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     //==============================================================================
    // APPLY 3-BAND EQ (AFTER SYNTH, BEFORE VOLUME)
 
-   // Get smoothed EQ parameter values
+  // READ LIVE FROM APVTS — always reflects current knob positions
     float eqLowGain = apvts.getRawParameterValue(ParameterIDs::lowGain)->load();
     float eqLowFreq = apvts.getRawParameterValue(ParameterIDs::lowFreq)->load();
     float eqMidGain = apvts.getRawParameterValue(ParameterIDs::midGain)->load();
     float eqMidFreq = apvts.getRawParameterValue(ParameterIDs::midFreq)->load();
     float eqHighGain = apvts.getRawParameterValue(ParameterIDs::highGain)->load();
     float eqHighFreq = apvts.getRawParameterValue(ParameterIDs::highFreq)->load();
-    float transAtk = smoothedTransientAttack.getNextValue();
-    float transDec = smoothedTransientDecay.getNextValue();
+    float transAtk = apvts.getRawParameterValue(ParameterIDs::transientAttack)->load();
+    float transDec = apvts.getRawParameterValue(ParameterIDs::transientDecay)->load();
 
  
 
-    // Check if a voice is active and use its randomized values instead
-    if (auto* voice = dynamic_cast<RRVoice*>(synthesiser.getVoice(0)))
-    {
-        if (voice->isVoiceActive())   // ← ADD THIS CHECK
-        {
-            eqLowGain = voice->getRandomizedLowGain();
-            eqLowFreq = voice->getRandomizedLowFreq();
-            eqMidGain = voice->getRandomizedMidGain();
-            eqMidFreq = voice->getRandomizedMidFreq();
-            eqHighGain = voice->getRandomizedHighGain();
-            eqHighFreq = voice->getRandomizedHighFreq();
-            transAtk = voice->getRandomizedTransientAttack();
-            transDec = voice->getRandomizedTransientDecay();
-        }
-    }
+    //// Check if a voice is active and use its randomized values instead
+    //if (auto* voice = dynamic_cast<RRVoice*>(synthesiser.getVoice(0)))
+    //{
+    //    if (voice->isVoiceActive())   // ← ADD THIS CHECK
+    //    {
+    //        eqLowGain = voice->getRandomizedLowGain();
+    //        eqLowFreq = voice->getRandomizedLowFreq();
+    //        eqMidGain = voice->getRandomizedMidGain();
+    //        eqMidFreq = voice->getRandomizedMidFreq();
+    //        eqHighGain = voice->getRandomizedHighGain();
+    //        eqHighFreq = voice->getRandomizedHighFreq();
+    //        transAtk = voice->getRandomizedTransientAttack();
+    //        transDec = voice->getRandomizedTransientDecay();
+    //    }
+    //}
 
 
     // Update EQ filters with current parameter values
@@ -322,8 +322,10 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     // APPLY TRANSIENT SHAPING (AFTER EQ, BEFORE VOLUME)
 
     // Get transient parameter values (these are integers -127 to +127)
-    float attackAmount = static_cast<float>(apvts.getRawParameterValue(ParameterIDs::transientAttack)->load());
-    float decayAmount = static_cast<float>(apvts.getRawParameterValue(ParameterIDs::transientDecay)->load());
+    //float attackAmount = static_cast<float>(apvts.getRawParameterValue(ParameterIDs::transientAttack)->load());
+    //float decayAmount = static_cast<float>(apvts.getRawParameterValue(ParameterIDs::transientDecay)->load());
+
+    transientShaper.processBlock(buffer, transAtk, transDec);
 
     // Process transient shaping
     transientShaper.processBlock(buffer, transAtk, transDec);
