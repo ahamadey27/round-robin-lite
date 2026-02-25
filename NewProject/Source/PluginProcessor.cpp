@@ -293,45 +293,21 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     float transAtk = smoothedTransientAttack.getNextValue();
     float transDec = smoothedTransientDecay.getNextValue();
 
-    //// Check if a voice is active and use its randomized values instead
-    //for (int i = 0; i < synthesiser.getNumVoices(); ++i)
-    //{
-    //    if (auto* voice = dynamic_cast<RRVoice*>(synthesiser.getVoice(i)))
-    //    {
-    //        if (voice->isVoiceActive())
-    //        {
-    //            eqLowGain = voice->getRandomizedLowGain();
-    //            eqLowFreq = voice->getRandomizedLowFreq();
-    //            eqMidGain = voice->getRandomizedMidGain();
-    //            eqMidFreq = voice->getRandomizedMidFreq();
-    //            eqHighGain = voice->getRandomizedHighGain();
-    //            eqHighFreq = voice->getRandomizedHighFreq();
-    //            transAtk = voice->getRandomizedTransientAttack();
-    //            transDec = voice->getRandomizedTransientDecay();
-    //            break;
-    //        }
-    //    }
-    //}
+ 
 
     // Check if a voice is active and use its randomized values instead
-    for (int i = 0; i < synthesiser.getNumVoices(); ++i)
+    if (auto* voice = dynamic_cast<RRVoice*>(synthesiser.getVoice(0)))
     {
-        if (auto* voice = dynamic_cast<RRVoice*>(synthesiser.getVoice(i)))
-        {
-            if (voice->isVoiceActive())
-            {
-                eqLowGain = voice->getRandomizedLowGain();
-                eqLowFreq = voice->getRandomizedLowFreq();
-                eqMidGain = voice->getRandomizedMidGain();
-                eqMidFreq = voice->getRandomizedMidFreq();
-                eqHighGain = voice->getRandomizedHighGain();
-                eqHighFreq = voice->getRandomizedHighFreq();
-                transAtk = voice->getRandomizedTransientAttack();
-                transDec = voice->getRandomizedTransientDecay();
-                break;
-            }
-        }
+        eqLowGain = voice->getRandomizedLowGain();
+        eqLowFreq = voice->getRandomizedLowFreq();
+        eqMidGain = voice->getRandomizedMidGain();
+        eqMidFreq = voice->getRandomizedMidFreq();
+        eqHighGain = voice->getRandomizedHighGain();
+        eqHighFreq = voice->getRandomizedHighFreq();
+        transAtk = voice->getRandomizedTransientAttack();
+        transDec = voice->getRandomizedTransientDecay();
     }
+
 
     // Update EQ filters with current parameter values
     threeBandEQ.updateFilters(eqLowGain, eqLowFreq, eqMidGain, eqMidFreq, eqHighGain, eqHighFreq);

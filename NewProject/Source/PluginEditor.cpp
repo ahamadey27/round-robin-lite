@@ -110,7 +110,7 @@ void NewProjectAudioProcessorEditor::loadSampleForSlot(int slotIndex)
             {
                 audioProcessor.sampleLoader.loadSample(slotIndex, result);
                 audioProcessor.rebuildLoadedIndices();
-                updateSlotLabels();
+                 updateSlotLabels();
             }
         }
     );

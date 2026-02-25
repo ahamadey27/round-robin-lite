@@ -246,6 +246,12 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
     // START PLAYBACK
 
     sourceSamplePosition = 0.0;
+    // cache audio data so buffer swaps can't corrupt playback
+    const auto& buf = currentSound->getAudioBuffer();
+    cachedSampleData = (buf.getNumChannels() > 0 && buf.getNumSamples() > 0)
+        ? buf.getReadPointer(0) : nullptr;
+    cachedSampleLength = buf.getNumSamples();
+
     isPlaying = true;
 }
 
@@ -263,6 +269,8 @@ void RRVoice::stopNote(float /*velocity*/, bool allowTailOff)
         clearCurrentNote();
         envelope.reset();
         isPlaying = false;
+        cachedSampleData = nullptr;   
+        cachedSampleLength = 0;      
     }
 
     // If allowTailOff is true, do NOTHING - let the envelope play through!
@@ -274,21 +282,11 @@ void RRVoice::stopNote(float /*velocity*/, bool allowTailOff)
 void RRVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer,
     int startSample, int numSamples)
 {
-    if (!isPlaying || currentSound == nullptr)
+    if (!isPlaying || cachedSampleData == nullptr || cachedSampleLength == 0)
         return;
 
-    const juce::AudioBuffer<float>& sampleBuffer = currentSound->getAudioBuffer();
-
-    // ADD THESE SAFETY CHECKS before any getReadPointer call
-    if (sampleBuffer.getNumChannels() == 0 || sampleBuffer.getNumSamples() == 0)
-    {
-        isPlaying = false;
-        clearCurrentNote();
-        return;
-    }
-
-    const float* sampleData = sampleBuffer.getReadPointer(0);
-    const int sampleLength = sampleBuffer.getNumSamples();
+    const float* sampleData = cachedSampleData;
+    const int sampleLength = cachedSampleLength;
 
     for (int i = 0; i < numSamples; ++i)
     {

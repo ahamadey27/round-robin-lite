@@ -90,7 +90,6 @@ bool SampleLoader::loadSample(int slotIndex, const juce::File& file)
         // --- Step 4: Resample to plugin sample rate if needed ---
         resampleBuffer(slots[slotIndex].audioBuffer, slots[slotIndex].sampleRate);  // not originalSampleRate
 
-        updateSynthesiserSounds();
     }
     else
     {
@@ -120,7 +119,7 @@ void SampleLoader::setSampleRate(double newSampleRate)
         resampleBuffer(slots[i].audioBuffer, slots[i].sampleRate);  // not originalSampleRate
     }
 
-    updateSynthesiserSounds();
+    //updateSynthesiserSounds();
 }
 
 void SampleLoader::resampleBuffer(juce::AudioBuffer<float>& buffer, double sourceSampleRate)

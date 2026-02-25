@@ -124,6 +124,9 @@ private:
     // Reference to current sound
     RRSound* currentSound = nullptr;
 
+    const float* cachedSampleData = nullptr;
+    int cachedSampleLength = 0;
+
     // Global parameters (non-randomized base values)
     float globalSemitones = 0.0f;
     float globalCents = 0.0f;
