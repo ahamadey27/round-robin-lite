@@ -68,6 +68,7 @@ public:
     static constexpr int NUM_SAMPLE_SLOTS = 20;
     SampleSlot sampleSlots[NUM_SAMPLE_SLOTS];
     SampleLoader sampleLoader{ formatManager, synthesiser, sampleSlots, NUM_SAMPLE_SLOTS };
+    RRSound* activeSound = nullptr;
 
     std::vector<int> loadedSlotIndices;   // indices of non-empty slots
     int roundRobinIndex = 0;

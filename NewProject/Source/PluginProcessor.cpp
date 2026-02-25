@@ -28,6 +28,8 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
 {
     // Initialize the synthesiser with one voice for monophonic playback
     synthesiser.addVoice(new RRVoice());
+    activeSound = new RRSound();
+    synthesiser.addSound(activeSound);
 
     // Register basic audio formats for sample loading
     formatManager.registerBasicFormats();
@@ -812,19 +814,18 @@ void NewProjectAudioProcessor::rebuildLoadedIndices()
 
 void NewProjectAudioProcessor::advanceRoundRobin()
 {
-    if (loadedSlotIndices.empty())
-        return;
-
-    synthesiser.allNotesOff(0, false);  // <-- ADD THIS LINE
-    synthesiser.clearSounds();
+    if (loadedSlotIndices.empty()) return;
 
     int slotIndex = loadedSlotIndices[roundRobinIndex];
-    auto* sound = new RRSound();
-    sound->setFromSlot(sampleSlots[slotIndex]);
-    synthesiser.addSound(sound);
+
+    // Update the existing sound's buffer in place — no clearSounds() needed
+    if (activeSound != nullptr)
+        activeSound->setFromSlot(sampleSlots[slotIndex]);
+
     DBG("Round Robin: playing slot " + juce::String(slotIndex) +
         " (" + juce::String(roundRobinIndex + 1) + "/" +
         juce::String(loadedSlotIndices.size()) + ")");
+
     roundRobinIndex = (roundRobinIndex + 1) % (int)loadedSlotIndices.size();
 }
 
