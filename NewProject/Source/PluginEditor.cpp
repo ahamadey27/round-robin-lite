@@ -40,7 +40,12 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
     transAtkRndNegAttachment(p.apvts, ParameterIDs::transientAttackRndNeg, transAtkRndNegSlider),
     transAtkRndPosAttachment(p.apvts, ParameterIDs::transientAttackRndPos, transAtkRndPosSlider),
     transDecRndNegAttachment(p.apvts, ParameterIDs::transientDecayRndNeg, transDecRndNegSlider),
-    transDecRndPosAttachment(p.apvts, ParameterIDs::transientDecayRndPos, transDecRndPosSlider)
+    transDecRndPosAttachment(p.apvts, ParameterIDs::transientDecayRndPos, transDecRndPosSlider),
+    envAtkRndNegAttachment(p.apvts, ParameterIDs::envAttackRndNeg, envAtkRndNegSlider),
+    envAtkRndPosAttachment(p.apvts, ParameterIDs::envAttackRndPos, envAtkRndPosSlider),
+    envDecRndNegAttachment(p.apvts, ParameterIDs::envDecayRndNeg, envDecRndNegSlider),
+    envDecRndPosAttachment(p.apvts, ParameterIDs::envDecayRndPos, envDecRndPosSlider)
+
 {
     // Load buttons
     for (int i = 0; i < 20; ++i)
@@ -71,7 +76,11 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
                      &highGainRndNegSlider,  &highGainRndPosSlider,
                      &highFreqRndNegSlider,  &highFreqRndPosSlider,
                      &transAtkRndNegSlider,  &transAtkRndPosSlider,
-                     &transDecRndNegSlider,  &transDecRndPosSlider })
+                     &transDecRndNegSlider,  &transDecRndPosSlider,
+                     &transDecRndNegSlider,& transDecRndPosSlider,
+                     &envAtkRndNegSlider,& envAtkRndPosSlider,
+                     &envDecRndNegSlider,& envDecRndPosSlider
+        })
         setupSlider(*s);
 
     viewport.setViewedComponent(&contentComponent, false);
@@ -235,6 +244,8 @@ void NewProjectAudioProcessorEditor::resized()
     addRndRow(highFreqRndNegSlider, highFreqRndPosSlider, "HiFreq Rnd");
     addRndRow(transAtkRndNegSlider, transAtkRndPosSlider, "Trans Atk Rnd");
     addRndRow(transDecRndNegSlider, transDecRndPosSlider, "Trans Dec Rnd");
+    addRndRow(envAtkRndNegSlider, envAtkRndPosSlider, "Env Atk Rnd");
+    addRndRow(envDecRndNegSlider, envDecRndPosSlider, "Env Dec Rnd");
 
     contentComponent.repaint();
 }

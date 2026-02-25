@@ -260,10 +260,9 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
     envelope.reset();
     envelope.noteOn();
 
-    // Fire fade-out when sample audio runs out (not at 100ms)
-    samplesPlayed = 0;
-    decayTriggered = false;
-    decayTriggerSample = cachedSampleLength;
+    // FIXED: trigger noteOff early so release fades REAL audio, not silence
+    int releaseSamples = static_cast<int>((randomizedDecayMs / 1000.0f) * getSampleRate());
+    decayTriggerSample = juce::jmax(1, cachedSampleLength - releaseSamples);
 
     isPlaying = true;
 }

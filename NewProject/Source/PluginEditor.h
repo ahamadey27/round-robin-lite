@@ -74,6 +74,9 @@ private:
     juce::Slider highFreqRndNegSlider, highFreqRndPosSlider;
     juce::Slider transAtkRndNegSlider, transAtkRndPosSlider;
     juce::Slider transDecRndNegSlider, transDecRndPosSlider;
+    juce::Slider envAtkRndNegSlider, envAtkRndPosSlider;
+    juce::Slider envDecRndNegSlider, envDecRndPosSlider;
+   
 
     // Attachments AFTER their sliders
     SliderAttachment semitoneRndNegAttachment, semitoneRndPosAttachment;
@@ -88,6 +91,8 @@ private:
     SliderAttachment highFreqRndNegAttachment, highFreqRndPosAttachment;
     SliderAttachment transAtkRndNegAttachment, transAtkRndPosAttachment;
     SliderAttachment transDecRndNegAttachment, transDecRndPosAttachment;
+    SliderAttachment envAtkRndNegAttachment, envAtkRndPosAttachment,
+        envDecRndNegAttachment, envDecRndPosAttachment;
 
     //==========================================================================
     void setupSlider(juce::Slider& s);
