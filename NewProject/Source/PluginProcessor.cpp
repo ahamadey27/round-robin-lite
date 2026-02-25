@@ -26,43 +26,36 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
     apvts(*this, nullptr, "Parameters", createParameterLayout())
 #endif
 {
-    // Initialize the synthesiser with one voice for monophonic playback
     synthesiser.addVoice(new RRVoice());
     synthesiser.addSound(new RRSound());
 
-    // Register basic audio formats for sample loading
     formatManager.registerBasicFormats();
 
-        DBG("=== Round Robin Lite Initialized ===");
-        DBG("Synthesiser ready with " + juce::String(synthesiser.getNumVoices()) + " voice(s)");
-        DBG("UNPITCHED PLAYBACK MODE - All samples play at original pitch");
-        DBG("Root reference note: C1 (MIDI 36)");
-        DBG("===================================");
+    DBG("=== Round Robin Lite Initialized ===");
+    DBG("Synthesiser ready with " + juce::String(synthesiser.getNumVoices()) + " voice(s)");
+    DBG("UNPITCHED PLAYBACK MODE - All samples play at original pitch");
+    DBG("Root reference note: C1 (MIDI 36)");
+    DBG("===================================");
 
-        // TEST: Verify parameter IDs are accessible
-        DBG("\n=== Testing Parameter IDs ===");
-        DBG("Semitone ID: " + juce::String(ParameterIDs::semitone));
-        DBG("Volume ID: " + juce::String(ParameterIDs::volume));
-        DBG("Total parameters: " + juce::String(ParameterIDs::totalParameters));
-        DBG("============================\n");
+    DBG("\n=== Testing Parameter IDs ===");
+    DBG("Semitone ID: " + juce::String(ParameterIDs::semitone));
+    DBG("Volume ID: " + juce::String(ParameterIDs::volume));
+    DBG("Total parameters: " + juce::String(ParameterIDs::totalParameters));
+    DBG("============================\n");
 
-        // TEST: Verify APVTS is initialized
-        DBG("\n=== Testing APVTS ===");
-        DBG("APVTS initialized: " + juce::String(apvts.state.isValid() ? "YES" : "NO"));
-        DBG("Current parameter count: " + juce::String(apvts.state.getNumChildren()));
-        DBG("=====================\n");
+    DBG("\n=== Testing APVTS ===");
+    DBG("APVTS initialized: " + juce::String(apvts.state.isValid() ? "YES" : "NO"));
+    DBG("Current parameter count: " + juce::String(apvts.state.getNumChildren()));
+    DBG("=====================\n");
 
-        DBG("=== Sample Slots Initialized ===");
-        DBG("Slots available: " + juce::String(NUM_SAMPLE_SLOTS));
-        DBG("All slots empty on startup — load via UI");
-        DBG("================================");
-
-        
-    }
+    DBG("=== Sample Slots Initialized ===");
+    DBG("Slots available: " + juce::String(NUM_SAMPLE_SLOTS));
+    DBG("All slots empty on startup — load via UI");
+    DBG("================================");
+}
 
 NewProjectAudioProcessor::~NewProjectAudioProcessor()
 {
-    // Synthesiser will clean up voices and sounds automatically
 }
 
 //==============================================================================
@@ -132,14 +125,10 @@ void NewProjectAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBl
     DBG("prepareToPlay called - Sample Rate: " + juce::String(sampleRate) +
         " Hz, Buffer Size: " + juce::String(samplesPerBlock) + " samples");
 
-    // Tell the synthesiser what sample rate we're running at
     synthesiser.setCurrentPlaybackSampleRate(sampleRate);
 
-    // Resample any loaded samples if sample rate changed
-    //sampleLoader.setSampleRate(sampleRate);
-
     //==============================================================================
-   // INITIALIZE 3-BAND EQ
+    // INITIALIZE 3-BAND EQ
 
     threeBandEQ.prepareToPlay(sampleRate, samplesPerBlock);
 
@@ -171,12 +160,7 @@ void NewProjectAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBl
     smoothedEnvDecay.reset(sampleRate, rampTimeSeconds);
     smoothedEnvDecay.setCurrentAndTargetValue(apvts.getRawParameterValue(ParameterIDs::envDecay)->load());
 
-    // Transient Master
-    smoothedTransientAttack.reset(sampleRate, rampTimeSeconds);
-    smoothedTransientAttack.setCurrentAndTargetValue(apvts.getRawParameterValue(ParameterIDs::transientAttack)->load());
-
-    smoothedTransientDecay.reset(sampleRate, rampTimeSeconds);
-    smoothedTransientDecay.setCurrentAndTargetValue(apvts.getRawParameterValue(ParameterIDs::transientDecay)->load());
+    // NOTE: Transient attack/decay read directly from APVTS — no smoothers needed
 
     DBG("All parameter smoothing initialized");
 }
@@ -185,7 +169,6 @@ void NewProjectAudioProcessor::releaseResources()
 {
     DBG("releaseResources called");
 
-    // Reset EQ filter states
     threeBandEQ.reset();
     transientShaper.reset();
 }
@@ -225,8 +208,6 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     smoothedVolume.setTargetValue(apvts.getRawParameterValue(ParameterIDs::volume)->load());
     smoothedEnvAttack.setTargetValue(apvts.getRawParameterValue(ParameterIDs::envAttack)->load());
     smoothedEnvDecay.setTargetValue(apvts.getRawParameterValue(ParameterIDs::envDecay)->load());
-    smoothedTransientAttack.setTargetValue(apvts.getRawParameterValue(ParameterIDs::transientAttack)->load());
-    smoothedTransientDecay.setTargetValue(apvts.getRawParameterValue(ParameterIDs::transientDecay)->load());
 
     //==============================================================================
     // CLEAR OUTPUT BUFFERS
@@ -238,9 +219,8 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
         buffer.clear(i, 0, buffer.getNumSamples());
 
     //==============================================================================
-   // STORE GLOBAL PARAMETER VALUES FOR VOICES
+    // STORE GLOBAL PARAMETER VALUES FOR VOICES
 
-   // These values will be accessed by voices when they start
     globalSemitones.store(smoothedSemitone.getCurrentValue());
     globalCents.store(smoothedFineTune.getCurrentValue());
     globalAttackMs.store(smoothedEnvAttack.getCurrentValue());
@@ -249,7 +229,6 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     //==============================================================================
     // UPDATE ALL VOICES WITH CURRENT GLOBAL PARAMETERS
 
-   // Get INSTANT parameter values (no smoothing for note-start parameters)
     float semitones = static_cast<float>(apvts.getRawParameterValue(ParameterIDs::semitone)->load());
     float cents = static_cast<float>(apvts.getRawParameterValue(ParameterIDs::fineTune)->load());
     float attackMs = apvts.getRawParameterValue(ParameterIDs::envAttack)->load();
@@ -258,9 +237,7 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     for (int i = 0; i < synthesiser.getNumVoices(); ++i)
     {
         if (auto* voice = dynamic_cast<RRVoice*>(synthesiser.getVoice(i)))
-        {
             voice->updateGlobalParameters(semitones, cents, attackMs, decayMs);
-        }
     }
 
     //==============================================================================
@@ -281,78 +258,44 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     synthesiser.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 
     //==============================================================================
-   // APPLY 3-BAND EQ (AFTER SYNTH, BEFORE VOLUME)
+    // APPLY 3-BAND EQ (AFTER SYNTH, BEFORE TRANSIENT)
 
-  // READ LIVE FROM APVTS — always reflects current knob positions
+    // Read live from APVTS — always reflects current knob positions
     float eqLowGain = apvts.getRawParameterValue(ParameterIDs::lowGain)->load();
     float eqLowFreq = apvts.getRawParameterValue(ParameterIDs::lowFreq)->load();
     float eqMidGain = apvts.getRawParameterValue(ParameterIDs::midGain)->load();
     float eqMidFreq = apvts.getRawParameterValue(ParameterIDs::midFreq)->load();
     float eqHighGain = apvts.getRawParameterValue(ParameterIDs::highGain)->load();
     float eqHighFreq = apvts.getRawParameterValue(ParameterIDs::highFreq)->load();
-    float transAtk = apvts.getRawParameterValue(ParameterIDs::transientAttack)->load();
-    float transDec = apvts.getRawParameterValue(ParameterIDs::transientDecay)->load();
 
- 
-
-    //// Check if a voice is active and use its randomized values instead
-    //if (auto* voice = dynamic_cast<RRVoice*>(synthesiser.getVoice(0)))
-    //{
-    //    if (voice->isVoiceActive())   // ← ADD THIS CHECK
-    //    {
-    //        eqLowGain = voice->getRandomizedLowGain();
-    //        eqLowFreq = voice->getRandomizedLowFreq();
-    //        eqMidGain = voice->getRandomizedMidGain();
-    //        eqMidFreq = voice->getRandomizedMidFreq();
-    //        eqHighGain = voice->getRandomizedHighGain();
-    //        eqHighFreq = voice->getRandomizedHighFreq();
-    //        transAtk = voice->getRandomizedTransientAttack();
-    //        transDec = voice->getRandomizedTransientDecay();
-    //    }
-    //}
-
-
-    // Update EQ filters with current parameter values
     threeBandEQ.updateFilters(eqLowGain, eqLowFreq, eqMidGain, eqMidFreq, eqHighGain, eqHighFreq);
-
-    // Process the buffer through the EQ
     threeBandEQ.processBlock(buffer);
 
     //==============================================================================
     // APPLY TRANSIENT SHAPING (AFTER EQ, BEFORE VOLUME)
 
-    // Get transient parameter values (these are integers -127 to +127)
-    //float attackAmount = static_cast<float>(apvts.getRawParameterValue(ParameterIDs::transientAttack)->load());
-    //float decayAmount = static_cast<float>(apvts.getRawParameterValue(ParameterIDs::transientDecay)->load());
+    float transAtk = apvts.getRawParameterValue(ParameterIDs::transientAttack)->load();
+    float transDec = apvts.getRawParameterValue(ParameterIDs::transientDecay)->load();
 
-    transientShaper.processBlock(buffer, transAtk, transDec);
-
-    // Process transient shaping
     transientShaper.processBlock(buffer, transAtk, transDec);
 
     //==============================================================================
     // APPLY VOLUME CONTROL
+    // FIXED: advance smoother once per sample, apply to all channels — prevents
+    // stereo divergence from getNextValue() being called once per channel per sample
 
-    // Get the number of samples in this block
     const int numSamples = buffer.getNumSamples();
 
-    // Apply volume to each sample with smoothing
-    for (int channel = 0; channel < totalNumOutputChannels; ++channel)
+    for (int sample = 0; sample < numSamples; ++sample)
     {
-        float* channelData = buffer.getWritePointer(channel);
+        float volumeGain = smoothedVolume.getNextValue();
 
-        for (int sample = 0; sample < numSamples; ++sample)
-        {
-            // Get the next smoothed volume value
-            float volumeGain = smoothedVolume.getNextValue();
-
-            // Apply gain to this sample
-            channelData[sample] *= volumeGain;
-        }
+        for (int channel = 0; channel < totalNumOutputChannels; ++channel)
+            buffer.getWritePointer(channel)[sample] *= volumeGain;
     }
 
     //==============================================================================
-    // LOG MIDI ACTIVITY (for debugging)
+    // LOG MIDI ACTIVITY (debug)
 
     if (!midiMessages.isEmpty())
     {
@@ -384,41 +327,19 @@ juce::AudioProcessorEditor* NewProjectAudioProcessor::createEditor()
 //==============================================================================
 void NewProjectAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
 {
-    // SAVE PLUGIN STATE TO PRESET
-    // This is called by the DAW when saving a project or preset
-
     DBG("=== SAVING PLUGIN STATE ===");
 
-    // Step 1: Get the current parameter state from APVTS as a ValueTree
     auto state = apvts.copyState();
 
-    // Step 2: Add custom data (for future use - sample paths will go here)
-    // For now, we'll create a placeholder section
     juce::ValueTree customData("CustomData");
-    customData.setProperty("version", 1, nullptr);  // Track preset format version
-
-    // TODO (Phase 4): Add sample file paths here
-    // Example structure for future:
-    // juce::ValueTree samples("Samples");
-    // for (int i = 0; i < 20; ++i)
-    // {
-    //     juce::ValueTree sample("Sample");
-    //     sample.setProperty("slot", i, nullptr);
-    //     sample.setProperty("path", samplePaths[i], nullptr);
-    //     samples.appendChild(sample, nullptr);
-    // }
-    // customData.appendChild(samples, nullptr);
-
+    customData.setProperty("version", 1, nullptr);
     state.appendChild(customData, nullptr);
 
-    // Step 3: Convert the ValueTree to XML
     std::unique_ptr<juce::XmlElement> xml(state.createXml());
 
     if (xml != nullptr)
     {
-        // Step 4: Convert XML to binary and store in destData
         copyXmlToBinary(*xml, destData);
-
         DBG("State saved successfully");
         DBG("  Parameters saved: " + juce::String(apvts.state.getNumChildren()));
         DBG("========================");
@@ -431,12 +352,8 @@ void NewProjectAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
 
 void NewProjectAudioProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
-    // LOAD PLUGIN STATE FROM PRESET
-    // This is called by the DAW when loading a project or preset
-
     DBG("=== LOADING PLUGIN STATE ===");
 
-    // Step 1: Parse the binary data back to XML
     std::unique_ptr<juce::XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
 
     if (xmlState == nullptr)
@@ -445,14 +362,12 @@ void NewProjectAudioProcessor::setStateInformation(const void* data, int sizeInB
         return;
     }
 
-    // Step 2: Check if the XML is valid and matches our state format
     if (!xmlState->hasTagName(apvts.state.getType()))
     {
         DBG("ERROR: XML tag name doesn't match APVTS state type");
         return;
     }
 
-    // Step 3: Convert XML back to ValueTree
     juce::ValueTree state = juce::ValueTree::fromXml(*xmlState);
 
     if (!state.isValid())
@@ -461,31 +376,16 @@ void NewProjectAudioProcessor::setStateInformation(const void* data, int sizeInB
         return;
     }
 
-    // Step 4: Restore APVTS parameter values from the loaded state
     apvts.replaceState(state);
 
     DBG("State loaded successfully");
     DBG("  Parameters restored: " + juce::String(apvts.state.getNumChildren()));
 
-    // Step 5: Restore custom data (sample paths - for future implementation)
     juce::ValueTree customData = state.getChildWithName("CustomData");
     if (customData.isValid())
     {
         int version = customData.getProperty("version", 0);
         DBG("  Custom data version: " + juce::String(version));
-
-        // TODO (Phase 4): Load sample file paths here
-        // juce::ValueTree samples = customData.getChildWithName("Samples");
-        // if (samples.isValid())
-        // {
-        //     for (int i = 0; i < samples.getNumChildren(); ++i)
-        //     {
-        //         juce::ValueTree sample = samples.getChild(i);
-        //         int slot = sample.getProperty("slot");
-        //         juce::String path = sample.getProperty("path").toString();
-        //         // Load sample from path...
-        //     }
-        // }
     }
 
     DBG("========================");
@@ -536,7 +436,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
     ));
 
     //==============================================================================
-    // Pan
+    // PAN
+
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::pan, 1),
         "Pan",
@@ -546,12 +447,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
         juce::AudioProcessorParameter::genericParameter,
         [](float value, int) {
             if (value < -0.01f) return juce::String(int(std::abs(value) * 100)) + "% L";
-            if (value > 0.01f) return juce::String(int(value * 100)) + "% R";
+            if (value > 0.01f)  return juce::String(int(value * 100)) + "% R";
             return juce::String("Center");
         }
     ));
 
-    // ADD PAN RANDOMIZATION (near other randomization params)
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::panRndNeg, 1),
         "Pan Rnd Neg", 0.0f, 1.0f, 0.0f));
@@ -577,7 +477,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
         juce::ParameterID(ParameterIDs::envDecay, 1),
         "Env Decay",
         juce::NormalisableRange<float>(0.0f, 5000.0f, 1.0f, 0.4f),
-        820.0f, //default amount
+        820.0f,
         "ms",
         juce::AudioProcessorParameter::genericParameter,
         [](float value, int) { return juce::String(value, 1) + " ms"; }
@@ -590,69 +490,43 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
         juce::ParameterID(ParameterIDs::lowGain, 1),
         "Low Gain",
         juce::NormalisableRange<float>(-24.0f, 24.0f, 0.1f),
-        0.0f,
-        "dB"
+        0.0f, "dB"
     ));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::lowFreq, 1),
         "Low Freq",
         juce::NormalisableRange<float>(20.0f, 500.0f, 1.0f, 0.25f),
-        100.0f,
-        "Hz"
+        100.0f, "Hz"
     ));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::midGain, 1),
         "Mid Gain",
         juce::NormalisableRange<float>(-24.0f, 24.0f, 0.1f),
-        0.0f,
-        "dB"
+        0.0f, "dB"
     ));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::midFreq, 1),
         "Mid Freq",
         juce::NormalisableRange<float>(200.0f, 5000.0f, 1.0f, 0.3f),
-        1000.0f,
-        "Hz"
+        1000.0f, "Hz"
     ));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::highGain, 1),
         "High Gain",
         juce::NormalisableRange<float>(-24.0f, 24.0f, 0.1f),
-        0.0f,
-        "dB"
+        0.0f, "dB"
     ));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::highFreq, 1),
         "High Freq",
         juce::NormalisableRange<float>(2000.0f, 20000.0f, 1.0f, 0.3f),
-        5000.0f,
-        "Hz"
+        5000.0f, "Hz"
     ));
-
-    // Envelope Attack Randomization
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID(ParameterIDs::envAttackRndNeg, 1),
-        "Env Attack Rnd Neg", 0.0f, 1000.0f, 0.0f));
-
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID(ParameterIDs::envAttackRndPos, 1),
-        "Env Attack Rnd Pos", 0.0f, 1000.0f, 0.0f));
-
-    // Envelope Decay Randomization  
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID(ParameterIDs::envDecayRndNeg, 1),
-        "Env Decay Rnd Neg", 0.0f, 5000.0f, 0.0f));
-
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID(ParameterIDs::envDecayRndPos, 1),
-        "Env Decay Rnd Pos", 0.0f, 5000.0f, 0.0f));
-
-    // Transient Attack Randomization (existing code below)
 
     //==============================================================================
     // TRANSIENT MASTER
@@ -672,110 +546,113 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
     DBG("Parameter layout created with " + juce::String(ParameterIDs::totalParameters) + " parameters");
 
     //==============================================================================
-    // RANDOMIZATION PARAMETERS (22 total: 2 per randomizable parameter)
+    // RANDOMIZATION PARAMETERS
 
-    // Semitone Randomization
+    // Semitone
     layout.add(std::make_unique<juce::AudioParameterInt>(
         juce::ParameterID(ParameterIDs::semitoneRndNeg, 1),
         "Semitone Rnd Neg", 0, 12, 0));
-
     layout.add(std::make_unique<juce::AudioParameterInt>(
         juce::ParameterID(ParameterIDs::semitoneRndPos, 1),
         "Semitone Rnd Pos", 0, 12, 0));
 
-    // Fine Tune Randomization
+    // Fine Tune
     layout.add(std::make_unique<juce::AudioParameterInt>(
         juce::ParameterID(ParameterIDs::fineTuneRndNeg, 1),
         "Fine Tune Rnd Neg", 0, 100, 0));
-
     layout.add(std::make_unique<juce::AudioParameterInt>(
         juce::ParameterID(ParameterIDs::fineTuneRndPos, 1),
         "Fine Tune Rnd Pos", 0, 100, 0));
 
-    // Volume Randomization
+    // Volume
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::volumeRndNeg, 1),
         "Volume Rnd Neg", 0.0f, 1.0f, 0.0f));
-
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::volumeRndPos, 1),
         "Volume Rnd Pos", 0.0f, 1.0f, 0.0f));
 
-    // Low EQ Gain Randomization
+    // Envelope Attack
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::envAttackRndNeg, 1),
+        "Env Attack Rnd Neg", 0.0f, 1000.0f, 0.0f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::envAttackRndPos, 1),
+        "Env Attack Rnd Pos", 0.0f, 1000.0f, 0.0f));
+
+    // Envelope Decay
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::envDecayRndNeg, 1),
+        "Env Decay Rnd Neg", 0.0f, 5000.0f, 0.0f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::envDecayRndPos, 1),
+        "Env Decay Rnd Pos", 0.0f, 5000.0f, 0.0f));
+
+    // Low EQ Gain
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::lowGainRndNeg, 1),
         "Low Gain Rnd Neg", 0.0f, 24.0f, 0.0f));
-
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::lowGainRndPos, 1),
         "Low Gain Rnd Pos", 0.0f, 24.0f, 0.0f));
 
-    // Low EQ Frequency Randomization
+    // Low EQ Frequency
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::lowFreqRndNeg, 1),
         "Low Freq Rnd Neg", 0.0f, 480.0f, 0.0f));
-
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::lowFreqRndPos, 1),
         "Low Freq Rnd Pos", 0.0f, 480.0f, 0.0f));
 
-    // Mid EQ Gain Randomization
+    // Mid EQ Gain
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::midGainRndNeg, 1),
         "Mid Gain Rnd Neg", 0.0f, 24.0f, 0.0f));
-
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::midGainRndPos, 1),
         "Mid Gain Rnd Pos", 0.0f, 24.0f, 0.0f));
 
-    // Mid EQ Frequency Randomization
+    // Mid EQ Frequency
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::midFreqRndNeg, 1),
         "Mid Freq Rnd Neg", 0.0f, 4800.0f, 0.0f));
-
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::midFreqRndPos, 1),
         "Mid Freq Rnd Pos", 0.0f, 4800.0f, 0.0f));
 
-    // High EQ Gain Randomization
+    // High EQ Gain
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::highGainRndNeg, 1),
         "High Gain Rnd Neg", 0.0f, 24.0f, 0.0f));
-
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::highGainRndPos, 1),
         "High Gain Rnd Pos", 0.0f, 24.0f, 0.0f));
 
-    // High EQ Frequency Randomization
+    // High EQ Frequency
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::highFreqRndNeg, 1),
         "High Freq Rnd Neg", 0.0f, 18000.0f, 0.0f));
-
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(ParameterIDs::highFreqRndPos, 1),
         "High Freq Rnd Pos", 0.0f, 18000.0f, 0.0f));
 
-    // Transient Attack Randomization
+    // Transient Attack
     layout.add(std::make_unique<juce::AudioParameterInt>(
         juce::ParameterID(ParameterIDs::transientAttackRndNeg, 1),
         "Trans Atk Rnd Neg", 0, 127, 0));
-
     layout.add(std::make_unique<juce::AudioParameterInt>(
         juce::ParameterID(ParameterIDs::transientAttackRndPos, 1),
         "Trans Atk Rnd Pos", 0, 127, 0));
 
-    // Transient Decay Randomization
+    // Transient Decay
     layout.add(std::make_unique<juce::AudioParameterInt>(
         juce::ParameterID(ParameterIDs::transientDecayRndNeg, 1),
         "Trans Dec Rnd Neg", 0, 127, 0));
-
     layout.add(std::make_unique<juce::AudioParameterInt>(
         juce::ParameterID(ParameterIDs::transientDecayRndPos, 1),
         "Trans Dec Rnd Pos", 0, 127, 0));
 
     return layout;
-
-    
 }
 
 //==============================================================================
@@ -798,7 +675,6 @@ void NewProjectAudioProcessor::advanceRoundRobin()
 
     int slotIndex = loadedSlotIndices[roundRobinIndex];
 
-    // Safely get sound directly from synthesiser — no raw pointer needed
     if (synthesiser.getNumSounds() == 0)
     {
         auto* newSound = new RRSound();
@@ -817,6 +693,7 @@ void NewProjectAudioProcessor::advanceRoundRobin()
 
     roundRobinIndex = (roundRobinIndex + 1) % (int)loadedSlotIndices.size();
 }
+
 //==============================================================================
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
