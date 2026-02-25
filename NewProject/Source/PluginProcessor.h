@@ -1,13 +1,4 @@
-/*
-  ==============================================================================
-
-    This file contains the basic framework code for a JUCE plugin processor.
-
-  ==============================================================================
-*/
-
 #pragma once
-
 #include <JuceHeader.h>
 #include "Audio/RRVoice.h"
 #include "Audio/RRSound.h"
@@ -18,11 +9,7 @@
 #include "DSP/TransientShaper.h"  
 #include "DSP/RandomizationEngine.h"
 
-
-
 //==============================================================================
-/**
-*/
 class NewProjectAudioProcessor : public juce::AudioProcessor
 {
 public:
@@ -46,7 +33,6 @@ public:
 
     //==============================================================================
     const juce::String getName() const override;
-
     bool acceptsMidi() const override;
     bool producesMidi() const override;
     bool isMidiEffect() const override;
@@ -63,14 +49,13 @@ public:
     void getStateInformation(juce::MemoryBlock& destData) override;
     void setStateInformation(const void* data, int sizeInBytes) override;
 
+    //==============================================================================
+    // Public Data (accessed by PluginEditor)
     juce::AudioProcessorValueTreeState apvts;
 
-    juce::AudioFormatManager formatManager;
     static constexpr int NUM_SAMPLE_SLOTS = 20;
     SampleSlot sampleSlots[NUM_SAMPLE_SLOTS];
-    SampleLoader sampleLoader{ formatManager, synthesiser, sampleSlots, NUM_SAMPLE_SLOTS };  
-
-    std::vector<int> loadedSlotIndices;   // indices of non-empty slots
+    std::vector<int> loadedSlotIndices;
     int roundRobinIndex = 0;
 
     void advanceRoundRobin();
@@ -78,21 +63,24 @@ public:
 
 private:
     //==============================================================================
-    // Parameter Layout Creation
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
     //==============================================================================
-    // Audio Engine
+    // Audio Engine — ORDER MATTERS: synthesiser and formatManager must come before sampleLoader
     juce::Synthesiser synthesiser;
     juce::AudioFormatManager formatManager;
-    SampleLoader sampleLoader{ formatManager, synthesiser, sampleSlots, NUM_SAMPLE_SLOTS }; // 3rd
-    
 
+public:
+    // Declared after private dependencies so it initializes after them
+    SampleLoader sampleLoader{ formatManager, synthesiser, sampleSlots, NUM_SAMPLE_SLOTS };
+
+private:
+    //==============================================================================
     // DSP Processors
-    ThreeBandEQ threeBandEQ;  
+    ThreeBandEQ threeBandEQ;
     TransientShaper transientShaper;
 
-    // Current global pitch values (updated each block)
+    // Current global pitch values
     std::atomic<float> globalSemitones{ 0.0f };
     std::atomic<float> globalCents{ 0.0f };
     std::atomic<float> globalAttackMs{ 0.0f };
