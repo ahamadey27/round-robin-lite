@@ -65,8 +65,10 @@ public:
 
     juce::AudioProcessorValueTreeState apvts;
 
+    juce::AudioFormatManager formatManager;
     static constexpr int NUM_SAMPLE_SLOTS = 20;
     SampleSlot sampleSlots[NUM_SAMPLE_SLOTS];
+    SampleLoader sampleLoader{ formatManager, synthesiser, sampleSlots, NUM_SAMPLE_SLOTS };  
 
     std::vector<int> loadedSlotIndices;   // indices of non-empty slots
     int roundRobinIndex = 0;
@@ -83,7 +85,7 @@ private:
     // Audio Engine
     juce::Synthesiser synthesiser;
     juce::AudioFormatManager formatManager;
-
+    SampleLoader sampleLoader{ formatManager, synthesiser, sampleSlots, NUM_SAMPLE_SLOTS }; // 3rd
     
 
     // DSP Processors

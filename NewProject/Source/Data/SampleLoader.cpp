@@ -157,19 +157,21 @@ void SampleLoader::resampleBuffer(juce::AudioBuffer<float>& buffer, double sourc
 
 void SampleLoader::updateSynthesiserSounds()
 {
-    synthesiser.clearSounds();
-
-    int loadedCount = 0;
-    for (int i = 0; i < numSlots; ++i)
+    // Update existing sound in place instead of clearing
+    if (synthesiser.getNumSounds() > 0)
     {
-        if (!slots[i].isLoaded)
-            continue;
-
-        auto* sound = new RRSound();
-        sound->setFromSlot(slots[i]);
-        synthesiser.addSound(sound);
-        ++loadedCount;
+        if (auto* sound = dynamic_cast<RRSound*>(synthesiser.getSound(0).get()))
+        {
+            // Find first loaded slot and update sound
+            for (int i = 0; i < numSlots; ++i)
+            {
+                if (slots[i].isLoaded)
+                {
+                    sound->setFromSlot(slots[i]);
+                    DBG("Sound updated from slot " + juce::String(i));
+                    return;
+                }
+            }
+        }
     }
-
-    DBG("Synthesiser updated: " + juce::String(loadedCount) + " sound(s) loaded");
 }
