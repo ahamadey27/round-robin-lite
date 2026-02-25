@@ -298,14 +298,17 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     // Check if a voice is active and use its randomized values instead
     if (auto* voice = dynamic_cast<RRVoice*>(synthesiser.getVoice(0)))
     {
-        eqLowGain = voice->getRandomizedLowGain();
-        eqLowFreq = voice->getRandomizedLowFreq();
-        eqMidGain = voice->getRandomizedMidGain();
-        eqMidFreq = voice->getRandomizedMidFreq();
-        eqHighGain = voice->getRandomizedHighGain();
-        eqHighFreq = voice->getRandomizedHighFreq();
-        transAtk = voice->getRandomizedTransientAttack();
-        transDec = voice->getRandomizedTransientDecay();
+        if (voice->isVoiceActive())   // ← ADD THIS CHECK
+        {
+            eqLowGain = voice->getRandomizedLowGain();
+            eqLowFreq = voice->getRandomizedLowFreq();
+            eqMidGain = voice->getRandomizedMidGain();
+            eqMidFreq = voice->getRandomizedMidFreq();
+            eqHighGain = voice->getRandomizedHighGain();
+            eqHighFreq = voice->getRandomizedHighFreq();
+            transAtk = voice->getRandomizedTransientAttack();
+            transDec = voice->getRandomizedTransientDecay();
+        }
     }
 
 
