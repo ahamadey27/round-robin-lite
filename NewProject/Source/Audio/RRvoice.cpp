@@ -239,18 +239,35 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
     // the fade-out is applied to real audio, not silence.
     samplesPlayed = 0;
     decayTriggered = false;
-    float decaySec = juce::jlimit(0.01f, 30.0f, randomizedDecayMs / 1000.0f);
-    decayTriggerSample = static_cast<int>(decaySec * getSampleRate());
+    //float decaySec = juce::jlimit(0.01f, 30.0f, randomizedDecayMs / 1000.0f);
+    //decayTriggerSample = static_cast<int>(decaySec * getSampleRate());
 
+    
     //==========================================================================
     // START PLAYBACK
 
     sourceSamplePosition = 0.0;
+
     // cache audio data so buffer swaps can't corrupt playback
     const auto& buf = currentSound->getAudioBuffer();
     cachedSampleData = (buf.getNumChannels() > 0 && buf.getNumSamples() > 0)
         ? buf.getReadPointer(0) : nullptr;
     cachedSampleLength = buf.getNumSamples();
+
+    // SET ALL envelope params on the MEMBER variable (not a local)
+    envelopeParams.attack = juce::jlimit(0.001f, 5.0f, randomizedAttackMs / 1000.0f);
+    envelopeParams.decay = 0.001f;
+    envelopeParams.sustain = 1.0f;
+    envelopeParams.release = juce::jlimit(0.001f, 10.0f, randomizedDecayMs / 1000.0f);
+    envelope.setParameters(envelopeParams);  // set BEFORE noteOn
+
+    envelope.reset();
+    envelope.noteOn();
+
+    // Fire fade-out when sample audio runs out (not at 100ms)
+    samplesPlayed = 0;
+    decayTriggered = false;
+    decayTriggerSample = cachedSampleLength;
 
     isPlaying = true;
 }
@@ -325,8 +342,17 @@ void RRVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer,
                     decayTriggered = true;
                 }
                 outputSample = 0.0f;
-            }  
-        }  
+            }
+            else
+            {
+                // ADD THIS BLOCK — envelope done, release the voice
+                isPlaying = false;
+                cachedSampleData = nullptr;
+                cachedSampleLength = 0;
+                clearCurrentNote();   // tells JUCE this voice is available
+                return;               // exit renderNextBlock immediately
+            }
+        }
 
         float panAngle = (randomizedPan + 1.0f) * 0.5f * juce::MathConstants<float>::halfPi;
         float leftGain = std::cos(panAngle);
