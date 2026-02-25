@@ -29,6 +29,13 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
     synthesiser.addVoice(new RRVoice());
     synthesiser.addSound(new RRSound());
 
+    // NEW: wire randomization engine + APVTS into the voice
+    for (int i = 0; i < synthesiser.getNumVoices(); ++i)
+    {
+        if (auto* voice = dynamic_cast<RRVoice*>(synthesiser.getVoice(i)))
+            voice->setRandomizationReferences(&randomizationEngine, &apvts);
+    }
+
     formatManager.registerBasicFormats();
 
     DBG("=== Round Robin Lite Initialized ===");
@@ -267,15 +274,33 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     float eqMidFreq = apvts.getRawParameterValue(ParameterIDs::midFreq)->load();
     float eqHighGain = apvts.getRawParameterValue(ParameterIDs::highGain)->load();
     float eqHighFreq = apvts.getRawParameterValue(ParameterIDs::highFreq)->load();
+    float transAtk = apvts.getRawParameterValue(ParameterIDs::transientAttack)->load();
+    float transDec = apvts.getRawParameterValue(ParameterIDs::transientDecay)->load();
 
-    threeBandEQ.updateFilters(eqLowGain, eqLowFreq, eqMidGain, eqMidFreq, eqHighGain, eqHighFreq);
-    threeBandEQ.processBlock(buffer);
+    // OVERRIDE with randomized values when a voice is actively playing
+    if (auto* voice = dynamic_cast<RRVoice*>(synthesiser.getVoice(0)))
+    {
+        if (voice->isVoiceActive())
+        {
+            eqLowGain = voice->getRandomizedLowGain();
+            eqLowFreq = voice->getRandomizedLowFreq();
+            eqMidGain = voice->getRandomizedMidGain();
+            eqMidFreq = voice->getRandomizedMidFreq();
+            eqHighGain = voice->getRandomizedHighGain();
+            eqHighFreq = voice->getRandomizedHighFreq();
+            transAtk = voice->getRandomizedTransientAttack();
+            transDec = voice->getRandomizedTransientDecay();
+        }
+
+        threeBandEQ.updateFilters(eqLowGain, eqLowFreq, eqMidGain, eqMidFreq, eqHighGain, eqHighFreq);
+        threeBandEQ.processBlock(buffer);
+    }
 
     //==============================================================================
     // APPLY TRANSIENT SHAPING (AFTER EQ, BEFORE VOLUME)
 
-    float transAtk = apvts.getRawParameterValue(ParameterIDs::transientAttack)->load();
-    float transDec = apvts.getRawParameterValue(ParameterIDs::transientDecay)->load();
+    //float transAtk = apvts.getRawParameterValue(ParameterIDs::transientAttack)->load();
+    //float transDec = apvts.getRawParameterValue(ParameterIDs::transientDecay)->load();
 
     transientShaper.processBlock(buffer, transAtk, transDec);
 

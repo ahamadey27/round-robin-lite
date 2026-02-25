@@ -219,21 +219,18 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
     //==========================================================================
     // CALCULATE PITCH RATIO (using randomized values)
 
+    if (randEngine == nullptr)
+    {
+        randomizedSemitones = currentSemitones;
+        randomizedCents = currentCents;
+    }
+
     float semitoneShift = std::pow(2.0f, randomizedSemitones / 12.0f);
     float centShift = std::pow(2.0f, randomizedCents / 1200.0f);
     pitchRatio = semitoneShift * centShift;
 
     //==========================================================================
     // CONFIGURE ENVELOPE (using randomized values)
-
-    juce::ADSR::Parameters envParams;
-    envParams.attack = juce::jlimit(0.001f, 5.0f, randomizedAttackMs / 1000.0f);
-    envParams.decay = 0.0f;
-    envParams.sustain = 1.0f;
-    envParams.release = 0.15f;   // Fixed 150ms anti-click fade (not user-controlled here)
-    envelope.setParameters(envParams);
-    envelope.reset();
-    envelope.noteOn();
 
     // Schedule decay gate: trigger noteOff() DURING sample playback so
     // the fade-out is applied to real audio, not silence.
