@@ -61,7 +61,7 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
                 playbackModeButton.setButtonText(isRandom ? "Random" : "Series");
             };
 
-        contentComponent.addAndMakeVisible(loadButtons[i]);
+        contentComponent.addAndMakeVisible(playbackModeButton);
     }
 
     // Base sliders
@@ -86,9 +86,8 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
                      &highFreqRndNegSlider,  &highFreqRndPosSlider,
                      &transAtkRndNegSlider,  &transAtkRndPosSlider,
                      &transDecRndNegSlider,  &transDecRndPosSlider,
-                     &transDecRndNegSlider,& transDecRndPosSlider,
-                     &envAtkRndNegSlider,& envAtkRndPosSlider,
-                     &envDecRndNegSlider,& envDecRndPosSlider
+                     &envAtkRndNegSlider,    &envAtkRndPosSlider,
+                     &envDecRndNegSlider,    &envDecRndPosSlider
         })
         setupSlider(*s);
 
