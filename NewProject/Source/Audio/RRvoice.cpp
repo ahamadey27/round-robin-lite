@@ -229,17 +229,7 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
     float centShift = std::pow(2.0f, randomizedCents / 1200.0f);
     pitchRatio = semitoneShift * centShift;
 
-    //==========================================================================
-    // CONFIGURE ENVELOPE (using randomized values)
-
-    // Schedule decay gate: trigger noteOff() DURING sample playback so
-    // the fade-out is applied to real audio, not silence.
-    samplesPlayed = 0;
-    decayTriggered = false;
-    //float decaySec = juce::jlimit(0.01f, 30.0f, randomizedDecayMs / 1000.0f);
-    //decayTriggerSample = static_cast<int>(decaySec * getSampleRate());
-
-    
+  
     //==========================================================================
     // START PLAYBACK
 
@@ -250,19 +240,17 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
     voiceBuffer.makeCopyOf(buf);           // deep copy — safe from buffer swaps
     cachedSampleLength = voiceBuffer.getNumSamples();
 
-    // SET ALL envelope params on the MEMBER variable (not a local)
+    // AD envelope: attack fade-in, decay fade-out to zero, no sustain
     envelopeParams.attack = juce::jlimit(0.001f, 5.0f, randomizedAttackMs / 1000.0f);
-    envelopeParams.decay = 0.001f;
-    envelopeParams.sustain = 1.0f;
-    envelopeParams.release = juce::jlimit(0.001f, 10.0f, randomizedDecayMs / 1000.0f);
-    envelope.setParameters(envelopeParams);  // set BEFORE noteOn
+    envelopeParams.decay = juce::jlimit(0.001f, 10.0f, randomizedDecayMs / 1000.0f);
+    envelopeParams.sustain = 0.0f;    // ← KEY: decays all the way to zero automatically
+    envelopeParams.release = 0.001f;  // negligible - not used in one-shot mode
+    envelope.setParameters(envelopeParams);
 
     envelope.reset();
     envelope.noteOn();
 
-    // FIXED: trigger noteOff early so release fades REAL audio, not silence
-    int releaseSamples = static_cast<int>((randomizedDecayMs / 1000.0f) * getSampleRate());
-    decayTriggerSample = juce::jmax(1, cachedSampleLength - releaseSamples);
+   
 
     isPlaying = true;
 }
@@ -296,56 +284,36 @@ void RRVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer,
     if (!isPlaying || voiceBuffer.getNumSamples() == 0 || cachedSampleLength == 0)
         return;
 
-    const float* sampleData = voiceBuffer.getReadPointer(0);  // safe local pointer
+    const float* sampleData = voiceBuffer.getReadPointer(0);
     const int sampleLength = cachedSampleLength;
 
     for (int i = 0; i < numSamples; ++i)
     {
-
-        ++samplesPlayed;
-        if (!decayTriggered && samplesPlayed >= decayTriggerSample)
-        {
-            envelope.noteOff();    // fade-out starts NOW while sample audio still available
-            decayTriggered = true;
-        }
-        const float envelopeLevel = envelope.getNextSample();
+        const float envelopeLevel = envelope.getNextSample();  // AD curve, no manual noteOff needed
 
         float outputSample = 0.0f;
 
         if (sourceSamplePosition < sampleLength - 1)
         {
-            // Normal playback
             const int index0 = static_cast<int>(sourceSamplePosition);
             const int index1 = index0 + 1;
             const float fraction = static_cast<float>(sourceSamplePosition - index0);
             const float sample0 = sampleData[index0];
             const float sample1 = sampleData[index1];
             outputSample = (sample0 + (sample1 - sample0) * fraction) * envelopeLevel * randomizedVolume;
-
             sourceSamplePosition += pitchRatio;
         }
-
         else
         {
-            // Sample fully exhausted
-            if (envelope.isActive())
+            if (!envelope.isActive())
             {
-                if (!decayTriggered)
-                {
-                    envelope.noteOff();
-                    decayTriggered = true;
-                }
-                outputSample = 0.0f;
-            }
-            else
-            {
-                // ADD THIS BLOCK — envelope done, release the voice
                 isPlaying = false;
                 voiceBuffer.setSize(0, 0);
                 cachedSampleLength = 0;
-                clearCurrentNote();   // tells JUCE this voice is available
-                return;               // exit renderNextBlock immediately
+                clearCurrentNote();
+                return;
             }
+            outputSample = 0.0f;  // envelope tail over silence
         }
 
         float panAngle = (randomizedPan + 1.0f) * 0.5f * juce::MathConstants<float>::halfPi;

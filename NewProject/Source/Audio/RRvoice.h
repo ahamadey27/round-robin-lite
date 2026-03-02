@@ -105,12 +105,6 @@ private:
     double pitchRatio = 1.0;
     bool isPlaying = false;
 
-    // ADD THESE — decay gate tracking
-    int  samplesPlayed = 0;
-    int  decayTriggerSample = INT_MAX;
-    bool decayTriggered = false;
-
-
     // Global parameters (updated before each note)  ← ADD THESE 4 LINES
     float currentSemitones = 0.0f;
     float currentCents = 0.0f;
