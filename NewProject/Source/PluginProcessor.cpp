@@ -712,6 +712,13 @@ void NewProjectAudioProcessor::reshuffleIndices()
         int j = rng.nextInt(i + 1);
         std::swap(shuffledIndices[i], shuffledIndices[j]);
     }
+    // Ensure first item of new loop doesn't match last item of previous loop
+    if (shuffledIndices.size() > 1 && shuffledIndices[0] == lastPlayedSlot)
+    {
+        // Swap with a random other position
+        int swapWith = 1 + rng.nextInt((int)shuffledIndices.size() - 1);
+        std::swap(shuffledIndices[0], shuffledIndices[swapWith]);
+    }
     roundRobinIndex = 0;
 }
 
@@ -737,6 +744,8 @@ void NewProjectAudioProcessor::advanceRoundRobin()
 
         slotIndex = shuffledIndices[roundRobinIndex++];
     }
+
+    lastPlayedSlot = slotIndex;  // ← ADD, track before playing
 
     if (synthesiser.getNumSounds() == 0)
     {

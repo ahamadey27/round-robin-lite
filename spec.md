@@ -734,12 +734,12 @@ EQ Low Gain: Base=0dB, Neg=-12dB, Pos=0dB → expect -12 to 0dB (only cuts)
 - [x] Verify only one sample plays at a time (monophonic)
 
 ### Step 6: Implement Sample Selection Logic
-- [ ] Create two options for Round Robin playback methods:
-  - [ ] Option A: Round-robin (cycle through loaded samples in order)
-  - [ ] Option B: Random selection from loaded samples
-- [ ] Create two parameter selections where one of two must be selected using a switch type UI which is defaults to "Series". "Series" is Option A / "Random" is Option B
-  - [ ] Add these to check boxes to the UI
-  - [ ] Have option B playback all sounds in the list randomly using the Fisher–Yates shuffle (unless you can find a more optimized one)
+- [x] Create two options for Round Robin playback methods:
+  - [x] Option A: Round-robin (cycle through loaded samples in order)
+  - [x] Option B: Random selection from loaded samples
+- [x] Create two parameter selections where one of two must be selected using a switch type UI which is defaults to "Series". "Series" is Option A / "Random" is Option B
+  - [x] Add these to check boxes to the UI
+  - [x] Have option B playback all sounds in the list randomly using the Fisher–Yates shuffle (unless you can find a more optimized one)
 - [ ] Track current sample index in AudioProcessor
 - [ ] On each note-on event, advance to next loaded sample
 - [ ] Wrap around to first sample after last sample
