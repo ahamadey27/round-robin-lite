@@ -169,7 +169,7 @@ void NewProjectAudioProcessorEditor::resized()
     // Section header: 30px each
     // Base params: 14 rows * gap
     // Rnd params: 12 rows * gap
-    const int slotsHeight = 5 * 35 + margin;
+    const int slotsHeight = 5 * (28 + 5) + 10 + 38 + 30;
     const int baseHeight = 30 + 14 * gap;
     const int rndHeight = 30 + 14 * gap;
     const int totalH = margin + slotsHeight + baseHeight + rndHeight + 20;
