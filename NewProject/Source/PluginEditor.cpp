@@ -193,11 +193,14 @@ void NewProjectAudioProcessorEditor::resized()
     int y = margin;
 
     //==========================================================================
-    // SAMPLE SLOTS — 4 columns x 5 rows / Sample Playback Toggle
+    // LOAD BUTTON / PLAYBACK TOGGLE
     {
         loadSamplesButton.setBounds(margin, y, 140, 28);
         samplesInfoLabel.setBounds(margin + 150, y, 300, 28);
-        playbackModeButton.setBounds(margin, y, 120, 28);  // existing ↓
+        y += 38;
+
+        playbackModeButton.setBounds(margin, y, 120, 28);
+        y += 38;
         
     }
 
