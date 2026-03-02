@@ -66,7 +66,7 @@ private:
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
     //==============================================================================
-    // Audio Engine — ORDER MATTERS: synthesiser and formatManager must come before sampleLoader
+    // Audio Engine â€” ORDER MATTERS: synthesiser and formatManager must come before sampleLoader
     juce::Synthesiser synthesiser;
     juce::AudioFormatManager formatManager;
 
