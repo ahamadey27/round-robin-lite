@@ -746,8 +746,8 @@ EQ Low Gain: Base=0dB, Neg=-12dB, Pos=0dB → expect -12 to 0dB (only cuts)
 - [x] Skip empty slots automatically
 - [x] Add method to reset round-robin position
   - [x] Put checkbox UI parameter next to the Series/Random switch toggle   
-- [ ] A single "Load Samples" button that opens a multi-file picker (select up to 20 files at once)
-- [ ] Files get assigned to slots in order starting from slot 1 (or the first empty slot)
+- [x] A single "Load Samples" button that opens a multi-file picker (select up to 20 files at once)
+- [x] Files get assigned to slots in order starting from slot 1 (or the first empty slot)
 
 **Implementation Example for Round-Robin:**
 ```cpp
