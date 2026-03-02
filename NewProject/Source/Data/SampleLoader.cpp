@@ -102,6 +102,16 @@ bool SampleLoader::loadSample(int slotIndex, const juce::File& file)
     return success;
 }
 
+void SampleLoader::clearSlot(int slotIndex)
+{
+    if (slotIndex < 0 || slotIndex >= numSlots)
+        return;
+
+    slots[slotIndex].clear();
+    DBG("SampleLoader: Slot " + juce::String(slotIndex) + " cleared");
+}
+
+
 void SampleLoader::setSampleRate(double newSampleRate)
 {
     if (juce::exactlyEqual(newSampleRate, currentSampleRate))
