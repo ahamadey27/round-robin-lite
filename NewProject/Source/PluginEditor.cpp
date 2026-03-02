@@ -53,16 +53,18 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
     {
         loadButtons[i].setButtonText("Slot " + juce::String(i + 1) + ": Empty");
         loadButtons[i].onClick = [this, i]() { loadSampleForSlot(i); };
-
-        playbackModeButton.setClickingTogglesState(true);
-        playbackModeButton.onClick = [this]()
-            {
-                bool isRandom = playbackModeButton.getToggleState();
-                playbackModeButton.setButtonText(isRandom ? "Random" : "Series");
-            };
-
-        contentComponent.addAndMakeVisible(playbackModeButton);
+        contentComponent.addAndMakeVisible(loadButtons[i]);
     }
+
+    // Playback button — OUTSIDE the loop
+    playbackModeButton.setButtonText("Series");
+    playbackModeButton.setClickingTogglesState(true);
+    playbackModeButton.onClick = [this]()
+        {
+            bool isRandom = playbackModeButton.getToggleState();
+            playbackModeButton.setButtonText(isRandom ? "Random" : "Series");
+        };
+    contentComponent.addAndMakeVisible(playbackModeButton);
 
     // Base sliders
     for (auto* s : { &semitoneSlider, &fineTuneSlider, &volumeSlider, &panSlider,
@@ -169,7 +171,7 @@ void NewProjectAudioProcessorEditor::resized()
     // Rnd params: 12 rows * gap
     const int slotsHeight = 5 * 35 + margin;
     const int baseHeight = 30 + 14 * gap;
-    const int rndHeight = 30 + 12 * gap;
+    const int rndHeight = 30 + 14 * gap;
     const int totalH = margin + slotsHeight + baseHeight + rndHeight + 20;
     contentComponent.setSize(contentW, totalH);
 
