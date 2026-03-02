@@ -740,12 +740,14 @@ EQ Low Gain: Base=0dB, Neg=-12dB, Pos=0dB → expect -12 to 0dB (only cuts)
 - [x] Create two parameter selections where one of two must be selected using a switch type UI which is defaults to "Series". "Series" is Option A / "Random" is Option B
   - [x] Add these to check boxes to the UI
   - [x] Have option B playback all sounds in the list randomly using the Fisher–Yates shuffle (unless you can find a more optimized one)
-- [ ] Track current sample index in AudioProcessor
-- [ ] On each note-on event, advance to next loaded sample
-- [ ] Wrap around to first sample after last sample
-- [ ] Skip empty slots automatically
-- [ ] Add method to reset round-robin position
-  - [ ] Put checkbox UI parameter next to the Series/Random switch toggle   
+- [x] Track current sample index in AudioProcessor
+- [x] On each note-on event, advance to next loaded sample
+- [x] Wrap around to first sample after last sample
+- [x] Skip empty slots automatically
+- [x] Add method to reset round-robin position
+  - [x] Put checkbox UI parameter next to the Series/Random switch toggle   
+- [ ] A single "Load Samples" button that opens a multi-file picker (select up to 20 files at once)
+- [ ] Files get assigned to slots in order starting from slot 1 (or the first empty slot)
 
 **Implementation Example for Round-Robin:**
 ```cpp

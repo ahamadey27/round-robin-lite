@@ -38,7 +38,8 @@ private:
 
     //==========================================================================
     // Sample slot load buttons and Playback Mode (20 slots)
-    juce::TextButton loadButtons[20];
+    juce::TextButton loadSamplesButton;
+    juce::Label samplesInfoLabel;
     juce::TextButton playbackModeButton;
     juce::AudioProcessorValueTreeState::ButtonAttachment playbackModeAttachment;
     std::unique_ptr<juce::FileChooser> fileChooser;
@@ -98,8 +99,8 @@ private:
 
     //==========================================================================
     void setupSlider(juce::Slider& s);
-    void loadSampleForSlot(int slotIndex);
-    void updateSlotLabels();
+    void loadSamplesFromFiles();
+    void updateSamplesInfo();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NewProjectAudioProcessorEditor)
 };

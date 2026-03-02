@@ -48,13 +48,14 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
     playbackModeAttachment(p.apvts, ParameterIDs::playbackMode, playbackModeButton)
 
 {
-    // Load buttons and Playback toggle Switch 
-    for (int i = 0; i < 20; ++i)
-    {
-        loadButtons[i].setButtonText("Slot " + juce::String(i + 1) + ": Empty");
-        loadButtons[i].onClick = [this, i]() { loadSampleForSlot(i); };
-        contentComponent.addAndMakeVisible(loadButtons[i]);
-    }
+    // Sample Load Button:
+    loadSamplesButton.setButtonText("Load Samples");
+    loadSamplesButton.onClick = [this]() { loadSamplesFromFiles(); };
+    contentComponent.addAndMakeVisible(loadSamplesButton);
+
+    samplesInfoLabel.setText("No samples loaded", juce::dontSendNotification);
+    samplesInfoLabel.setColour(juce::Label::textColourId, juce::Colours::white);
+    contentComponent.addAndMakeVisible(samplesInfoLabel);
 
     // Playback button — OUTSIDE the loop
     playbackModeButton.setButtonText("Series");
@@ -112,38 +113,52 @@ void NewProjectAudioProcessorEditor::setupSlider(juce::Slider& s)
 }
 
 //==============================================================================
-void NewProjectAudioProcessorEditor::loadSampleForSlot(int slotIndex)
+void NewProjectAudioProcessorEditor::loadSamplesFromFiles()
 {
     fileChooser = std::make_unique<juce::FileChooser>(
-        "Load Sample for Slot " + juce::String(slotIndex + 1),
+        "Load Samples (up to 20)",
         juce::File{},
         "*.wav;*.aif;*.aiff;*.flac;*.ogg"
     );
 
     fileChooser->launchAsync(
-        juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles,
-        [this, slotIndex](const juce::FileChooser& fc)
+        juce::FileBrowserComponent::openMode |
+        juce::FileBrowserComponent::canSelectFiles |
+        juce::FileBrowserComponent::canSelectMultipleItems,
+        [this](const juce::FileChooser& fc)
         {
-            auto result = fc.getResult();
-            if (result.existsAsFile())
+            auto results = fc.getResults();
+
+            // Clear existing pool before loading new selection
+            for (int i = 0; i < NewProjectAudioProcessor::NUM_SAMPLE_SLOTS; ++i)
+                audioProcessor.sampleLoader.clearSlot(i);
+
+            int slot = 0;
+
+            for (const auto& file : results)
             {
-                audioProcessor.sampleLoader.loadSample(slotIndex, result);
-                audioProcessor.rebuildLoadedIndices();
-                 updateSlotLabels();
+                if (slot >= NewProjectAudioProcessor::NUM_SAMPLE_SLOTS) break;
+                if (file.existsAsFile())
+                {
+                    audioProcessor.sampleLoader.loadSample(slot, file);
+                    ++slot;
+                }
             }
+
+            audioProcessor.rebuildLoadedIndices();
+            updateSamplesInfo();
         }
     );
 }
 
-void NewProjectAudioProcessorEditor::updateSlotLabels()
+void NewProjectAudioProcessorEditor::updateSamplesInfo()
 {
-    for (int i = 0; i < 20; ++i)
-    {
-        if (audioProcessor.sampleSlots[i].isLoaded)
-            loadButtons[i].setButtonText(audioProcessor.sampleSlots[i].displayName);
-        else
-            loadButtons[i].setButtonText("Slot " + juce::String(i + 1) + ": Empty");
-    }
+    int count = (int)audioProcessor.loadedSlotIndices.size();
+    if (count == 0)
+        samplesInfoLabel.setText("No samples loaded", juce::dontSendNotification);
+    else
+        samplesInfoLabel.setText(juce::String(count) + " sample(s) loaded",
+            juce::dontSendNotification);
 }
 
 //==============================================================================
@@ -169,7 +184,7 @@ void NewProjectAudioProcessorEditor::resized()
     // Section header: 30px each
     // Base params: 14 rows * gap
     // Rnd params: 12 rows * gap
-    const int slotsHeight = 5 * (28 + 5) + 10 + 38 + 30;
+    const int slotsHeight = 38 + 38 + 10;
     const int baseHeight = 30 + 14 * gap;
     const int rndHeight = 30 + 14 * gap;
     const int totalH = margin + slotsHeight + baseHeight + rndHeight + 20;
@@ -180,26 +195,10 @@ void NewProjectAudioProcessorEditor::resized()
     //==========================================================================
     // SAMPLE SLOTS — 4 columns x 5 rows / Sample Playback Toggle
     {
-        const int cols = 4;
-        const int btnW = (contentW - margin * 2 - (cols - 1) * 5) / cols;
-        const int btnH = 28;
-        const int btnGap = 5;
-
-        for (int i = 0; i < 20; ++i)
-        {
-            int col = i % cols;
-            int row = i / cols;
-            loadButtons[i].setBounds(margin + col * (btnW + btnGap),
-                y + row * (btnH + btnGap),
-                btnW, btnH);
-        }
-        y += 5 * (28 + 5) + 10;
-
-        // Playback mode toggle — sits just below the sample slots
-        playbackModeButton.setBounds(margin, y, 120, 28);
-        y += 38;
-
-        y += 30; // section header gap  ← existing
+        loadSamplesButton.setBounds(margin, y, 140, 28);
+        samplesInfoLabel.setBounds(margin + 150, y, 300, 28);
+        playbackModeButton.setBounds(margin, y, 120, 28);  // existing ↓
+        
     }
 
     //==========================================================================
