@@ -508,6 +508,14 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
         [](float value, int) { return juce::String(value, 1) + " ms"; }
     ));
 
+
+    //==============================================================================
+    // PLAYBACK MODE
+
+    layout.add(std::make_unique<juce::AudioParameterBool>(
+        juce::ParameterID(ParameterIDs::playbackMode, 1),
+        "Playback Mode", false));  // false = Series, true = Random
+
     //==============================================================================
     // 3-BAND EQ
 
@@ -694,11 +702,41 @@ void NewProjectAudioProcessor::rebuildLoadedIndices()
         roundRobinIndex = roundRobinIndex % (int)loadedSlotIndices.size();
 }
 
+void NewProjectAudioProcessor::reshuffleIndices()
+{
+    shuffledIndices = loadedSlotIndices;  // copy ordered list
+
+    juce::Random rng;
+    for (int i = (int)shuffledIndices.size() - 1; i > 0; --i)
+    {
+        int j = rng.nextInt(i + 1);
+        std::swap(shuffledIndices[i], shuffledIndices[j]);
+    }
+    roundRobinIndex = 0;
+}
+
+
 void NewProjectAudioProcessor::advanceRoundRobin()
 {
     if (loadedSlotIndices.empty()) return;
 
-    int slotIndex = loadedSlotIndices[roundRobinIndex];
+    bool isRandom = apvts.getRawParameterValue(ParameterIDs::playbackMode)->load() > 0.5f;
+    int slotIndex = 0;
+
+    if (!isRandom)
+    {
+        // Series: cycle in order
+        slotIndex = loadedSlotIndices[roundRobinIndex % (int)loadedSlotIndices.size()];
+        roundRobinIndex = (roundRobinIndex + 1) % (int)loadedSlotIndices.size();
+    }
+    else
+    {
+        // Random: exhaust shuffled list before reshuffling (no immediate repeats)
+        if (shuffledIndices.empty() || roundRobinIndex >= (int)shuffledIndices.size())
+            reshuffleIndices();
+
+        slotIndex = shuffledIndices[roundRobinIndex++];
+    }
 
     if (synthesiser.getNumSounds() == 0)
     {
@@ -712,11 +750,8 @@ void NewProjectAudioProcessor::advanceRoundRobin()
             sound->setFromSlot(sampleSlots[slotIndex]);
     }
 
-    DBG("Round Robin: playing slot " + juce::String(slotIndex) +
-        " (" + juce::String(roundRobinIndex + 1) + "/" +
-        juce::String(loadedSlotIndices.size()) + ")");
-
-    roundRobinIndex = (roundRobinIndex + 1) % (int)loadedSlotIndices.size();
+    DBG("RR [" + juce::String(isRandom ? "Random" : "Series") + "]: slot "
+        + juce::String(slotIndex) + " (" + sampleSlots[slotIndex].displayName + ")");
 }
 
 //==============================================================================

@@ -154,7 +154,7 @@ namespace ParameterIDs
     /**
      * ENV_DECAY - Amplitude envelope decay/release time
      * Range: 0.0 to 5000.0 milliseconds
-     * Default: 100.0ms (short natural release)
+     * Default: 5000.0ms (short natural release)
      * Scaling: Linear or exponential
      *
      * Controls how long the sample takes to fade out after note-off.
@@ -164,7 +164,9 @@ namespace ParameterIDs
     inline constexpr auto envDecay = "envDecay";
 
     //==============================================================================
-    // TRANSIENT MASTER
+    // PLAYBACK MODE
+
+    inline constexpr auto playbackMode = "playbackMode";  // false = Series, true = Random
 
     //==============================================================================
     // TRANSIENT MASTER
