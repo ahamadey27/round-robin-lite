@@ -510,11 +510,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
 
 
     //==============================================================================
-    // PLAYBACK MODE
+    // PLAYBACK MODE -- Set true to select random
 
     layout.add(std::make_unique<juce::AudioParameterBool>(
         juce::ParameterID(ParameterIDs::playbackMode, 1),
-        "Playback Mode", false));  // false = Series, true = Random
+        "Playback Mode", true));  // false = Series, true = Random
 
     //==============================================================================
     // 3-BAND EQ

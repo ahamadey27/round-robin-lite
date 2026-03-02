@@ -37,8 +37,10 @@ private:
     LabelledContent contentComponent;
 
     //==========================================================================
-    // Sample slot load buttons (20 slots)
+    // Sample slot load buttons and Playback Mode (20 slots)
     juce::TextButton loadButtons[20];
+    juce::TextButton playbackModeButton;
+    juce::AudioProcessorValueTreeState::ButtonAttachment playbackModeAttachment;
     std::unique_ptr<juce::FileChooser> fileChooser;
 
     //==========================================================================

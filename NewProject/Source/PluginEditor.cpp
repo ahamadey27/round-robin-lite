@@ -44,14 +44,23 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
     envAtkRndNegAttachment(p.apvts, ParameterIDs::envAttackRndNeg, envAtkRndNegSlider),
     envAtkRndPosAttachment(p.apvts, ParameterIDs::envAttackRndPos, envAtkRndPosSlider),
     envDecRndNegAttachment(p.apvts, ParameterIDs::envDecayRndNeg, envDecRndNegSlider),
-    envDecRndPosAttachment(p.apvts, ParameterIDs::envDecayRndPos, envDecRndPosSlider)
+    envDecRndPosAttachment(p.apvts, ParameterIDs::envDecayRndPos, envDecRndPosSlider),
+    playbackModeAttachment(p.apvts, ParameterIDs::playbackMode, playbackModeButton)
 
 {
-    // Load buttons
+    // Load buttons and Playback toggle Switch 
     for (int i = 0; i < 20; ++i)
     {
         loadButtons[i].setButtonText("Slot " + juce::String(i + 1) + ": Empty");
         loadButtons[i].onClick = [this, i]() { loadSampleForSlot(i); };
+
+        playbackModeButton.setClickingTogglesState(true);
+        playbackModeButton.onClick = [this]()
+            {
+                bool isRandom = playbackModeButton.getToggleState();
+                playbackModeButton.setButtonText(isRandom ? "Random" : "Series");
+            };
+
         contentComponent.addAndMakeVisible(loadButtons[i]);
     }
 
@@ -168,7 +177,7 @@ void NewProjectAudioProcessorEditor::resized()
     int y = margin;
 
     //==========================================================================
-    // SAMPLE SLOTS — 4 columns x 5 rows
+    // SAMPLE SLOTS — 4 columns x 5 rows / Sample Playback Toggle
     {
         const int cols = 4;
         const int btnW = (contentW - margin * 2 - (cols - 1) * 5) / cols;
@@ -184,6 +193,12 @@ void NewProjectAudioProcessorEditor::resized()
                 btnW, btnH);
         }
         y += 5 * (28 + 5) + 10;
+
+        // Playback mode toggle — sits just below the sample slots
+        playbackModeButton.setBounds(margin, y, 120, 28);
+        y += 38;
+
+        y += 30; // section header gap  ← existing
     }
 
     //==========================================================================
