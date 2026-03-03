@@ -765,11 +765,11 @@ if (!loadedSampleIndices.empty())
 ```
 
 **Quick Test After Step 6:**
-- [ ] Load 3-4 test samples
-- [ ] Play C2/D2 repeatedly
-- [ ] Verify samples cycle in order (1, 2, 3, 1, 2, 3...)
-- [ ] Verify empty slots are skipped
-- [ ] Test with only 1 sample loaded
+- [x Load 3-4 test samples
+- [x] Play C2/D2 repeatedly
+- [x] Verify samples cycle in order (1, 2, 3, 1, 2, 3...)
+- [x] Verify empty slots are skipped
+- [x] Test with only 1 sample loaded
 
 ### Step 7: Add Sample Persistence (Save/Load with Project State)
 - [ ] In getStateInformation():

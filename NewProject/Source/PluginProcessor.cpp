@@ -358,6 +358,23 @@ void NewProjectAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
 
     juce::ValueTree customData("CustomData");
     customData.setProperty("version", 1, nullptr);
+    juce::ValueTree customData("CustomData");
+    customData.setProperty("version", 1, nullptr);
+
+    // ADD: save sample file paths
+    juce::ValueTree sampleData("SampleData");
+    for (int i = 0; i < NUM_SAMPLE_SLOTS; ++i)
+    {
+        if (sampleSlots[i].isLoaded)
+        {
+            juce::ValueTree slot("Slot");
+            slot.setProperty("index", i, nullptr);
+            slot.setProperty("path", sampleSlots[i].sourceFile.getFullPathName(), nullptr);
+            slot.setProperty("displayName", sampleSlots[i].displayName, nullptr);
+            sampleData.appendChild(slot, nullptr);
+        }
+    }
+    customData.appendChild(sampleData, nullptr);
     state.appendChild(customData, nullptr);
 
     std::unique_ptr<juce::XmlElement> xml(state.createXml());
@@ -403,16 +420,63 @@ void NewProjectAudioProcessor::setStateInformation(const void* data, int sizeInB
 
     apvts.replaceState(state);
 
-    DBG("State loaded successfully");
-    DBG("  Parameters restored: " + juce::String(apvts.state.getNumChildren()));
-
+    // Restore sample file paths
     juce::ValueTree customData = state.getChildWithName("CustomData");
     if (customData.isValid())
     {
-        int version = customData.getProperty("version", 0);
-        DBG("  Custom data version: " + juce::String(version));
+        juce::ValueTree sampleData = customData.getChildWithName("SampleData");
+        if (sampleData.isValid())
+        {
+            // Clear all slots before restoring
+            for (int i = 0; i < NUM_SAMPLE_SLOTS; ++i)
+                sampleLoader.clearSlot(i);
+
+            juce::StringArray missingSamples;
+
+            for (auto slot : sampleData)
+            {
+                int    index = slot.getProperty("index", -1);
+                juce::String path = slot.getProperty("path", "");
+                juce::String name = slot.getProperty("displayName", "");
+
+                if (index < 0 || index >= NUM_SAMPLE_SLOTS)
+                    continue;
+
+                juce::File file(path);
+                if (file.existsAsFile())
+                {
+                    sampleLoader.loadSample(index, file);
+                    DBG("Restored slot " + juce::String(index) + ": " + name);
+                }
+                else
+                {
+                    missingSamples.add("Slot " + juce::String(index + 1) + ": " + name);
+                    DBG("Missing sample for slot " + juce::String(index) + ": " + path);
+                }
+            }
+
+            rebuildLoadedIndices();
+
+            // Warn user about any missing files
+            if (!missingSamples.isEmpty())
+            {
+                juce::String msg = "The following samples could not be found:\n\n";
+                msg += missingSamples.joinIntoString("\n");
+                msg += "\n\nPlease reload them manually.";
+
+                juce::MessageManager::callAsync([msg]()
+                    {
+                        juce::AlertWindow::showMessageBoxAsync(
+                            juce::AlertWindow::WarningIcon,
+                            "Missing Samples",
+                            msg);
+                    });
+            }
+        }
     }
 
+    DBG("State loaded successfully");
+    DBG("  Parameters restored: " + juce::String(apvts.state.getNumChildren()));
     DBG("========================");
 }
 
