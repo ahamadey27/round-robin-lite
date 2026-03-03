@@ -77,7 +77,7 @@ void RRLookAndFeel::drawRotarySlider(juce::Graphics& g,
 void RRLookAndFeel::drawLabel(juce::Graphics& g, juce::Label& label)
 {
     g.setColour(RRColors::labelText);
-    g.setFont(juce::Font(11.0f, juce::Font::bold));
+    g.setFont(juce::Font(11.0f).boldened());
     g.drawFittedText(label.getText(), label.getLocalBounds(),
         label.getJustificationType(), 1);
 }
