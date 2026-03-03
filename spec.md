@@ -813,6 +813,23 @@ if (!loadedSampleIndices.empty())
 - [x] Move a sample file, load preset — verify missing samples dialog appears
 - [x] Load preset on fresh plugin instance — verify everything restores
 
+### Step 7.2: Basic UI Implementation
+- [x] Create RRLookAndFeel.h and RRLookAndFeel.cpp in Source/UI/
+- [x] Define RRColors namespace (background, knobBody, arcNeg, arcPos, 
+      arcTrack, labelText, sectionLine, valueBox)
+- [x] Implement custom drawRotarySlider() — dual arc (blue neg / red pos)
+- [x] Implement custom drawLabel()
+- [x] Add to Projucer and confirm successful build
+- [ ] Step 7.2.1: PluginEditor layout — set window size, background, 
+      section headers with divider lines
+- [ ] Step 7.2.2: Add all knobs (Amplitude, Pitch, Envelope, Transients, EQ)
+      with labels and value display boxes
+- [ ] Step 7.2.3: Wire all knobs to APVTS via SliderParameterAttachment
+- [ ] Step 7.2.4: Add Series/Random toggle button
+- [ ] Step 7.2.5: Add Load Samples button with file browser logic
+- [ ] Step 7.2.6: Add Save/Load Preset buttons
+- [ ] Step 7.2.7: Final visual pass — spacing, fonts, colors
+
 ### Step 8: Test Complete Sample Management System
 - [ ] Prepare 10 diverse test WAV files (different lengths, sample rates)
 - [ ] Manually load samples into different slots
