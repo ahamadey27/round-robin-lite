@@ -65,6 +65,9 @@ public:
     void advanceRoundRobin();
     void rebuildLoadedIndices();
 
+    void savePreset(const juce::File& file);  
+    void loadPreset(const juce::File& file);  
+
 private:
     //==============================================================================
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();

@@ -53,6 +53,16 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
     loadSamplesButton.onClick = [this]() { loadSamplesFromFiles(); };
     contentComponent.addAndMakeVisible(loadSamplesButton);
 
+    // User Presets
+    savePresetButton.setButtonText("Save Preset");
+    savePresetButton.onClick = [this]() { savePreset(); };
+    contentComponent.addAndMakeVisible(savePresetButton);
+
+    loadPresetButton.setButtonText("Load Preset");
+    loadPresetButton.onClick = [this]() { loadPreset(); };
+    contentComponent.addAndMakeVisible(loadPresetButton);
+
+    // Sample Info Label
     samplesInfoLabel.setText("No samples loaded", juce::dontSendNotification);
     samplesInfoLabel.setColour(juce::Label::textColourId, juce::Colours::white);
     contentComponent.addAndMakeVisible(samplesInfoLabel);
@@ -161,6 +171,44 @@ void NewProjectAudioProcessorEditor::updateSamplesInfo()
             juce::dontSendNotification);
 }
 
+void NewProjectAudioProcessorEditor::savePreset()
+{
+    fileChooser = std::make_unique<juce::FileChooser>(
+        "Save Preset", juce::File{}, "*.rrpreset");
+
+    fileChooser->launchAsync(
+        juce::FileBrowserComponent::saveMode |
+        juce::FileBrowserComponent::canSelectFiles,
+        [this](const juce::FileChooser& fc)
+        {
+            auto file = fc.getResult();
+            if (file != juce::File{})
+            {
+                auto withExt = file.withFileExtension(".rrpreset");
+                audioProcessor.savePreset(withExt);
+            }
+        });
+}
+
+void NewProjectAudioProcessorEditor::loadPreset()
+{
+    fileChooser = std::make_unique<juce::FileChooser>(
+        "Load Preset", juce::File{}, "*.rrpreset");
+
+    fileChooser->launchAsync(
+        juce::FileBrowserComponent::openMode |
+        juce::FileBrowserComponent::canSelectFiles,
+        [this](const juce::FileChooser& fc)
+        {
+            auto file = fc.getResult();
+            if (file.existsAsFile())
+            {
+                audioProcessor.loadPreset(file);
+                updateSamplesInfo();
+            }
+        });
+}
+
 //==============================================================================
 void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
 {
@@ -184,7 +232,7 @@ void NewProjectAudioProcessorEditor::resized()
     // Section header: 30px each
     // Base params: 14 rows * gap
     // Rnd params: 12 rows * gap
-    const int slotsHeight = 38 + 38 + 10;
+    const int slotsHeight = 38 + 38 + 38 + 10;
     const int baseHeight = 30 + 14 * gap;
     const int rndHeight = 30 + 14 * gap;
     const int totalH = margin + slotsHeight + baseHeight + rndHeight + 20;
@@ -193,11 +241,15 @@ void NewProjectAudioProcessorEditor::resized()
     int y = margin;
 
     //==========================================================================
-    // LOAD BUTTON / PLAYBACK TOGGLE
+    // LOAD BUTTON / PLAYBACK TOGGLE / Load/Save User Presets
     {
         loadSamplesButton.setBounds(margin, y, 140, 28);
         samplesInfoLabel.setBounds(margin + 150, y, 300, 28);
         y += 38;
+
+        savePresetButton.setBounds(margin, y, 120, 28);         // ← ADD
+        loadPresetButton.setBounds(margin + 130, y, 120, 28);   // ← ADD
+        y += 38;                                                // ← ADD
 
         playbackModeButton.setBounds(margin, y, 120, 28);
         y += 38;

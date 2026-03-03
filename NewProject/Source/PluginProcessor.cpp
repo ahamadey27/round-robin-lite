@@ -824,6 +824,37 @@ void NewProjectAudioProcessor::advanceRoundRobin()
 }
 
 //==============================================================================
+// User Presets
+void NewProjectAudioProcessor::savePreset(const juce::File& file)
+{
+    juce::MemoryBlock data;
+    getStateInformation(data);
+
+    if (file.replaceWithData(data.getData(), data.getSize()))
+        DBG("Preset saved: " + file.getFullPathName());
+    else
+        DBG("ERROR: Failed to save preset: " + file.getFullPathName());
+}
+
+void NewProjectAudioProcessor::loadPreset(const juce::File& file)
+{
+    if (!file.existsAsFile())
+    {
+        DBG("ERROR: Preset file not found: " + file.getFullPathName());
+        return;
+    }
+
+    juce::MemoryBlock data;
+    if (file.loadFileAsData(data))
+    {
+        setStateInformation(data.getData(), (int)data.getSize());
+        DBG("Preset loaded: " + file.getFullPathName());
+    }
+    else
+        DBG("ERROR: Failed to read preset file: " + file.getFullPathName());
+}
+
+//==============================================================================
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new NewProjectAudioProcessor();

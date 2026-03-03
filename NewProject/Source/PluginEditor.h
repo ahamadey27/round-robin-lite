@@ -37,8 +37,10 @@ private:
     LabelledContent contentComponent;
 
     //==========================================================================
-    // Sample slot load buttons and Playback Mode (20 slots)
+    // Sample slot load button, save/load preset/playback mode
     juce::TextButton loadSamplesButton;
+    juce::TextButton savePresetButton;   
+    juce::TextButton loadPresetButton;   
     juce::Label samplesInfoLabel;
     juce::TextButton playbackModeButton;
     juce::AudioProcessorValueTreeState::ButtonAttachment playbackModeAttachment;
@@ -101,6 +103,8 @@ private:
     void setupSlider(juce::Slider& s);
     void loadSamplesFromFiles();
     void updateSamplesInfo();
+    void savePreset();           
+    void loadPreset();           
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NewProjectAudioProcessorEditor)
 };
