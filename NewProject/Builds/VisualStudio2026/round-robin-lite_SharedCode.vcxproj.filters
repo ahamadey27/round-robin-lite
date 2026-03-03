@@ -11,6 +11,9 @@
     <Filter Include="round-robin-lite\Source\Data">
       <UniqueIdentifier>{68CB7A90-44EC-68E8-1ABB-CBF20850DEC8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="round-robin-lite\Source\UI">
+      <UniqueIdentifier>{FBE1581B-6867-E353-3BC6-5C77B3CCEE7F}</UniqueIdentifier>
+    </Filter>
     <Filter Include="round-robin-lite\Source\Audio">
       <UniqueIdentifier>{73965BAD-CF0D-ED06-3243-8BEA405EFBF8}</UniqueIdentifier>
     </Filter>
@@ -726,6 +729,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Source\Data\SampleLoader.cpp">
       <Filter>round-robin-lite\Source\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\UI\RRLookAndFeel.cpp">
+      <Filter>round-robin-lite\Source\UI</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Audio\RRSound.cpp">
       <Filter>round-robin-lite\Source\Audio</Filter>
@@ -3791,6 +3797,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\Data\SampleSlot.h">
       <Filter>round-robin-lite\Source\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\UI\RRLookAndFeel.h">
+      <Filter>round-robin-lite\Source\UI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Audio\MidiMapper.h">
       <Filter>round-robin-lite\Source\Audio</Filter>

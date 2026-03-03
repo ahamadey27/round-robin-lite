@@ -150,6 +150,7 @@
     <ClCompile Include="..\..\Source\DSP\ThreeBandEQ.cpp"/>
     <ClCompile Include="..\..\Source\DSP\TransientShaper.cpp"/>
     <ClCompile Include="..\..\Source\Data\SampleLoader.cpp"/>
+    <ClCompile Include="..\..\Source\UI\RRLookAndFeel.cpp"/>
     <ClCompile Include="..\..\Source\Audio\RRSound.cpp"/>
     <ClCompile Include="..\..\Source\Audio\RRvoice.cpp"/>
     <ClCompile Include="..\..\Source\PluginProcessor.cpp"/>
@@ -3012,6 +3013,7 @@
     <ClInclude Include="..\..\Source\Parameters\RandomizationParams.h"/>
     <ClInclude Include="..\..\Source\Data\SampleLoader.h"/>
     <ClInclude Include="..\..\Source\Data\SampleSlot.h"/>
+    <ClInclude Include="..\..\Source\UI\RRLookAndFeel.h"/>
     <ClInclude Include="..\..\Source\Audio\MidiMapper.h"/>
     <ClInclude Include="..\..\Source\Audio\RRSound.h"/>
     <ClInclude Include="..\..\Source\Audio\RRvoice.h"/>

@@ -29,7 +29,11 @@
         <FILE id="djXge6" name="SampleLoader.h" compile="0" resource="0" file="Source/Data/SampleLoader.h"/>
         <FILE id="ZD14EG" name="SampleSlot.h" compile="0" resource="0" file="Source/Data/SampleSlot.h"/>
       </GROUP>
-      <GROUP id="{BE5F3C22-AB0D-49FF-90E9-8DCE18E735F3}" name="UI"/>
+      <GROUP id="{BE5F3C22-AB0D-49FF-90E9-8DCE18E735F3}" name="UI">
+        <FILE id="bwjEB7" name="RRLookAndFeel.cpp" compile="1" resource="0"
+              file="Source/UI/RRLookAndFeel.cpp"/>
+        <FILE id="mRcZLb" name="RRLookAndFeel.h" compile="0" resource="0" file="Source/UI/RRLookAndFeel.h"/>
+      </GROUP>
       <GROUP id="{A9D9CA2D-D0D8-EF05-31D9-D59CA0D4367D}" name="Audio">
         <FILE id="J7YTOR" name="MidiMapper.h" compile="0" resource="0" file="Source/Audio/MidiMapper.h"/>
         <FILE id="g4RxPy" name="RRSound.cpp" compile="1" resource="0" file="Source/Audio/RRSound.cpp"/>
