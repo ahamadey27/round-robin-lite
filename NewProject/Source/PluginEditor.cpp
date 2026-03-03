@@ -51,21 +51,21 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
     // Sample Load Button:
     loadSamplesButton.setButtonText("Load Samples");
     loadSamplesButton.onClick = [this]() { loadSamplesFromFiles(); };
-    contentComponent.addAndMakeVisible(loadSamplesButton);
+    addAndMakeVisible(loadSamplesButton);
 
     // User Presets
     savePresetButton.setButtonText("Save Preset");
     savePresetButton.onClick = [this]() { savePreset(); };
-    contentComponent.addAndMakeVisible(savePresetButton);
+    addAndMakeVisible(savePresetButton);
 
     loadPresetButton.setButtonText("Load Preset");
     loadPresetButton.onClick = [this]() { loadPreset(); };
-    contentComponent.addAndMakeVisible(loadPresetButton);
+    addAndMakeVisible(loadPresetButton);
 
     // Sample Info Label
     samplesInfoLabel.setText("No samples loaded", juce::dontSendNotification);
     samplesInfoLabel.setColour(juce::Label::textColourId, juce::Colours::white);
-    contentComponent.addAndMakeVisible(samplesInfoLabel);
+    addAndMakeVisible(samplesInfoLabel);
 
     // Playback button — OUTSIDE the loop
     playbackModeButton.setButtonText("Series");
@@ -75,7 +75,7 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
             bool isRandom = playbackModeButton.getToggleState();
             playbackModeButton.setButtonText(isRandom ? "Random" : "Series");
         };
-    contentComponent.addAndMakeVisible(playbackModeButton);
+    addAndMakeVisible(playbackModeButton);
 
     // Base sliders
     for (auto* s : { &semitoneSlider, &fineTuneSlider, &volumeSlider, &panSlider,
@@ -84,7 +84,7 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
                      &highGainSlider, &highFreqSlider,
                      &transientAttackSlider, &transientDecaySlider,
                      &envAttackSlider, &envDecaySlider })
-        setupSlider(*s);
+        setupKnob(*s);
 
     // Rnd sliders
     for (auto* s : { &semitoneRndNegSlider,  &semitoneRndPosSlider,
@@ -108,7 +108,7 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
     viewport.setScrollBarsShown(true, false);
     addAndMakeVisible(viewport);
 
-    setSize(700, 750);
+    setSize(700, 650);
     resized(); // force layout so contentComponent size is set
 }
 
@@ -120,6 +120,13 @@ void NewProjectAudioProcessorEditor::setupSlider(juce::Slider& s)
     s.setSliderStyle(juce::Slider::LinearHorizontal);
     s.setTextBoxStyle(juce::Slider::TextBoxRight, false, 55, 20);
     contentComponent.addAndMakeVisible(s);
+}
+
+void NewProjectAudioProcessorEditor::setupKnob(juce::Slider& s)
+{
+    s.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    s.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 65, 16);
+    addAndMakeVisible(s);   // directly on editor, NOT contentComponent
 }
 
 //==============================================================================
@@ -212,94 +219,177 @@ void NewProjectAudioProcessorEditor::loadPreset()
 //==============================================================================
 void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
 {
-    g.fillAll(juce::Colours::darkgrey);
+    //==========================================================================
+    // Background
+    g.fillAll(juce::Colour(28, 28, 33));
+
+    //==========================================================================
+    // Layout constants — must match resized() exactly
+    constexpr int margin = 20;
+    constexpr int knobW = 85;
+    constexpr int knobH = 100;
+    constexpr int knobGap = 10;
+    constexpr int sectGap = 35;
+    constexpr int row1Y = 100;
+    constexpr int row2Y = 233;
+    constexpr int row3Y = 366;
+    constexpr int eqStep = (700 - 2 * margin - 6 * knobW) / 5;
+
+    // Section x positions (matching resized)
+    const int pitchX = margin;
+    const int ampX = pitchX + 2 * (knobW + knobGap) + sectGap;
+    const int envX = ampX + 2 * (knobW + knobGap) + sectGap;
+    const int transX = margin;
+
+    //==========================================================================
+    // Helpers
+    auto drawSectionLabel = [&](int x, int y, const juce::String& text, juce::Colour col)
+        {
+            g.setColour(col);
+            g.setFont(juce::Font(10.5f).boldened());
+            g.drawText(text, x, y, 160, 14, juce::Justification::left);
+        };
+
+    auto drawKnobLabel = [&](int x, int knobY, const juce::String& text)
+        {
+            g.setColour(juce::Colour(180, 180, 195));
+            g.setFont(juce::Font(10.0f));
+            g.drawText(text, x, knobY - 15, knobW, 13, juce::Justification::centred);
+        };
+
+    auto drawDivider = [&](int y)
+        {
+            g.setColour(juce::Colour(55, 55, 65));
+            g.fillRect(margin, y, getWidth() - 2 * margin, 1);
+        };
+
+    //==========================================================================
+    // Plugin header bar
+    g.setColour(juce::Colour(40, 40, 48));
+    g.fillRect(0, 0, getWidth(), 82);
+    g.setColour(juce::Colour(100, 180, 255));
+    g.setFont(juce::Font(13.0f).boldened());
+    g.drawText("ROUND ROBIN LITE", getWidth() - 170, 10, 150, 20, juce::Justification::right);
+
+    //==========================================================================
+    // ROW 1 — PITCH
+    drawSectionLabel(pitchX, row1Y - 16, "PITCH", juce::Colour(100, 180, 255));
+    drawKnobLabel(pitchX, row1Y, "Semitone");
+    drawKnobLabel(pitchX + knobW + knobGap, row1Y, "Fine Tune");
+
+    // ROW 1 — AMPLITUDE
+    drawSectionLabel(ampX, row1Y - 16, "AMPLITUDE", juce::Colour(100, 210, 140));
+    drawKnobLabel(ampX, row1Y, "Volume");
+    drawKnobLabel(ampX + knobW + knobGap, row1Y, "Pan");
+
+    // ROW 1 — ENVELOPE
+    drawSectionLabel(envX, row1Y - 16, "ENVELOPE", juce::Colour(210, 170, 90));
+    drawKnobLabel(envX, row1Y, "Atk");
+    drawKnobLabel(envX + knobW + knobGap, row1Y, "Dec");
+
+    drawDivider(row1Y + knobH + 6);
+
+    //==========================================================================
+    // ROW 2 — TRANSIENT
+    drawSectionLabel(transX, row2Y - 16, "TRANSIENT", juce::Colour(220, 110, 110));
+    drawKnobLabel(transX, row2Y, "Attack");
+    drawKnobLabel(transX + knobW + knobGap, row2Y, "Decay");
+
+    drawDivider(row2Y + knobH + 6);
+
+    //==========================================================================
+    // ROW 3 — EQ
+    drawSectionLabel(margin, row3Y - 16, "3-BAND EQ", juce::Colour(170, 120, 220));
+    const char* eqLabels[] = { "Lo Gain", "Lo Freq", "Mid Gain", "Mid Freq", "Hi Gain", "Hi Freq" };
+    for (int i = 0; i < 6; ++i)
+        drawKnobLabel(margin + i * (knobW + eqStep), row3Y, eqLabels[i]);
+
+    drawDivider(row3Y + knobH + 6);
+
+    //==========================================================================
+    // RANDOMIZATION header
+    constexpr int rndHeaderY = 478;
+    g.setColour(juce::Colour(140, 140, 155));
+    g.setFont(juce::Font(10.5f).boldened());
+    g.drawText("RANDOMIZATION  —  Neg / Pos per parameter",
+        margin, rndHeaderY, 400, 14, juce::Justification::left);
 }
 
 //==============================================================================
 void NewProjectAudioProcessorEditor::resized()
 {
-    viewport.setBounds(getLocalBounds());
-
-    const int margin = 10;
-    const int rowH = 24;
-    const int gap = 34;
-    const int labelW = 110;
-    const int contentW = 665;
+    //==========================================================================
+    constexpr int margin = 20;
+    constexpr int btnH = 28;
+    constexpr int knobW = 85;
+    constexpr int knobH = 100;
+    constexpr int knobGap = 10;   // gap between knobs within a section
+    constexpr int sectGap = 35;   // gap between sections
 
     //==========================================================================
-    // Calculate total content height upfront
-    // Slots: 5 rows * 35px = 175 + margin
-    // Section header: 30px each
-    // Base params: 14 rows * gap
-    // Rnd params: 12 rows * gap
-    const int slotsHeight = 38 + 38 + 38 + 10;
-    const int baseHeight = 30 + 14 * gap;
-    const int rndHeight = 30 + 14 * gap;
-    const int totalH = margin + slotsHeight + baseHeight + rndHeight + 20;
-    contentComponent.setSize(contentW, totalH);
+    // BUTTON ROW 1: Load Samples + info label
+    loadSamplesButton.setBounds(margin, 10, 140, btnH);
+    samplesInfoLabel.setBounds(margin + 150, 10, 320, btnH);
 
-    int y = margin;
+    // BUTTON ROW 2: Save / Load preset / playback mode
+    savePresetButton.setBounds(margin, 46, 110, btnH);
+    loadPresetButton.setBounds(margin + 120, 46, 110, btnH);
+    playbackModeButton.setBounds(margin + 250, 46, 130, btnH);
 
     //==========================================================================
-    // LOAD BUTTON / PLAYBACK TOGGLE / Load/Save User Presets
-    {
-        loadSamplesButton.setBounds(margin, y, 140, 28);
-        samplesInfoLabel.setBounds(margin + 150, y, 300, 28);
-        y += 38;
+    // KNOB ROW 1: PITCH | AMPLITUDE | ENVELOPE  (y = 100)
+    constexpr int row1Y = 100;
 
-        savePresetButton.setBounds(margin, y, 120, 28);         // ← ADD
-        loadPresetButton.setBounds(margin + 130, y, 120, 28);   // ← ADD
-        y += 38;                                                // ← ADD
+    const int pitchX = margin;
+    semitoneSlider.setBounds(pitchX, row1Y, knobW, knobH);
+    fineTuneSlider.setBounds(pitchX + knobW + knobGap, row1Y, knobW, knobH);
 
-        playbackModeButton.setBounds(margin, y, 120, 28);
-        y += 38;
-        
-    }
+    const int ampX = pitchX + 2 * (knobW + knobGap) + sectGap;  // 225
+    volumeSlider.setBounds(ampX, row1Y, knobW, knobH);
+    panSlider.setBounds(ampX + knobW + knobGap, row1Y, knobW, knobH);
+
+    const int envX = ampX + 2 * (knobW + knobGap) + sectGap;    // 430
+    envAttackSlider.setBounds(envX, row1Y, knobW, knobH);
+    envDecaySlider.setBounds(envX + knobW + knobGap, row1Y, knobW, knobH);
 
     //==========================================================================
-    // BASE PARAMETERS
-    const int sliderW = contentW - labelW - margin * 2;
+    // KNOB ROW 2: TRANSIENT  (y = 233)
+    constexpr int row2Y = 233;
 
-    // Record y positions for labels BEFORE advancing y
+    const int transX = margin;
+    transientAttackSlider.setBounds(transX, row2Y, knobW, knobH);
+    transientDecaySlider.setBounds(transX + knobW + knobGap, row2Y, knobW, knobH);
+
+    //==========================================================================
+    // KNOB ROW 3: EQ  (y = 366)
+    constexpr int row3Y = 366;
+    constexpr int eqStep = (700 - 2 * margin - 6 * knobW) / 5;  // = 30px spacing
+
+    lowGainSlider.setBounds(margin + 0 * (knobW + eqStep), row3Y, knobW, knobH);
+    lowFreqSlider.setBounds(margin + 1 * (knobW + eqStep), row3Y, knobW, knobH);
+    midGainSlider.setBounds(margin + 2 * (knobW + eqStep), row3Y, knobW, knobH);
+    midFreqSlider.setBounds(margin + 3 * (knobW + eqStep), row3Y, knobW, knobH);
+    highGainSlider.setBounds(margin + 4 * (knobW + eqStep), row3Y, knobW, knobH);
+    highFreqSlider.setBounds(margin + 5 * (knobW + eqStep), row3Y, knobW, knobH);
+
+    //==========================================================================
+    // RANDOMIZATION — scrollable contentComponent inside viewport
+    constexpr int rndViewportY = 498;
+    const     int contentW = getWidth() - 2 * margin;
+    constexpr int labelW = 120;
+    constexpr int rowH = 20;
+    constexpr int rowGap = 26;
+    const     int halfW = (contentW - labelW - 5) / 2;
+
     contentComponent.labelPositions.clear();
-
-    y += 30; // section header gap
-
-    // Helper lambda — records label position then places slider
-    auto addRow = [&](juce::Slider& s, const juce::String& name)
-        {
-            contentComponent.labelPositions.push_back({ y, name });
-            s.setBounds(margin + labelW, y, sliderW, rowH);
-            y += gap;
-        };
-
-    addRow(semitoneSlider, "Semitone");
-    addRow(fineTuneSlider, "Fine Tune");
-    addRow(volumeSlider, "Volume");
-    addRow(panSlider, "Pan");
-    addRow(lowGainSlider, "EQ Low Gain");
-    addRow(lowFreqSlider, "EQ Low Freq");
-    addRow(midGainSlider, "EQ Mid Gain");
-    addRow(midFreqSlider, "EQ Mid Freq");
-    addRow(highGainSlider, "EQ High Gain");
-    addRow(highFreqSlider, "EQ High Freq");
-    addRow(transientAttackSlider, "Trans Attack");
-    addRow(transientDecaySlider, "Trans Decay");
-    addRow(envAttackSlider, "Env Attack");
-    addRow(envDecaySlider, "Env Decay");
-
-    //==========================================================================
-    // RANDOMIZATION PARAMETERS — neg and pos side by side
-    const int halfW = (sliderW - 5) / 2;
-
-    y += 30; // section header gap
+    int cy = 4;
 
     auto addRndRow = [&](juce::Slider& neg, juce::Slider& pos, const juce::String& name)
         {
-            contentComponent.labelPositions.push_back({ y, name });
-            neg.setBounds(margin + labelW, y, halfW, rowH);
-            pos.setBounds(margin + labelW + halfW + 5, y, halfW, rowH);
-            y += gap;
+            contentComponent.labelPositions.push_back({ cy, name });
+            neg.setBounds(labelW, cy, halfW, rowH);
+            pos.setBounds(labelW + halfW + 5, cy, halfW, rowH);
+            cy += rowGap;
         };
 
     addRndRow(semitoneRndNegSlider, semitoneRndPosSlider, "Semitone Rnd");
@@ -316,6 +406,9 @@ void NewProjectAudioProcessorEditor::resized()
     addRndRow(transDecRndNegSlider, transDecRndPosSlider, "Trans Dec Rnd");
     addRndRow(envAtkRndNegSlider, envAtkRndPosSlider, "Env Atk Rnd");
     addRndRow(envDecRndNegSlider, envDecRndPosSlider, "Env Dec Rnd");
+
+    contentComponent.setSize(contentW, cy + 4);
+    viewport.setBounds(margin, rndViewportY, contentW, getHeight() - rndViewportY - 10);
 
     contentComponent.repaint();
 }
