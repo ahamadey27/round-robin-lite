@@ -772,19 +772,19 @@ if (!loadedSampleIndices.empty())
 - [x] Test with only 1 sample loaded
 
 ### Step 7: Add Sample Persistence (Save/Load with Project State)
-- [ ] In getStateInformation():
-  - [ ] Create "SampleData" ValueTree node
-  - [ ] For each loaded sample slot, create child node
-  - [ ] Store file path (consider relative vs absolute paths)
-  - [ ] Store display name
-  - [ ] Append SampleData node to main state tree
-- [ ] In setStateInformation():
-  - [ ] Find and parse "SampleData" node
-  - [ ] For each stored sample entry:
-    - [ ] Check if file still exists at stored path
-    - [ ] Attempt to reload sample from file
-    - [ ] Restore display name
-    - [ ] Show warning message if file is missing
+- [x] In getStateInformation():
+  - [x] Create "SampleData" ValueTree node
+  - [x] For each loaded sample slot, create child node
+  - [x] Store file path (consider relative vs absolute paths)
+  - [x] Store display name
+  - [x] Append SampleData node to main state tree
+- [x] In setStateInformation():
+  - [x] Find and parse "SampleData" node
+  - [x] For each stored sample entry:
+    - [x] Check if file still exists at stored path
+    - [x] Attempt to reload sample from file
+    - [x] Restore display name
+    - [x] Show warning message if file is missing
 - [ ] Consider option to embed samples as Base64 in project (increases file size)
 - [ ] Implement "Missing Samples" dialog on project load if files not found
 
