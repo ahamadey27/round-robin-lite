@@ -358,9 +358,7 @@ void NewProjectAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
 
     juce::ValueTree customData("CustomData");
     customData.setProperty("version", 1, nullptr);
-    juce::ValueTree customData("CustomData");
-    customData.setProperty("version", 1, nullptr);
-
+    
     // ADD: save sample file paths
     juce::ValueTree sampleData("SampleData");
     for (int i = 0; i < NUM_SAMPLE_SLOTS; ++i)
