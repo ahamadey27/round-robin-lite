@@ -472,11 +472,10 @@ void NewProjectAudioProcessor::setStateInformation(const void* data, int sizeInB
         }
 
     }
-    
-
     DBG("State loaded successfully");
     DBG("  Parameters restored: " + juce::String(apvts.state.getNumChildren()));
     DBG("========================");
+
 }
 
 //==============================================================================
