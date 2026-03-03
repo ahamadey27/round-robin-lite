@@ -785,15 +785,33 @@ if (!loadedSampleIndices.empty())
     - [x] Attempt to reload sample from file
     - [x] Restore display name
     - [x] Show warning message if file is missing
-- [ ] Consider option to embed samples as Base64 in project (increases file size)
-- [ ] Implement "Missing Samples" dialog on project load if files not found
+- [x] Consider option to embed samples as Base64 in project (increases file size)
+- [x] Implement "Missing Samples" dialog on project load if files not found
 
 **Quick Test After Step 7:**
-- [ ] Load samples
-- [ ] Save DAW project
-- [ ] Close and reopen project
-- [ ] Verify all samples reload correctly
-- [ ] Move a sample file, reload project - verify missing file warning
+- [x] Load samples
+- [x] Save DAW project
+- [x] Close and reopen project
+- [x] Verify all samples reload correctly
+- [x] Move a sample file, reload project - verify missing file warning
+
+### Step 7.1: User Preset Save/Load System
+- [x] Add "Save Preset" button to UI
+- [x] Add "Load Preset" button to UI
+- [x] In PluginProcessor, add savePreset() method:
+  - [x] Reuse getStateInformation() XML logic
+  - [x] Write XML to user-chosen .rrpreset file
+- [x] In PluginProcessor, add loadPreset() method:
+  - [x] Read .rrpreset file and parse XML
+  - [x] Reuse setStateInformation() restore logic
+- [x] Handle missing sample paths on preset load (reuse existing dialog)
+
+**Quick Test After Step 7.1:**
+- [x] Set parameters, load samples, click Save Preset
+- [x] Change all parameters and reload samples
+- [x] Click Load Preset — verify full state restores
+- [x] Move a sample file, load preset — verify missing samples dialog appears
+- [x] Load preset on fresh plugin instance — verify everything restores
 
 ### Step 8: Test Complete Sample Management System
 - [ ] Prepare 10 diverse test WAV files (different lengths, sample rates)
