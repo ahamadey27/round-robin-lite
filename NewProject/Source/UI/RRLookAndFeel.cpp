@@ -1,83 +1,91 @@
 #include "RRLookAndFeel.h"
 
-RRLookAndFeel::RRLookAndFeel()
+//==============================================================================
+void RRKnobLAF::drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height,
+    float sliderPos, float rotaryStartAngle, float rotaryEndAngle, juce::Slider&)
 {
-    setColour(juce::Slider::textBoxTextColourId, RRColors::labelText);
-    setColour(juce::Slider::textBoxBackgroundColourId, RRColors::valueBox);
-    setColour(juce::Slider::textBoxOutlineColourId, RRColors::arcTrack);
-    setColour(juce::Label::textColourId, RRColors::labelText);
-}
-
-void RRLookAndFeel::drawRotarySlider(juce::Graphics& g,
-    int x, int y, int width, int height,
-    float sliderPos,
-    float rotaryStartAngle, float rotaryEndAngle,
-    juce::Slider& slider)
-{
-    const float radius = (float)juce::jmin(width / 2, height / 2) - 6.0f;
-    const float centreX = (float)x + (float)width * 0.5f;
-    const float centreY = (float)y + (float)height * 0.5f;
+    const float radius = juce::jmin(width, height) * 0.5f - 4.0f;
+    const float cx = x + width * 0.5f;
+    const float cy = y + height * 0.5f;
     const float angle = rotaryStartAngle + sliderPos * (rotaryEndAngle - rotaryStartAngle);
-    const float thickness = 0.25f;
 
-    // --- Background track arc ---
-    {
-        juce::Path track;
-        track.addArc(centreX - radius, centreY - radius,
-            radius * 2.0f, radius * 2.0f,
-            rotaryStartAngle, rotaryEndAngle, true);
-        g.setColour(RRColors::arcTrack);
-        g.strokePath(track, juce::PathStrokeType(radius * thickness));
-    }
+    // Full arc track (dark)
+    juce::Path track;
+    track.addArc(cx - radius, cy - radius, radius * 2.0f, radius * 2.0f,
+        rotaryStartAngle, rotaryEndAngle, true);
+    g.setColour(juce::Colour(55, 55, 65));
+    g.strokePath(track, juce::PathStrokeType(3.5f,
+        juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
 
-    // --- Negative arc (blue, left of center) ---
-    {
-        juce::Path negArc;
-        const float midAngle = rotaryStartAngle + (rotaryEndAngle - rotaryStartAngle) * 0.5f;
-        if (angle < midAngle)
-        {
-            negArc.addArc(centreX - radius, centreY - radius,
-                radius * 2.0f, radius * 2.0f,
-                angle, midAngle, true);
-            g.setColour(RRColors::arcNeg);
-            g.strokePath(negArc, juce::PathStrokeType(radius * thickness));
-        }
-    }
+    // Value arc (blue)
+    juce::Path valueArc;
+    valueArc.addArc(cx - radius, cy - radius, radius * 2.0f, radius * 2.0f,
+        rotaryStartAngle, angle, true);
+    g.setColour(juce::Colour(100, 180, 255));
+    g.strokePath(valueArc, juce::PathStrokeType(3.5f,
+        juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
 
-    // --- Positive arc (red, right of center) ---
-    {
-        juce::Path posArc;
-        const float midAngle = rotaryStartAngle + (rotaryEndAngle - rotaryStartAngle) * 0.5f;
-        if (angle > midAngle)
-        {
-            posArc.addArc(centreX - radius, centreY - radius,
-                radius * 2.0f, radius * 2.0f,
-                midAngle, angle, true);
-            g.setColour(RRColors::arcPos);
-            g.strokePath(posArc, juce::PathStrokeType(radius * thickness));
-        }
-    }
+    // Knob body
+    const float bodyR = radius - 6.0f;
+    g.setColour(juce::Colour(52, 52, 62));
+    g.fillEllipse(cx - bodyR, cy - bodyR, bodyR * 2.0f, bodyR * 2.0f);
+    g.setColour(juce::Colour(78, 78, 92));
+    g.drawEllipse(cx - bodyR, cy - bodyR, bodyR * 2.0f, bodyR * 2.0f, 1.0f);
 
-    // --- Knob body ---
-    const float bodyRadius = radius * 0.65f;
-    g.setColour(RRColors::knobBody);
-    g.fillEllipse(centreX - bodyRadius, centreY - bodyRadius,
-        bodyRadius * 2.0f, bodyRadius * 2.0f);
-
-    // --- Pointer line ---
-    juce::Path pointer;
-    const float pointerLength = bodyRadius * 0.6f;
-    const float pointerThickness = 2.5f;
-    pointer.addRectangle(-pointerThickness * 0.5f, -bodyRadius, pointerThickness, pointerLength);
-    pointer.applyTransform(juce::AffineTransform::rotation(angle).translated(centreX, centreY));
-    g.setColour(RRColors::labelText);
-    g.fillPath(pointer);
+    // Indicator line (center → edge)
+    const float innerR = bodyR * 0.2f;
+    const float outerR = bodyR * 0.82f;
+    g.setColour(juce::Colours::white);
+    g.drawLine(cx + std::sin(angle) * innerR, cy - std::cos(angle) * innerR,
+        cx + std::sin(angle) * outerR, cy - std::cos(angle) * outerR,
+        2.2f);
 }
 
-void RRLookAndFeel::drawLabel(juce::Graphics& g, juce::Label& label)
+//==============================================================================
+static void drawRndSlider(juce::Graphics& g, int x, int y, int width, int height,
+    float sliderPos, bool isNeg)
 {
-    g.setColour(RRColors::labelText);
-    g.setFont(juce::Font(11.0f).boldened());
-    g.drawFittedText(label.getText(), label.getLocalBounds(),
-        label.getJustificationType(), 1);
+    const float trackY = y + height * 0.5f;
+    const float trackH = 3.5f;
+    const float thumbR = 6.0f;
+
+    // Track background
+    g.setColour(juce::Colour(38, 38, 48));
+    g.fillRoundedRectangle((float)x, trackY - trackH * 0.5f, (float)width, trackH, 2.0f);
+
+    // Fill
+    if (isNeg)
+    {
+        // Neg: fill from thumb rightward (shows how much negative range is set)
+        g.setColour(juce::Colour(140, 35, 35));
+        g.fillRoundedRectangle(sliderPos, trackY - trackH * 0.5f,
+            (float)(x + width) - sliderPos, trackH, 2.0f);
+    }
+    else
+    {
+        // Pos: fill from left to thumb
+        g.setColour(juce::Colour(35, 75, 165));
+        g.fillRoundedRectangle((float)x, trackY - trackH * 0.5f,
+            sliderPos - (float)x, trackH, 2.0f);
+    }
+
+    // Thumb ball
+    const juce::Colour thumbCol = isNeg ? juce::Colour(210, 65, 65)
+        : juce::Colour(65, 135, 235);
+    g.setColour(thumbCol);
+    g.fillEllipse(sliderPos - thumbR, trackY - thumbR, thumbR * 2.0f, thumbR * 2.0f);
+    g.setColour(juce::Colours::white.withAlpha(0.35f));
+    g.drawEllipse(sliderPos - thumbR, trackY - thumbR, thumbR * 2.0f, thumbR * 2.0f, 1.0f);
+}
+
+void RRNegSliderLAF::drawLinearSlider(juce::Graphics& g, int x, int y, int width, int height,
+    float sliderPos, float, float, juce::Slider::SliderStyle, juce::Slider&)
+{
+    drawRndSlider(g, x, y, width, height, sliderPos, true);
+}
+
+void RRPosSliderLAF::drawLinearSlider(juce::Graphics& g, int x, int y, int width, int height,
+    float sliderPos, float, float, juce::Slider::SliderStyle, juce::Slider&)
+{
+    drawRndSlider(g, x, y, width, height, sliderPos, false);
 }

@@ -2,6 +2,7 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "Parameters/ParametersIDs.h"
+#include "UI/RRLookAndFeel.h"  
 
 //= ============================================================================ =
 class LabelledContent : public juce::Component
@@ -29,25 +30,31 @@ public:
 
 private:
     NewProjectAudioProcessor& audioProcessor;
-    using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
 
-    //==========================================================================
-    // Viewport for scrolling
-    juce::Viewport viewport;
+    using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
+    using ButtonAttachment = juce::AudioProcessorValueTreeState::ButtonAttachment;
+
+    // LAFs first — destroyed last (sliders must be gone before LAFs)
+    RRKnobLAF      knobLAF;
+    RRNegSliderLAF negSliderLAF;
+    RRPosSliderLAF posSliderLAF;
+
+    // Viewport
+    juce::Viewport  viewport;
     LabelledContent contentComponent;
 
-    //==========================================================================
-    // Sample slot load button, save/load preset/playback mode
+    // Buttons & labels
     juce::TextButton loadSamplesButton;
-    juce::TextButton savePresetButton;   
-    juce::TextButton loadPresetButton;   
-    juce::Label samplesInfoLabel;
+    juce::TextButton savePresetButton;
+    juce::TextButton loadPresetButton;
     juce::TextButton playbackModeButton;
-    juce::AudioProcessorValueTreeState::ButtonAttachment playbackModeAttachment;
+    juce::Label      samplesInfoLabel;
     std::unique_ptr<juce::FileChooser> fileChooser;
 
-    //==========================================================================
-    // Base parameter sliders — declared BEFORE attachments
+    // Button attachment (after its button)
+    ButtonAttachment playbackModeAttachment;
+
+    // Main sliders — before their attachments
     juce::Slider semitoneSlider, fineTuneSlider;
     juce::Slider volumeSlider, panSlider;
     juce::Slider lowGainSlider, lowFreqSlider;
@@ -56,7 +63,7 @@ private:
     juce::Slider transientAttackSlider, transientDecaySlider;
     juce::Slider envAttackSlider, envDecaySlider;
 
-    // Attachments AFTER their sliders (destroyed before sliders — required by JUCE)
+    // Main attachments — after their sliders
     SliderAttachment semitoneAttachment, fineTuneAttachment;
     SliderAttachment volumeAttachment, panAttachment;
     SliderAttachment lowGainAttachment, lowFreqAttachment;
@@ -65,8 +72,7 @@ private:
     SliderAttachment transientAttackAttachment, transientDecayAttachment;
     SliderAttachment envAttackAttachment, envDecayAttachment;
 
-    //==========================================================================
-    // Randomization sliders — declared BEFORE attachments
+    // Rnd sliders — before their attachments
     juce::Slider semitoneRndNegSlider, semitoneRndPosSlider;
     juce::Slider fineTuneRndNegSlider, fineTuneRndPosSlider;
     juce::Slider volumeRndNegSlider, volumeRndPosSlider;
@@ -81,9 +87,8 @@ private:
     juce::Slider transDecRndNegSlider, transDecRndPosSlider;
     juce::Slider envAtkRndNegSlider, envAtkRndPosSlider;
     juce::Slider envDecRndNegSlider, envDecRndPosSlider;
-   
 
-    // Attachments AFTER their sliders
+    // Rnd attachments — after their sliders
     SliderAttachment semitoneRndNegAttachment, semitoneRndPosAttachment;
     SliderAttachment fineTuneRndNegAttachment, fineTuneRndPosAttachment;
     SliderAttachment volumeRndNegAttachment, volumeRndPosAttachment;
@@ -96,16 +101,16 @@ private:
     SliderAttachment highFreqRndNegAttachment, highFreqRndPosAttachment;
     SliderAttachment transAtkRndNegAttachment, transAtkRndPosAttachment;
     SliderAttachment transDecRndNegAttachment, transDecRndPosAttachment;
-    SliderAttachment envAtkRndNegAttachment, envAtkRndPosAttachment,
-        envDecRndNegAttachment, envDecRndPosAttachment;
+    SliderAttachment envAtkRndNegAttachment, envAtkRndPosAttachment;
+    SliderAttachment envDecRndNegAttachment, envDecRndPosAttachment;
 
-    //==========================================================================
+    // Helpers
     void setupSlider(juce::Slider& s);
     void setupKnob(juce::Slider& s);
     void loadSamplesFromFiles();
     void updateSamplesInfo();
-    void savePreset();           
-    void loadPreset();           
+    void savePreset();
+    void loadPreset();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NewProjectAudioProcessorEditor)
 };

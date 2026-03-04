@@ -1,5 +1,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+//#include "UI/RRLookAndFeel.h"
+
 
 NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioProcessor& p)
     : AudioProcessorEditor(&p), audioProcessor(p),
@@ -108,11 +110,62 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
     viewport.setScrollBarsShown(true, false);
     addAndMakeVisible(viewport);
 
+    // Apply knob LAF to all main parameter sliders
+    for (auto* s : { &semitoneSlider, &fineTuneSlider, &volumeSlider, &panSlider,
+                     &lowGainSlider, &lowFreqSlider, &midGainSlider, &midFreqSlider,
+                     &highGainSlider, &highFreqSlider,
+                     &transientAttackSlider, &transientDecaySlider,
+                     &envAttackSlider, &envDecaySlider })
+        s->setLookAndFeel(&knobLAF);
+
+    // Apply neg/pos LAFs to randomization sliders
+    for (auto* s : { &semitoneRndNegSlider, &fineTuneRndNegSlider,
+                     &volumeRndNegSlider,   &panRndNegSlider,
+                     &lowGainRndNegSlider,  &lowFreqRndNegSlider,
+                     &midGainRndNegSlider,  &midFreqRndNegSlider,
+                     &highGainRndNegSlider, &highFreqRndNegSlider,
+                     &transAtkRndNegSlider, &transDecRndNegSlider,
+                     &envAtkRndNegSlider,   &envDecRndNegSlider })
+        s->setLookAndFeel(&negSliderLAF);
+
+    for (auto* s : { &semitoneRndPosSlider, &fineTuneRndPosSlider,
+                     &volumeRndPosSlider,   &panRndPosSlider,
+                     &lowGainRndPosSlider,  &lowFreqRndPosSlider,
+                     &midGainRndPosSlider,  &midFreqRndPosSlider,
+                     &highGainRndPosSlider, &highFreqRndPosSlider,
+                     &transAtkRndPosSlider, &transDecRndPosSlider,
+                     &envAtkRndPosSlider,   &envDecRndPosSlider })
+        s->setLookAndFeel(&posSliderLAF);
+
     setSize(700, 650);
     resized(); // force layout so contentComponent size is set
 }
 
-NewProjectAudioProcessorEditor::~NewProjectAudioProcessorEditor() {}
+    NewProjectAudioProcessorEditor::~NewProjectAudioProcessorEditor()
+    {
+        for (auto* s : { &semitoneSlider, &fineTuneSlider, &volumeSlider, &panSlider,
+                         &lowGainSlider, &lowFreqSlider, &midGainSlider, &midFreqSlider,
+                         &highGainSlider, &highFreqSlider,
+                         &transientAttackSlider, &transientDecaySlider,
+                         &envAttackSlider, &envDecaySlider })
+            s->setLookAndFeel(nullptr);
+
+        for (auto* s : { &semitoneRndNegSlider, &fineTuneRndNegSlider,
+                         &volumeRndNegSlider,   &panRndNegSlider,
+                         &lowGainRndNegSlider,  &lowFreqRndNegSlider,
+                         &midGainRndNegSlider,  &midFreqRndNegSlider,
+                         &highGainRndNegSlider, &highFreqRndNegSlider,
+                         &transAtkRndNegSlider, &transDecRndNegSlider,
+                         &envAtkRndNegSlider,   &envDecRndNegSlider,
+                         &semitoneRndPosSlider, &fineTuneRndPosSlider,
+                         &volumeRndPosSlider,   &panRndPosSlider,
+                         &lowGainRndPosSlider,  &lowFreqRndPosSlider,
+                         &midGainRndPosSlider,  &midFreqRndPosSlider,
+                         &highGainRndPosSlider, &highFreqRndPosSlider,
+                         &transAtkRndPosSlider, &transDecRndPosSlider,
+                         &envAtkRndPosSlider,   &envDecRndPosSlider })
+            s->setLookAndFeel(nullptr);
+    }
 
 //==============================================================================
 void NewProjectAudioProcessorEditor::setupSlider(juce::Slider& s)
@@ -230,9 +283,9 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
     constexpr int knobH = 100;
     constexpr int knobGap = 10;
     constexpr int sectGap = 35;
-    constexpr int row1Y = 100;
-    constexpr int row2Y = 233;
-    constexpr int row3Y = 366;
+    constexpr int row1Y = 110;
+    constexpr int row2Y = 250;
+    constexpr int row3Y = 390;
     constexpr int eqStep = (700 - 2 * margin - 6 * knobW) / 5;
 
     // Section x positions (matching resized)
@@ -273,17 +326,17 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
 
     //==========================================================================
     // ROW 1 — PITCH
-    drawSectionLabel(pitchX, row1Y - 16, "PITCH", juce::Colour(100, 180, 255));
+    drawSectionLabel(pitchX, row1Y - 30, "PITCH", juce::Colour(100, 180, 255));
     drawKnobLabel(pitchX, row1Y, "Semitone");
     drawKnobLabel(pitchX + knobW + knobGap, row1Y, "Fine Tune");
 
     // ROW 1 — AMPLITUDE
-    drawSectionLabel(ampX, row1Y - 16, "AMPLITUDE", juce::Colour(100, 210, 140));
+    drawSectionLabel(ampX, row1Y - 30, "AMPLITUDE", juce::Colour(100, 210, 140));
     drawKnobLabel(ampX, row1Y, "Volume");
     drawKnobLabel(ampX + knobW + knobGap, row1Y, "Pan");
 
     // ROW 1 — ENVELOPE
-    drawSectionLabel(envX, row1Y - 16, "ENVELOPE", juce::Colour(210, 170, 90));
+    drawSectionLabel(envX, row1Y - 30, "ENVELOPE", juce::Colour(210, 170, 90));
     drawKnobLabel(envX, row1Y, "Atk");
     drawKnobLabel(envX + knobW + knobGap, row1Y, "Dec");
 
@@ -291,7 +344,7 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
 
     //==========================================================================
     // ROW 2 — TRANSIENT
-    drawSectionLabel(transX, row2Y - 16, "TRANSIENT", juce::Colour(220, 110, 110));
+    drawSectionLabel(transX, row2Y - 30, "TRANSIENT", juce::Colour(220, 110, 110));
     drawKnobLabel(transX, row2Y, "Attack");
     drawKnobLabel(transX + knobW + knobGap, row2Y, "Decay");
 
@@ -299,8 +352,8 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
 
     //==========================================================================
     // ROW 3 — EQ
-    drawSectionLabel(margin, row3Y - 16, "3-BAND EQ", juce::Colour(170, 120, 220));
-    const char* eqLabels[] = { "Lo Gain", "Lo Freq", "Mid Gain", "Mid Freq", "Hi Gain", "Hi Freq" };
+    drawSectionLabel(margin, row3Y - 30, "3-BAND EQ", juce::Colour(170, 120, 220));
+    juce::StringArray eqLabels{ "Lo Gain", "Lo Freq", "Mid Gain", "Mid Freq", "Hi Gain", "Hi Freq" };
     for (int i = 0; i < 6; ++i)
         drawKnobLabel(margin + i * (knobW + eqStep), row3Y, eqLabels[i]);
 
@@ -308,7 +361,7 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
 
     //==========================================================================
     // RANDOMIZATION header
-    constexpr int rndHeaderY = 478;
+    constexpr int rndHeaderY = 500;
     g.setColour(juce::Colour(140, 140, 155));
     g.setFont(juce::Font(10.5f).boldened());
     g.drawText("RANDOMIZATION  -  Neg / Pos per parameter",
@@ -339,7 +392,7 @@ void NewProjectAudioProcessorEditor::resized()
 
     //==========================================================================
     // KNOB ROW 1: PITCH | AMPLITUDE | ENVELOPE  (y = 100)
-    constexpr int row1Y = 100;
+    constexpr int row1Y = 110;
 
     const int pitchX = margin;
     semitoneSlider.setBounds(pitchX, row1Y, knobW, knobH);
@@ -355,7 +408,7 @@ void NewProjectAudioProcessorEditor::resized()
 
     //==========================================================================
     // KNOB ROW 2: TRANSIENT  (y = 233)
-    constexpr int row2Y = 233;
+    constexpr int row2Y = 250;
 
     const int transX = margin;
     transientAttackSlider.setBounds(transX, row2Y, knobW, knobH);
@@ -363,7 +416,7 @@ void NewProjectAudioProcessorEditor::resized()
 
     //==========================================================================
     // KNOB ROW 3: EQ  (y = 366)
-    constexpr int row3Y = 366;
+    constexpr int row3Y = 390;
     constexpr int eqStep = (700 - 2 * margin - 6 * knobW) / 5;  // = 30px spacing
 
     lowGainSlider.setBounds(margin + 0 * (knobW + eqStep), row3Y, knobW, knobH);
@@ -375,7 +428,7 @@ void NewProjectAudioProcessorEditor::resized()
 
     //==========================================================================
     // RANDOMIZATION — scrollable contentComponent inside viewport
-    constexpr int rndViewportY = 498;
+    constexpr int rndViewportY = 520;
     const     int contentW = getWidth() - 2 * margin;
     constexpr int labelW = 120;
     constexpr int rowH = 20;
