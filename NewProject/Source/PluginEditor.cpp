@@ -110,27 +110,9 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
                      &envAttackSlider, &envDecaySlider })
         s->setLookAndFeel(&knobLAF);
 
-    // Apply neg LAF
-    for (auto* s : { &semitoneRndNegSlider, &fineTuneRndNegSlider,
-                     &volumeRndNegSlider,   &panRndNegSlider,
-                     &lowGainRndNegSlider,  &lowFreqRndNegSlider,
-                     &midGainRndNegSlider,  &midFreqRndNegSlider,
-                     &highGainRndNegSlider, &highFreqRndNegSlider,
-                     &transAtkRndNegSlider, &transDecRndNegSlider,
-                     &envAtkRndNegSlider,   &envDecRndNegSlider })
-        s->setLookAndFeel(&negSliderLAF);
-
-    // Apply pos LAF
-    for (auto* s : { &semitoneRndPosSlider, &fineTuneRndPosSlider,
-                     &volumeRndPosSlider,   &panRndPosSlider,
-                     &lowGainRndPosSlider,  &lowFreqRndPosSlider,
-                     &midGainRndPosSlider,  &midFreqRndPosSlider,
-                     &highGainRndPosSlider, &highFreqRndPosSlider,
-                     &transAtkRndPosSlider, &transDecRndPosSlider,
-                     &envAtkRndPosSlider,   &envDecRndPosSlider })
-        s->setLookAndFeel(&posSliderLAF);
-
     setSize(700, 520);
+    // Overlay must be added AFTER all knobs so it sits on top
+    addAndMakeVisible(arcOverlay);
     resized();
 }
 
@@ -346,16 +328,16 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
 //==============================================================================
 void NewProjectAudioProcessorEditor::paintOverChildren(juce::Graphics& g)
 {
-    // JUCE addArc convention: 0 = 3 o'clock, increases clockwise.
-    // 12 o'clock = 3*pi/2
+    // JUCE addArc convention: 0 = 12 o'clock, clockwise positive.
+    // Point at angle A: x = cx + sin(A)*r,  y = cy - cos(A)*r
     constexpr float pi = juce::MathConstants<float>::pi;
-    constexpr float twelve = pi * 1.5f;         // 12 o'clock (top)
-    constexpr float maxNeg = pi;                 // CCW sweep: 12 -> 6 (left side)
-    constexpr float maxPos = pi * 2.0f / 3.0f;  // CW  sweep: 12 -> 4 (right side)
-    constexpr float trackW = 5.0f;               // dim background track thickness
-    constexpr float arcW = 6.0f;               // active arc thickness
-    constexpr float dotR = 5.0f;               // endpoint dot radius
-    constexpr int   textBoxH = 16;
+    constexpr float twoPi = juce::MathConstants<float>::twoPi;
+    constexpr float maxNeg = pi;                // CCW max: 12 -> 6 o'clock (left side)
+    constexpr float maxPos = pi * 2.0f / 3.0f; // CW  max: 12 -> 4 o'clock (right side)
+    constexpr float trackW = 5.0f;
+    constexpr float arcW = 6.5f;
+    constexpr float dotR = 5.5f;
+    constexpr int   tbH = 16; // text box height
 
     auto drawRndArcs = [&](juce::Slider& knob,
         juce::Slider& negSlider,
@@ -363,81 +345,76 @@ void NewProjectAudioProcessorEditor::paintOverChildren(juce::Graphics& g)
         {
             auto  b = knob.getBounds();
             float w = (float)b.getWidth();
-            float h = (float)(b.getHeight() - textBoxH);
+            float h = (float)(b.getHeight() - tbH);
             float cx = b.getX() + w * 0.5f;
             float cy = b.getY() + h * 0.5f;
             float radius = juce::jmin(w, h) * 0.5f - 1.0f;
 
-            auto getNorm = [](juce::Slider& s) -> float
-                {
-                    double range = s.getMaximum() - s.getMinimum();
-                    if (range == 0.0) return 0.0f;
-                    return (float)((s.getValue() - s.getMinimum()) / range);
+            auto getNorm = [](juce::Slider& s) -> float {
+                double range = s.getMaximum() - s.getMinimum();
+                if (range == 0.0) return 0.0f;
+                return (float)((s.getValue() - s.getMinimum()) / range);
                 };
 
             float negExtent = getNorm(negSlider) * maxNeg;
             float posExtent = getNorm(posSlider) * maxPos;
 
-            //----------------------------------------------------------------------
-            // Dim background tracks — always visible so user can see grab zones
-
-            // Neg track: CW from (12 - maxNeg) to 12  →  6 o'clock through 9 to 12
+            // Dim background tracks — always visible
+            // Neg track: CW from 6 o'clock (pi) to 12 o'clock (twoPi) via 9 o'clock
             juce::Path negTrack;
             negTrack.addArc(cx - radius, cy - radius, radius * 2.0f, radius * 2.0f,
-                twelve - maxNeg, twelve, true);
+                pi, twoPi, true);
             g.setColour(juce::Colour(40, 60, 100).withAlpha(0.55f));
             g.strokePath(negTrack, juce::PathStrokeType(trackW,
                 juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
 
-            // Pos track: CW from 12 to (12 + maxPos)  →  12 o'clock through 2 to 4
+            // Pos track: CW from 12 o'clock (0) to 4 o'clock (maxPos)
             juce::Path posTrack;
             posTrack.addArc(cx - radius, cy - radius, radius * 2.0f, radius * 2.0f,
-                twelve, twelve + maxPos, true);
+                0.0f, maxPos, true);
             g.setColour(juce::Colour(100, 30, 30).withAlpha(0.55f));
             g.strokePath(posTrack, juce::PathStrokeType(trackW,
                 juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
 
-            //----------------------------------------------------------------------
-            // Active filled arcs
-
+            // Active neg arc: CW from (twoPi - negExtent) to twoPi
             if (negExtent > 0.01f)
             {
                 juce::Path negArc;
                 negArc.addArc(cx - radius, cy - radius, radius * 2.0f, radius * 2.0f,
-                    twelve - negExtent, twelve, true);
+                    twoPi - negExtent, twoPi, true);
                 g.setColour(juce::Colour(65, 135, 235).withAlpha(0.9f));
                 g.strokePath(negArc, juce::PathStrokeType(arcW,
                     juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
             }
 
+            // Active pos arc: CW from 0 to posExtent
             if (posExtent > 0.01f)
             {
                 juce::Path posArc;
                 posArc.addArc(cx - radius, cy - radius, radius * 2.0f, radius * 2.0f,
-                    twelve, twelve + posExtent, true);
+                    0.0f, posExtent, true);
                 g.setColour(juce::Colour(210, 65, 65).withAlpha(0.9f));
                 g.strokePath(posArc, juce::PathStrokeType(arcW,
                     juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
             }
 
-            //----------------------------------------------------------------------
-            // Endpoint dots — always drawn so user knows where to grab
-            // Neg dot: sits at current neg arc end (or 12 o'clock if zero)
-            float negDotAngle = twelve - negExtent;
-            float posDotAngle = twelve + posExtent;
+            // Blue dot at neg arc endpoint — always drawn, this is the grab handle
+            // Angle in JUCE convention = twoPi - negExtent
+            // Point formula: x = cx + sin(A)*r,  y = cy - cos(A)*r
+            float negDotX = cx - std::sin(negExtent) * radius; // sin(twoPi-x) = -sin(x)
+            float negDotY = cy - std::cos(negExtent) * radius; // cos(twoPi-x) =  cos(x)
+            g.setColour(juce::Colour(65, 135, 235));
+            g.fillEllipse(negDotX - dotR, negDotY - dotR, dotR * 2.0f, dotR * 2.0f);
+            g.setColour(juce::Colours::white.withAlpha(0.45f));
+            g.drawEllipse(negDotX - dotR, negDotY - dotR, dotR * 2.0f, dotR * 2.0f, 1.0f);
 
-            auto drawDot = [&](float angle, juce::Colour col)
-                {
-                    float dx = cx + std::cos(angle) * radius;
-                    float dy = cy + std::sin(angle) * radius;
-                    g.setColour(col);
-                    g.fillEllipse(dx - dotR, dy - dotR, dotR * 2.0f, dotR * 2.0f);
-                    g.setColour(juce::Colours::white.withAlpha(0.5f));
-                    g.drawEllipse(dx - dotR, dy - dotR, dotR * 2.0f, dotR * 2.0f, 1.0f);
-                };
-
-            drawDot(negDotAngle, juce::Colour(65, 135, 235));
-            drawDot(posDotAngle, juce::Colour(210, 65, 65));
+            // Red dot at pos arc endpoint
+            float posDotX = cx + std::sin(posExtent) * radius;
+            float posDotY = cy - std::cos(posExtent) * radius;
+            g.setColour(juce::Colour(210, 65, 65));
+            g.fillEllipse(posDotX - dotR, posDotY - dotR, dotR * 2.0f, dotR * 2.0f);
+            g.setColour(juce::Colours::white.withAlpha(0.45f));
+            g.drawEllipse(posDotX - dotR, posDotY - dotR, dotR * 2.0f, dotR * 2.0f, 1.0f);
         };
 
     drawRndArcs(semitoneSlider, semitoneRndNegSlider, semitoneRndPosSlider);
@@ -456,135 +433,6 @@ void NewProjectAudioProcessorEditor::paintOverChildren(juce::Graphics& g)
     drawRndArcs(envDecaySlider, envDecRndNegSlider, envDecRndPosSlider);
 }
 
-//==============================================================================
-// Returns the rnd slider whose endpoint dot is nearest to pos (within hitRadius),
-// or nullptr if no dot is close enough.
-static juce::Slider* hitTestDot(const juce::Point<float> pos,
-    juce::Slider& knob,
-    juce::Slider& negSlider,
-    juce::Slider& posSlider)
-{
-    constexpr float pi = juce::MathConstants<float>::pi;
-    constexpr float twelve = pi * 1.5f;
-    constexpr float maxNeg = pi;
-    constexpr float maxPos = pi * 2.0f / 3.0f;
-    constexpr int   textBoxH = 16;
-    constexpr float hitR = 14.0f;   // generous hit radius around each dot
-
-    auto  b = knob.getBounds();
-    float w = (float)b.getWidth();
-    float h = (float)(b.getHeight() - textBoxH);
-    float cx = b.getX() + w * 0.5f;
-    float cy = b.getY() + h * 0.5f;
-    float radius = juce::jmin(w, h) * 0.5f - 1.0f;
-
-    auto getNorm = [](juce::Slider& s) -> float
-        {
-            double range = s.getMaximum() - s.getMinimum();
-            if (range == 0.0) return 0.0f;
-            return (float)((s.getValue() - s.getMinimum()) / range);
-        };
-
-    float negAngle = twelve - getNorm(negSlider) * maxNeg;
-    float posAngle = twelve + getNorm(posSlider) * maxPos;
-
-    auto dotPos = [&](float angle) -> juce::Point<float>
-        {
-            return { cx + std::cos(angle) * radius,
-                     cy + std::sin(angle) * radius };
-        };
-
-    if (pos.getDistanceFrom(dotPos(negAngle)) < hitR) return &negSlider;
-    if (pos.getDistanceFrom(dotPos(posAngle)) < hitR) return &posSlider;
-    return nullptr;
-}
-// Helper — finds which rnd slider the mouse is targeting on a given knob.
-// Returns &negSlider if on left arc zone, &posSlider if on right, nullptr if not on arc.
-static juce::Slider* hitTestArc(const juce::Point<float> pos,
-    juce::Slider& knob,
-    juce::Slider& negSlider,
-    juce::Slider& posSlider)
-{
-    constexpr int   textBoxH = 16;
-    constexpr float arcThick = 4.0f;
-
-    auto  b = knob.getBounds();
-    float w = (float)b.getWidth();
-    float h = (float)(b.getHeight() - textBoxH);
-    float cx = b.getX() + w * 0.5f;
-    float cy = b.getY() + h * 0.5f;
-    float radius = juce::jmin(w, h) * 0.5f - 1.0f;
-
-    float dx = pos.x - cx;
-    float dy = pos.y - cy;
-    float dist = std::sqrt(dx * dx + dy * dy);
-
-    // Only respond within the arc ring band
-    if (dist < radius - arcThick || dist > radius + arcThick)
-        return nullptr;
-
-    // Angle from 12 o'clock, positive CW
-    float angle = std::atan2(dx, -dy);   // atan2(x,-y) gives 0 at top
-
-    if (angle <= 0.0f)  return &negSlider;  // left of 12 = neg zone
-    else                return &posSlider;  // right of 12 = pos zone
-}
-
-void NewProjectAudioProcessorEditor::mouseDown(const juce::MouseEvent& e)
-{
-    activeRndSlider = nullptr;
-    auto pos = e.position;
-
-    struct Pair { juce::Slider* knob; juce::Slider* neg; juce::Slider* pos; };
-    Pair pairs[] = {
-        { &semitoneSlider,        &semitoneRndNegSlider,  &semitoneRndPosSlider  },
-        { &fineTuneSlider,        &fineTuneRndNegSlider,  &fineTuneRndPosSlider  },
-        { &volumeSlider,          &volumeRndNegSlider,    &volumeRndPosSlider    },
-        { &panSlider,             &panRndNegSlider,       &panRndPosSlider       },
-        { &lowGainSlider,         &lowGainRndNegSlider,   &lowGainRndPosSlider   },
-        { &lowFreqSlider,         &lowFreqRndNegSlider,   &lowFreqRndPosSlider   },
-        { &midGainSlider,         &midGainRndNegSlider,   &midGainRndPosSlider   },
-        { &midFreqSlider,         &midFreqRndNegSlider,   &midFreqRndPosSlider   },
-        { &highGainSlider,        &highGainRndNegSlider,  &highGainRndPosSlider  },
-        { &highFreqSlider,        &highFreqRndNegSlider,  &highFreqRndPosSlider  },
-        { &transientAttackSlider, &transAtkRndNegSlider,  &transAtkRndPosSlider  },
-        { &transientDecaySlider,  &transDecRndNegSlider,  &transDecRndPosSlider  },
-        { &envAttackSlider,       &envAtkRndNegSlider,    &envAtkRndPosSlider    },
-        { &envDecaySlider,        &envDecRndNegSlider,    &envDecRndPosSlider    },
-    };
-
-    for (auto& p : pairs)
-    {
-        auto* hit = hitTestDot(pos, *p.knob, *p.neg, *p.pos);
-        if (hit != nullptr)
-        {
-            activeRndSlider = hit;
-            arcDragStartY = pos.y;
-            arcDragStartVal = (float)hit->getValue();
-            break;
-        }
-    }
-}
-
-void NewProjectAudioProcessorEditor::mouseDrag(const juce::MouseEvent& e)
-{
-    if (activeRndSlider == nullptr) return;
-
-    // 150px drag = full range — feels natural
-    float delta = arcDragStartY - e.position.y;
-    float range = (float)(activeRndSlider->getMaximum() - activeRndSlider->getMinimum());
-    float newVal = arcDragStartVal + delta * (range / 150.0f);
-    newVal = juce::jlimit((float)activeRndSlider->getMinimum(),
-        (float)activeRndSlider->getMaximum(), newVal);
-    activeRndSlider->setValue(newVal, juce::sendNotificationAsync);
-    repaint();
-}
-
-
-void NewProjectAudioProcessorEditor::mouseUp(const juce::MouseEvent&)
-{
-    activeRndSlider = nullptr;
-}
 
 //==============================================================================
 void NewProjectAudioProcessorEditor::resized()
@@ -636,4 +484,141 @@ void NewProjectAudioProcessorEditor::resized()
     midFreqSlider.setBounds(margin + 3 * (knobW + eqStep), row3Y, knobW, knobH);
     highGainSlider.setBounds(margin + 4 * (knobW + eqStep), row3Y, knobW, knobH);
     highFreqSlider.setBounds(margin + 5 * (knobW + eqStep), row3Y, knobW, knobH);
+
+    arcOverlay.setBounds(getLocalBounds());
+}
+
+//==============================================================================
+// RndArcOverlay — transparent component sitting over all knobs.
+// hitTest returns true only near arc dots, so knobs still receive
+// normal mouse events everywhere else.
+
+static void getDotPositions(juce::Slider& knob,
+    juce::Slider& negSlider,
+    juce::Slider& posSlider,
+    juce::Point<float>& negPt,
+    juce::Point<float>& posPt)
+{
+    constexpr float pi = juce::MathConstants<float>::pi;
+    constexpr float maxNeg = pi;
+    constexpr float maxPos = pi * 2.0f / 3.0f;
+    constexpr int   tbH = 16;
+
+    auto b = knob.getBounds();
+    float w = (float)b.getWidth();
+    float h = (float)(b.getHeight() - tbH);
+    float cx = b.getX() + w * 0.5f;
+    float cy = b.getY() + h * 0.5f;
+    float radius = juce::jmin(w, h) * 0.5f - 1.0f;
+
+    auto getNorm = [](juce::Slider& s) -> float {
+        double range = s.getMaximum() - s.getMinimum();
+        if (range == 0.0) return 0.0f;
+        return (float)((s.getValue() - s.getMinimum()) / range);
+        };
+
+    float negExtent = getNorm(negSlider) * maxNeg;
+    float posExtent = getNorm(posSlider) * maxPos;
+
+    negPt = { cx - std::sin(negExtent) * radius,
+              cy - std::cos(negExtent) * radius };
+    posPt = { cx + std::sin(posExtent) * radius,
+              cy - std::cos(posExtent) * radius };
+}
+
+bool NewProjectAudioProcessorEditor::RndArcOverlay::hitTest(int x, int y)
+{
+    constexpr float hitR = 14.0f;
+    auto pos = juce::Point<float>((float)x, (float)y);
+
+    struct Trio { juce::Slider* k; juce::Slider* n; juce::Slider* p; };
+    Trio trios[] = {
+        { &editor.semitoneSlider,        &editor.semitoneRndNegSlider,  &editor.semitoneRndPosSlider  },
+        { &editor.fineTuneSlider,        &editor.fineTuneRndNegSlider,  &editor.fineTuneRndPosSlider  },
+        { &editor.volumeSlider,          &editor.volumeRndNegSlider,    &editor.volumeRndPosSlider    },
+        { &editor.panSlider,             &editor.panRndNegSlider,       &editor.panRndPosSlider       },
+        { &editor.lowGainSlider,         &editor.lowGainRndNegSlider,   &editor.lowGainRndPosSlider   },
+        { &editor.lowFreqSlider,         &editor.lowFreqRndNegSlider,   &editor.lowFreqRndPosSlider   },
+        { &editor.midGainSlider,         &editor.midGainRndNegSlider,   &editor.midGainRndPosSlider   },
+        { &editor.midFreqSlider,         &editor.midFreqRndNegSlider,   &editor.midFreqRndPosSlider   },
+        { &editor.highGainSlider,        &editor.highGainRndNegSlider,  &editor.highGainRndPosSlider  },
+        { &editor.highFreqSlider,        &editor.highFreqRndNegSlider,  &editor.highFreqRndPosSlider  },
+        { &editor.transientAttackSlider, &editor.transAtkRndNegSlider,  &editor.transAtkRndPosSlider  },
+        { &editor.transientDecaySlider,  &editor.transDecRndNegSlider,  &editor.transDecRndPosSlider  },
+        { &editor.envAttackSlider,       &editor.envAtkRndNegSlider,    &editor.envAtkRndPosSlider    },
+        { &editor.envDecaySlider,        &editor.envDecRndNegSlider,    &editor.envDecRndPosSlider    },
+    };
+
+    for (auto& t : trios)
+    {
+        juce::Point<float> negPt, posPt;
+        getDotPositions(*t.k, *t.n, *t.p, negPt, posPt);
+        if (pos.getDistanceFrom(negPt) < hitR) return true;
+        if (pos.getDistanceFrom(posPt) < hitR) return true;
+    }
+    return false; // pass through to knob below
+}
+
+void NewProjectAudioProcessorEditor::RndArcOverlay::mouseDown(const juce::MouseEvent& e)
+{
+    activeSlider = nullptr;
+    auto pos = e.position;
+    constexpr float hitR = 14.0f;
+
+    struct Trio { juce::Slider* k; juce::Slider* n; juce::Slider* p; };
+    Trio trios[] = {
+        { &editor.semitoneSlider,        &editor.semitoneRndNegSlider,  &editor.semitoneRndPosSlider  },
+        { &editor.fineTuneSlider,        &editor.fineTuneRndNegSlider,  &editor.fineTuneRndPosSlider  },
+        { &editor.volumeSlider,          &editor.volumeRndNegSlider,    &editor.volumeRndPosSlider    },
+        { &editor.panSlider,             &editor.panRndNegSlider,       &editor.panRndPosSlider       },
+        { &editor.lowGainSlider,         &editor.lowGainRndNegSlider,   &editor.lowGainRndPosSlider   },
+        { &editor.lowFreqSlider,         &editor.lowFreqRndNegSlider,   &editor.lowFreqRndPosSlider   },
+        { &editor.midGainSlider,         &editor.midGainRndNegSlider,   &editor.midGainRndPosSlider   },
+        { &editor.midFreqSlider,         &editor.midFreqRndNegSlider,   &editor.midFreqRndPosSlider   },
+        { &editor.highGainSlider,        &editor.highGainRndNegSlider,  &editor.highGainRndPosSlider  },
+        { &editor.highFreqSlider,        &editor.highFreqRndNegSlider,  &editor.highFreqRndPosSlider  },
+        { &editor.transientAttackSlider, &editor.transAtkRndNegSlider,  &editor.transAtkRndPosSlider  },
+        { &editor.transientDecaySlider,  &editor.transDecRndNegSlider,  &editor.transDecRndPosSlider  },
+        { &editor.envAttackSlider,       &editor.envAtkRndNegSlider,    &editor.envAtkRndPosSlider    },
+        { &editor.envDecaySlider,        &editor.envDecRndNegSlider,    &editor.envDecRndPosSlider    },
+    };
+
+    for (auto& t : trios)
+    {
+        juce::Point<float> negPt, posPt;
+        getDotPositions(*t.k, *t.n, *t.p, negPt, posPt);
+
+        if (pos.getDistanceFrom(negPt) < hitR)
+        {
+            activeSlider = t.n; break;
+        }
+        if (pos.getDistanceFrom(posPt) < hitR)
+        {
+            activeSlider = t.p; break;
+        }
+    }
+
+    if (activeSlider != nullptr)
+    {
+        dragStartY = e.position.y;
+        dragStartVal = (float)activeSlider->getValue();
+    }
+}
+
+void NewProjectAudioProcessorEditor::RndArcOverlay::mouseDrag(const juce::MouseEvent& e)
+{
+    if (activeSlider == nullptr) return;
+
+    float delta = dragStartY - e.position.y;  // drag up = increase
+    float range = (float)(activeSlider->getMaximum() - activeSlider->getMinimum());
+    float newVal = dragStartVal + delta * (range / 150.0f);
+    newVal = juce::jlimit((float)activeSlider->getMinimum(),
+        (float)activeSlider->getMaximum(), newVal);
+    activeSlider->setValue(newVal, juce::sendNotificationAsync);
+    editor.repaint();
+}
+
+void NewProjectAudioProcessorEditor::RndArcOverlay::mouseUp(const juce::MouseEvent&)
+{
+    activeSlider = nullptr;
 }

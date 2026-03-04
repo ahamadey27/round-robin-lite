@@ -4,22 +4,6 @@
 #include "Parameters/ParametersIDs.h"
 #include "UI/RRLookAndFeel.h"  
 
-//= ============================================================================ =
-class LabelledContent : public juce::Component
-{
-public:
-    std::vector<std::pair<int, juce::String>> labelPositions; // y -> label text
-
-    void paint(juce::Graphics& g) override
-    {
-        g.fillAll(juce::Colours::darkgrey);
-        g.setColour(juce::Colours::white);
-        g.setFont(11.5f);
-        for (auto& [y, text] : labelPositions)
-            g.drawText(text, 5, y + 4, 108, 20, juce::Justification::left, true);
-    }
-};
-
 class NewProjectAudioProcessorEditor : public juce::AudioProcessorEditor
 {
 public:
@@ -29,24 +13,16 @@ public:
     void resized() override;
     void paintOverChildren(juce::Graphics&) override;
 
-    void mouseDown(const juce::MouseEvent& e) override;
-    void mouseDrag(const juce::MouseEvent& e) override;
-    void mouseUp(const juce::MouseEvent& e) override;
-
 private:
     NewProjectAudioProcessor& audioProcessor;
 
     using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
     using ButtonAttachment = juce::AudioProcessorValueTreeState::ButtonAttachment;
 
-    // LAFs first — destroyed last (sliders must be gone before LAFs)
+    // LAFs first — destroyed last
     RRKnobLAF      knobLAF;
-    RRNegSliderLAF negSliderLAF;
-    RRPosSliderLAF posSliderLAF;
-
-    // Viewport
-    juce::Viewport  viewport;
-    LabelledContent contentComponent;
+    //RRNegSliderLAF negSliderLAF;
+    //RRPosSliderLAF posSliderLAF;
 
     // Buttons & labels
     juce::TextButton loadSamplesButton;
@@ -55,11 +31,9 @@ private:
     juce::TextButton playbackModeButton;
     juce::Label      samplesInfoLabel;
     std::unique_ptr<juce::FileChooser> fileChooser;
-
-    // Button attachment (after its button)
     ButtonAttachment playbackModeAttachment;
 
-    // Main sliders — before their attachments
+    // Main sliders — before attachments
     juce::Slider semitoneSlider, fineTuneSlider;
     juce::Slider volumeSlider, panSlider;
     juce::Slider lowGainSlider, lowFreqSlider;
@@ -68,7 +42,6 @@ private:
     juce::Slider transientAttackSlider, transientDecaySlider;
     juce::Slider envAttackSlider, envDecaySlider;
 
-    // Main attachments — after their sliders
     SliderAttachment semitoneAttachment, fineTuneAttachment;
     SliderAttachment volumeAttachment, panAttachment;
     SliderAttachment lowGainAttachment, lowFreqAttachment;
@@ -77,7 +50,7 @@ private:
     SliderAttachment transientAttackAttachment, transientDecayAttachment;
     SliderAttachment envAttackAttachment, envDecayAttachment;
 
-    // Rnd sliders — before their attachments
+    // Rnd sliders — before attachments
     juce::Slider semitoneRndNegSlider, semitoneRndPosSlider;
     juce::Slider fineTuneRndNegSlider, fineTuneRndPosSlider;
     juce::Slider volumeRndNegSlider, volumeRndPosSlider;
@@ -93,7 +66,6 @@ private:
     juce::Slider envAtkRndNegSlider, envAtkRndPosSlider;
     juce::Slider envDecRndNegSlider, envDecRndPosSlider;
 
-    // Rnd attachments — after their sliders
     SliderAttachment semitoneRndNegAttachment, semitoneRndPosAttachment;
     SliderAttachment fineTuneRndNegAttachment, fineTuneRndPosAttachment;
     SliderAttachment volumeRndNegAttachment, volumeRndPosAttachment;
@@ -109,6 +81,22 @@ private:
     SliderAttachment envAtkRndNegAttachment, envAtkRndPosAttachment;
     SliderAttachment envDecRndNegAttachment, envDecRndPosAttachment;
 
+    // Overlay AFTER all sliders — accesses slider members via editor reference
+    struct RndArcOverlay : public juce::Component
+    {
+        NewProjectAudioProcessorEditor& editor;
+        explicit RndArcOverlay(NewProjectAudioProcessorEditor& e) : editor(e) {}
+
+        bool hitTest(int x, int y) override;
+        void mouseDown(const juce::MouseEvent& e) override;
+        void mouseDrag(const juce::MouseEvent& e) override;
+        void mouseUp(const juce::MouseEvent& e) override;
+
+        juce::Slider* activeSlider = nullptr;
+        float         dragStartY = 0.0f;
+        float         dragStartVal = 0.0f;
+    } arcOverlay{ *this };
+
     // Helpers
     void setupSlider(juce::Slider& s);
     void setupKnob(juce::Slider& s);
@@ -116,11 +104,6 @@ private:
     void updateSamplesInfo();
     void savePreset();
     void loadPreset();
-
-    // Arc drag state
-    juce::Slider* activeRndSlider = nullptr;
-    float         arcDragStartY = 0.0f;
-    float         arcDragStartVal = 0.0f;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NewProjectAudioProcessorEditor)
 };
