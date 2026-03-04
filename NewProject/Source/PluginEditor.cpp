@@ -311,7 +311,8 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
     constexpr int rndHeaderY = 478;
     g.setColour(juce::Colour(140, 140, 155));
     g.setFont(juce::Font(10.5f).boldened());
-    g.drawText("RANDOMIZATION  —  Neg / Pos per parameter",
+    g.drawText("RANDOMIZATION  -  Neg / Pos per parameter",
+
         margin, rndHeaderY, 400, 14, juce::Justification::left);
 }
 
