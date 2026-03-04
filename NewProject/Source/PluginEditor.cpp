@@ -366,8 +366,10 @@ void NewProjectAudioProcessorEditor::paintOverChildren(juce::Graphics& g)
                 return (float)((s.getValue() - s.getMinimum()) / range);
                 };
 
-            float negExtent = getNorm(negSlider) * maxNeg;
-            float posExtent = getNorm(posSlider) * maxPos;
+            constexpr float dotOffset = 0.15f;
+
+            float negExtent = getNorm(negSlider) * (maxNeg - dotOffset);
+            float posExtent = getNorm(posSlider) * (maxPos - dotOffset);
 
             // Dim background tracks — always visible
             // Neg track: CW from 6 o'clock (pi) to 12 o'clock (twoPi) via 9 o'clock
@@ -411,7 +413,6 @@ void NewProjectAudioProcessorEditor::paintOverChildren(juce::Graphics& g)
             // Blue dot at neg arc endpoint — always drawn, this is the grab handle
             // Angle in JUCE convention = twoPi - negExtent
             // Point formula: x = cx + sin(A)*r,  y = cy - cos(A)*r
-            constexpr float dotOffset = 0.12f;
             float negDotX = cx - std::sin(negExtent + dotOffset) * radius;
             float negDotY = cy - std::cos(negExtent + dotOffset) * radius;
             g.setColour(juce::Colour(65, 135, 235));
@@ -517,6 +518,7 @@ static void getDotPositions(juce::Slider& knob,
     constexpr float pi = juce::MathConstants<float>::pi;
     constexpr float maxNeg = pi * 0.8f;
     constexpr float maxPos = pi * 0.8f;
+    constexpr float dotOffset = 0.15f;
     constexpr int   tbH = 16;
 
     auto b = knob.getBounds();
@@ -532,10 +534,9 @@ static void getDotPositions(juce::Slider& knob,
         return (float)((s.getValue() - s.getMinimum()) / range);
         };
 
-    float negExtent = getNorm(negSlider) * maxNeg;
-    float posExtent = getNorm(posSlider) * maxPos;
+    float negExtent = getNorm(negSlider) * (maxNeg - dotOffset);
+    float posExtent = getNorm(posSlider) * (maxPos - dotOffset);
 
-    constexpr float dotOffset = 0.12f;
     negPt = { cx - std::sin(negExtent + dotOffset) * radius,
               cy - std::cos(negExtent + dotOffset) * radius };
     posPt = { cx + std::sin(posExtent + dotOffset) * radius,
