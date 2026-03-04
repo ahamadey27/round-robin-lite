@@ -27,6 +27,11 @@ public:
     ~NewProjectAudioProcessorEditor() override;
     void paint(juce::Graphics&) override;
     void resized() override;
+    void paintOverChildren(juce::Graphics&) override;
+
+    void mouseDown(const juce::MouseEvent& e) override;
+    void mouseDrag(const juce::MouseEvent& e) override;
+    void mouseUp(const juce::MouseEvent& e) override;
 
 private:
     NewProjectAudioProcessor& audioProcessor;
@@ -111,6 +116,11 @@ private:
     void updateSamplesInfo();
     void savePreset();
     void loadPreset();
+
+    // Arc drag state
+    juce::Slider* activeRndSlider = nullptr;
+    float         arcDragStartY = 0.0f;
+    float         arcDragStartVal = 0.0f;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NewProjectAudioProcessorEditor)
 };
