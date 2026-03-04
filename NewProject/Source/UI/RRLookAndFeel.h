@@ -10,6 +10,14 @@ public:
         float rotaryEndAngle, juce::Slider&) override;
 };
 
+class RRToggleLAF : public juce::LookAndFeel_V4
+{
+public:
+    void drawButtonBackground(juce::Graphics&, juce::Button&,
+        const juce::Colour&, bool, bool) override;
+    void drawButtonText(juce::Graphics&, juce::TextButton&, bool, bool) override;
+};
+
 // Randomization neg sliders — red ball, fills right
 class RRNegSliderLAF : public juce::LookAndFeel_V4
 {

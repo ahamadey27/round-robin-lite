@@ -21,8 +21,10 @@ private:
 
     // LAFs first — destroyed last
     RRKnobLAF      knobLAF;
-    //RRNegSliderLAF negSliderLAF;
-    //RRPosSliderLAF posSliderLAF;
+    RRNegSliderLAF negSliderLAF;
+    RRPosSliderLAF posSliderLAF;
+    RRToggleLAF    toggleLAF;
+
 
     // Buttons & labels
     juce::TextButton loadSamplesButton;
@@ -30,6 +32,7 @@ private:
     juce::TextButton loadPresetButton;
     juce::TextButton playbackModeButton;
     juce::Label      samplesInfoLabel;
+    juce::Label      playbackTypeLabel;
     std::unique_ptr<juce::FileChooser> fileChooser;
     ButtonAttachment playbackModeAttachment;
 

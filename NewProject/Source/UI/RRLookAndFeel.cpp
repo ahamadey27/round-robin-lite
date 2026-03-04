@@ -89,3 +89,41 @@ void RRPosSliderLAF::drawLinearSlider(juce::Graphics& g, int x, int y, int width
 {
     drawRndSlider(g, x, y, width, height, sliderPos, false);
 }
+
+void RRToggleLAF::drawButtonBackground(juce::Graphics& g, juce::Button& button,
+    const juce::Colour&, bool, bool)
+{
+    auto b = button.getLocalBounds().toFloat().reduced(1.0f);
+    bool isOn = button.getToggleState();
+    float r = b.getHeight() * 0.5f;
+
+    // Pill background
+    g.setColour(juce::Colour(38, 38, 50));
+    g.fillRoundedRectangle(b, r);
+
+    // Sliding thumb
+    float halfW = b.getWidth() * 0.5f;
+    float thumbX = isOn ? b.getX() + halfW : b.getX();
+    g.setColour(isOn ? juce::Colour(180, 60, 60) : juce::Colour(55, 110, 200));
+    g.fillRoundedRectangle(thumbX, b.getY(), halfW, b.getHeight(), r);
+
+    // "Series" text (left)
+    g.setColour(!isOn ? juce::Colours::white : juce::Colour(120, 120, 130));
+    g.setFont(juce::Font(juce::FontOptions(10.0f)));
+    g.drawText("Series", (int)b.getX(), (int)b.getY(),
+        (int)halfW, (int)b.getHeight(), juce::Justification::centred);
+
+    // "Random" text (right)
+    g.setColour(isOn ? juce::Colours::white : juce::Colour(120, 120, 130));
+    g.drawText("Random", (int)(b.getX() + halfW), (int)b.getY(),
+        (int)halfW, (int)b.getHeight(), juce::Justification::centred);
+
+    // Border
+    g.setColour(juce::Colour(75, 75, 90));
+    g.drawRoundedRectangle(b, r, 1.0f);
+}
+
+void RRToggleLAF::drawButtonText(juce::Graphics&, juce::TextButton&, bool, bool)
+{
+    // Text drawn in drawButtonBackground — intentionally empty
+}

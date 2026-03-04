@@ -75,6 +75,14 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
             playbackModeButton.setButtonText(isRandom ? "Random" : "Series");
         };
     addAndMakeVisible(playbackModeButton);
+    playbackModeButton.setLookAndFeel(&toggleLAF);
+
+    // Label setup:
+    playbackTypeLabel.setText("Playback Type", juce::dontSendNotification);
+    playbackTypeLabel.setFont(juce::Font(juce::FontOptions(10.0f)));
+    playbackTypeLabel.setColour(juce::Label::textColourId, juce::Colour(180, 180, 195));
+    playbackTypeLabel.setJustificationType(juce::Justification::centred);
+    addAndMakeVisible(playbackTypeLabel);
 
     // Main parameter knobs — visible, on the editor
     for (auto* s : { &semitoneSlider, &fineTuneSlider, &volumeSlider, &panSlider,
@@ -141,6 +149,8 @@ NewProjectAudioProcessorEditor::~NewProjectAudioProcessorEditor()
                      &transAtkRndPosSlider, &transDecRndPosSlider,
                      &envAtkRndPosSlider,   &envDecRndPosSlider })
         s->setLookAndFeel(nullptr);
+
+        playbackModeButton.setLookAndFeel(nullptr);
 }
 
 //==============================================================================
@@ -401,16 +411,17 @@ void NewProjectAudioProcessorEditor::paintOverChildren(juce::Graphics& g)
             // Blue dot at neg arc endpoint — always drawn, this is the grab handle
             // Angle in JUCE convention = twoPi - negExtent
             // Point formula: x = cx + sin(A)*r,  y = cy - cos(A)*r
-            float negDotX = cx - std::sin(negExtent) * radius; // sin(twoPi-x) = -sin(x)
-            float negDotY = cy - std::cos(negExtent) * radius; // cos(twoPi-x) =  cos(x)
+            constexpr float dotOffset = 0.05f;
+            float negDotX = cx - std::sin(negExtent + dotOffset) * radius;
+            float negDotY = cy - std::cos(negExtent + dotOffset) * radius;
             g.setColour(juce::Colour(65, 135, 235));
             g.fillEllipse(negDotX - dotR, negDotY - dotR, dotR * 2.0f, dotR * 2.0f);
             g.setColour(juce::Colours::white.withAlpha(0.45f));
             g.drawEllipse(negDotX - dotR, negDotY - dotR, dotR * 2.0f, dotR * 2.0f, 1.0f);
 
             // Red dot at pos arc endpoint
-            float posDotX = cx + std::sin(posExtent) * radius;
-            float posDotY = cy - std::cos(posExtent) * radius;
+            float posDotX = cx + std::sin(posExtent + dotOffset) * radius;
+            float posDotY = cy - std::cos(posExtent + dotOffset) * radius;
             g.setColour(juce::Colour(210, 65, 65));
             g.fillEllipse(posDotX - dotR, posDotY - dotR, dotR * 2.0f, dotR * 2.0f);
             g.setColour(juce::Colours::white.withAlpha(0.45f));
@@ -451,7 +462,6 @@ void NewProjectAudioProcessorEditor::resized()
     // BUTTON ROW 2: Save / Load preset / playback mode
     savePresetButton.setBounds(margin, 46, 110, btnH);
     loadPresetButton.setBounds(margin + 120, 46, 110, btnH);
-    playbackModeButton.setBounds(margin + 250, 46, 130, btnH);
 
     // KNOB ROW 1: PITCH | AMPLITUDE | ENVELOPE
     constexpr int row1Y = 110;
@@ -473,6 +483,11 @@ void NewProjectAudioProcessorEditor::resized()
     const int     transX = margin;
     transientAttackSlider.setBounds(transX, row2Y, knobW, knobH);
     transientDecaySlider.setBounds(transX + knobW + knobGap, row2Y, knobW, knobH);
+
+    // Toggle to the right of transient knobs, vertically centred in row
+    constexpr int toggleX = transX + 2 * (knobW + knobGap) + sectGap;
+    playbackTypeLabel.setBounds(toggleX, row2Y + 28, 150, 14);
+    playbackModeButton.setBounds(toggleX, row2Y + 46, 150, 34);
 
     // KNOB ROW 3: EQ
     constexpr int row3Y = 390;
@@ -520,10 +535,12 @@ static void getDotPositions(juce::Slider& knob,
     float negExtent = getNorm(negSlider) * maxNeg;
     float posExtent = getNorm(posSlider) * maxPos;
 
-    negPt = { cx - std::sin(negExtent) * radius,
-              cy - std::cos(negExtent) * radius };
-    posPt = { cx + std::sin(posExtent) * radius,
-              cy - std::cos(posExtent) * radius };
+    constexpr float dotOffset = 0.05f;
+
+    negPt = { cx - std::sin(negExtent + dotOffset) * radius,
+              cy - std::cos(negExtent + dotOffset) * radius };
+    posPt = { cx + std::sin(posExtent + dotOffset) * radius,
+              cy - std::cos(posExtent + dotOffset) * radius };
 }
 
 bool NewProjectAudioProcessorEditor::RndArcOverlay::hitTest(int x, int y)
