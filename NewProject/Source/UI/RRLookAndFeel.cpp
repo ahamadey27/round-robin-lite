@@ -17,14 +17,6 @@ void RRKnobLAF::drawRotarySlider(juce::Graphics& g, int x, int y, int width, int
     g.strokePath(track, juce::PathStrokeType(3.5f,
         juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
 
-    // Value arc (blue)
-    juce::Path valueArc;
-    valueArc.addArc(cx - radius, cy - radius, radius * 2.0f, radius * 2.0f,
-        rotaryStartAngle, angle, true);
-    g.setColour(juce::Colour(100, 180, 255));
-    g.strokePath(valueArc, juce::PathStrokeType(3.5f,
-        juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
-
     // Knob body
     const float bodyR = radius - 6.0f;
     g.setColour(juce::Colour(52, 52, 62));

@@ -342,8 +342,8 @@ void NewProjectAudioProcessorEditor::paintOverChildren(juce::Graphics& g)
     // Point at angle A: x = cx + sin(A)*r,  y = cy - cos(A)*r
     constexpr float pi = juce::MathConstants<float>::pi;
     constexpr float twoPi = juce::MathConstants<float>::twoPi;
-    constexpr float maxNeg = pi;                // CCW max: 12 -> 6 o'clock (left side)
-    constexpr float maxPos = pi * 2.0f / 3.0f; // CW  max: 12 -> 4 o'clock (right side)
+    constexpr float maxNeg = pi * 0.8f;                // CCW max: 12 -> 6 o'clock (left side)
+    constexpr float maxPos = pi * 0.8f; // CW  max: 12 -> 4 o'clock (right side)
     constexpr float trackW = 5.0f;
     constexpr float arcW = 6.5f;
     constexpr float dotR = 5.5f;
@@ -373,7 +373,7 @@ void NewProjectAudioProcessorEditor::paintOverChildren(juce::Graphics& g)
             // Neg track: CW from 6 o'clock (pi) to 12 o'clock (twoPi) via 9 o'clock
             juce::Path negTrack;
             negTrack.addArc(cx - radius, cy - radius, radius * 2.0f, radius * 2.0f,
-                pi, twoPi, true);
+                twoPi - maxNeg, twoPi, true);
             g.setColour(juce::Colour(40, 60, 100).withAlpha(0.55f));
             g.strokePath(negTrack, juce::PathStrokeType(trackW,
                 juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
@@ -515,8 +515,8 @@ static void getDotPositions(juce::Slider& knob,
     juce::Point<float>& posPt)
 {
     constexpr float pi = juce::MathConstants<float>::pi;
-    constexpr float maxNeg = pi;
-    constexpr float maxPos = pi * 2.0f / 3.0f;
+    constexpr float maxNeg = pi * 0.8f;
+    constexpr float maxPos = pi * 0.8f;
     constexpr int   tbH = 16;
 
     auto b = knob.getBounds();
