@@ -59,33 +59,28 @@ void ThreeBandEQ::updateFilters(float lowGain_dB, float lowFreq_Hz,
     midGain_dB = juce::jlimit(-24.0f, 24.0f, midGain_dB);
     highGain_dB = juce::jlimit(-24.0f, 24.0f, highGain_dB);
 
-    // Q factor for filters (0.707 = Butterworth response, musical)
-    constexpr float Q = 0.707f;
+    // Q values — lower = gentler/wider, higher = sharper/narrower
+    constexpr float shelfQ = 0.5f;   // softer shelf slopes for low and high
+    constexpr float peakQ = 0.6f;   // broader bell for mid, less ringy
 
     // LOW SHELF FILTER
     // Boosts/cuts frequencies below lowFreq_Hz
     *lowShelfFilter.state = *FilterCoefs::makeLowShelf(
-        currentSampleRate,
-        lowFreq_Hz,
-        Q,
+        currentSampleRate, lowFreq_Hz, shelfQ,     // was Q
         juce::Decibels::decibelsToGain(lowGain_dB)
     );
 
     // MID PEAK FILTER (Bell/Parametric)
     // Boosts/cuts frequencies around midFreq_Hz
     *midPeakFilter.state = *FilterCoefs::makePeakFilter(
-        currentSampleRate,
-        midFreq_Hz,
-        Q,
+        currentSampleRate, midFreq_Hz, peakQ,      // was Q
         juce::Decibels::decibelsToGain(midGain_dB)
     );
 
     // HIGH SHELF FILTER
     // Boosts/cuts frequencies above highFreq_Hz
     *highShelfFilter.state = *FilterCoefs::makeHighShelf(
-        currentSampleRate,
-        highFreq_Hz,
-        Q,
+        currentSampleRate, highFreq_Hz, shelfQ,    // was Q
         juce::Decibels::decibelsToGain(highGain_dB)
     );
 }
