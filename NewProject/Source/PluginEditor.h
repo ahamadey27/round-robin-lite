@@ -84,6 +84,50 @@ private:
     SliderAttachment envAtkRndNegAttachment, envAtkRndPosAttachment;
     SliderAttachment envDecRndNegAttachment, envDecRndPosAttachment;
 
+    // AboutWindow — inline popup component
+    class AboutWindow : public juce::Component
+    {
+    public:
+        AboutWindow()
+        {
+            closeButton.setButtonText("Close");
+            closeButton.onClick = [this] { setVisible(false); };
+            addAndMakeVisible(closeButton);
+            setSize(340, 200);
+        }
+
+        void paint(juce::Graphics& g) override
+        {
+            g.setColour(juce::Colour(40, 40, 50));
+            g.fillRoundedRectangle(getLocalBounds().toFloat(), 8.f);
+            g.setColour(juce::Colour(100, 180, 255));
+            g.setFont(juce::Font(13.f).boldened());
+            g.drawText("Round Robin Lite", 0, 18, getWidth(), 20, juce::Justification::centred);
+            g.setColour(juce::Colour(180, 180, 195));
+            g.setFont(juce::Font(11.f));
+            juce::String body =
+                "Load up to 20 one-shot samples. Each sample is mapped\n"
+                "to a white-key pair (C0-C4), root pitch at C2.\n\n"
+                "Use the knobs to control pitch, volume, pan, EQ,\n"
+                "and transients. Drag the red/blue arc dots to set\n"
+                "per-note randomization ranges.";
+            g.drawFittedText(body, 20, 50, getWidth() - 40, 110,
+                juce::Justification::centredTop, 6);
+        }
+
+        void resized() override
+        {
+            closeButton.setBounds(getWidth() / 2 - 40, getHeight() - 36, 80, 24);
+        }
+
+    private:
+        juce::TextButton closeButton;
+    };
+
+    AboutWindow      aboutWindow;
+    juce::TextButton aboutButton;
+
+
     // Overlay AFTER all sliders — accesses slider members via editor reference
     struct RndArcOverlay : public juce::Component
     {

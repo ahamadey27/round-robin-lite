@@ -52,6 +52,16 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
     loadSamplesButton.onClick = [this]() { loadSamplesFromFiles(); };
     addAndMakeVisible(loadSamplesButton);
 
+    // About button
+    aboutButton.setButtonText("?");
+    aboutButton.onClick = [this]
+        {
+            aboutWindow.setTopLeftPosition(getWidth() / 2 - 170, getHeight() / 2 - 100); 
+            addAndMakeVisible(aboutWindow);
+            aboutWindow.toFront(true);
+        };
+    addAndMakeVisible(aboutButton);
+
     // User Presets
     savePresetButton.setButtonText("Save Preset");
     savePresetButton.onClick = [this]() { savePreset(); };
@@ -286,7 +296,7 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
         {
             g.setColour(juce::Colour(180, 180, 195));
             g.setFont(juce::Font(10.0f));
-            g.drawText(text, x, knobY - 15, knobW, 13, juce::Justification::centred);
+            g.drawText(text, x, knobY - 19, knobW, 13, juce::Justification::centred);
         };
 
     auto drawDivider = [&](int y)
@@ -459,6 +469,9 @@ void NewProjectAudioProcessorEditor::resized()
     // BUTTON ROW 1: Load Samples + info label
     loadSamplesButton.setBounds(margin, 10, 140, btnH);
     samplesInfoLabel.setBounds(margin + 150, 10, 320, btnH);
+
+    // About button — top-right of header bar
+    aboutButton.setBounds(getWidth() - margin - 28, 10, 28, 28);   // ← AD
 
     // BUTTON ROW 2: Save / Load preset / playback mode
     savePresetButton.setBounds(margin, 46, 110, btnH);
