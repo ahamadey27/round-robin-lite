@@ -310,7 +310,7 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
     g.fillRect(0, 0, getWidth(), 82);
     g.setColour(juce::Colour(100, 180, 255));
     g.setFont(juce::Font(13.0f).boldened());
-    g.drawText("ROUND ROBIN LITE", getWidth() - 170, 10, 150, 20, juce::Justification::right);
+    g.drawText("ROUND ROBIN LITE", getWidth() - 220, 10, 160, 20, juce::Justification::left);
 
     // ROW 1 — PITCH
     drawSectionLabel(pitchX, row1Y - 30, "PITCH", juce::Colour(100, 180, 255));
@@ -471,7 +471,7 @@ void NewProjectAudioProcessorEditor::resized()
     samplesInfoLabel.setBounds(margin + 150, 10, 320, btnH);
 
     // About button — top-right of header bar
-    aboutButton.setBounds(getWidth() - margin - 28, 10, 28, 28);   // ← AD
+    aboutButton.setBounds(getWidth() - 52, 10, 24, 24);
 
     // BUTTON ROW 2: Save / Load preset / playback mode
     savePresetButton.setBounds(margin, 46, 110, btnH);

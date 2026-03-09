@@ -104,13 +104,14 @@ private:
             g.setFont(juce::Font(13.f).boldened());
             g.drawText("Round Robin Lite", 0, 18, getWidth(), 20, juce::Justification::centred);
             g.setColour(juce::Colour(180, 180, 195));
-            g.setFont(juce::Font(11.f));
+            g.setFont(juce::Font(13.f));
             juce::String body =
-                "Load up to 20 one-shot samples. Each sample is mapped\n"
-                "to a white-key pair (C0-C4), root pitch at C2.\n\n"
-                "Use the knobs to control pitch, volume, pan, EQ,\n"
-                "and transients. Drag the red/blue arc dots to set\n"
-                "per-note randomization ranges.";
+                "Load up to 20 one-shot samples. Each sample is\n"
+                "mapped to all white keys and played back randomly\n"
+                "based on selected playback algorithm type.\n\n"
+                "Use the knobs to control pitch, volume, etc.\n"
+                "Drag the blue/red arc dots to set negative and positive\n"
+                "(respectively) per-note randomization ranges.";
             g.drawFittedText(body, 20, 50, getWidth() - 40, 110,
                 juce::Justification::centredTop, 6);
         }
