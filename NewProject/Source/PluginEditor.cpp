@@ -607,17 +607,22 @@ void NewProjectAudioProcessorEditor::RndArcOverlay::mouseDown(const juce::MouseE
 
         if (pos.getDistanceFrom(negPt) < hitR)
         {
-            activeSlider = t.n; break;
+            activeSlider = t.n; 
+            activeIsNeg = true;
+            break;
         }
         if (pos.getDistanceFrom(posPt) < hitR)
         {
-            activeSlider = t.p; break;
+            activeSlider = t.p; 
+            activeIsNeg = false;
+            break;
         }
     }
 
     if (activeSlider != nullptr)
     {
         dragStartY = e.position.y;
+        dragStartX = e.position.x;           // ← ADD
         dragStartVal = (float)activeSlider->getValue();
     }
 }
@@ -626,7 +631,10 @@ void NewProjectAudioProcessorEditor::RndArcOverlay::mouseDrag(const juce::MouseE
 {
     if (activeSlider == nullptr) return;
 
-    float delta = dragStartY - e.position.y;  // drag up = increase
+    float vertDelta = dragStartY - e.position.y;                  // up   = +
+    float horzDelta = activeIsNeg ? (dragStartX - e.position.x)   // left = + for neg
+        : (e.position.x - dragStartX);  // right = + for pos
+    float delta = vertDelta + horzDelta;
     float range = (float)(activeSlider->getMaximum() - activeSlider->getMinimum());
     float newVal = dragStartVal + delta * (range / 150.0f);
     newVal = juce::jlimit((float)activeSlider->getMinimum(),

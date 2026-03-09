@@ -98,6 +98,9 @@ private:
         juce::Slider* activeSlider = nullptr;
         float         dragStartY = 0.0f;
         float         dragStartVal = 0.0f;
+
+        float dragStartX = 0.f;
+        bool  activeIsNeg = false;   // true = neg (blue) dot grabbed
     } arcOverlay{ *this };
 
     // Helpers
