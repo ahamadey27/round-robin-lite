@@ -88,11 +88,11 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
     playbackModeButton.setLookAndFeel(&toggleLAF);
 
     // Label setup:
-    playbackTypeLabel.setText("Playback Type", juce::dontSendNotification);
-    playbackTypeLabel.setFont(juce::Font(juce::FontOptions(10.0f)));
-    playbackTypeLabel.setColour(juce::Label::textColourId, juce::Colour(180, 180, 195));
-    playbackTypeLabel.setJustificationType(juce::Justification::centred);
-    addAndMakeVisible(playbackTypeLabel);
+    //playbackTypeLabel.setText("Playback Type", juce::dontSendNotification);
+    //playbackTypeLabel.setFont(juce::Font(juce::FontOptions(10.0f)));
+    //playbackTypeLabel.setColour(juce::Label::textColourId, juce::Colour(180, 180, 195));
+    //playbackTypeLabel.setJustificationType(juce::Justification::centred);
+    //addAndMakeVisible(playbackTypeLabel);
 
     // Main parameter knobs — visible, on the editor
     for (auto* s : { &semitoneSlider, &fineTuneSlider, &volumeSlider, &panSlider,
@@ -127,6 +127,29 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
                      &transientAttackSlider, &transientDecaySlider,
                      &envAttackSlider, &envDecaySlider })
         s->setLookAndFeel(&knobLAF);
+    
+    // NEW: set indicator line color per section (rotarySliderFillColourId)
+        for (auto* s : { &semitoneSlider, &fineTuneSlider })
+            s->setColour(juce::Slider::rotarySliderFillColourId, RRColors::pitchCol);
+
+        for (auto* s : { &volumeSlider, &panSlider })
+            s->setColour(juce::Slider::rotarySliderFillColourId, RRColors::ampCol);
+
+        for (auto* s : { &envAttackSlider, &envDecaySlider })
+            s->setColour(juce::Slider::rotarySliderFillColourId, RRColors::envCol);
+
+        for (auto* s : { &transientAttackSlider, &transientDecaySlider })
+            s->setColour(juce::Slider::rotarySliderFillColourId, RRColors::transCol);
+
+        for (auto* s : { &lowGainSlider, &lowFreqSlider })
+            s->setColour(juce::Slider::rotarySliderFillColourId, RRColors::eqLowCol);
+
+        for (auto* s : { &midGainSlider, &midFreqSlider })
+            s->setColour(juce::Slider::rotarySliderFillColourId, RRColors::eqMidCol);
+
+        for (auto* s : { &highGainSlider, &highFreqSlider })
+            s->setColour(juce::Slider::rotarySliderFillColourId, RRColors::eqHighCol);
+
 
     setSize(700, 520);
     // Overlay must be added AFTER all knobs so it sits on top
@@ -265,255 +288,289 @@ void NewProjectAudioProcessorEditor::loadPreset()
 //==============================================================================
 void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
 {
-    // Background
-    g.fillAll(juce::Colour(28, 28, 33));
+    // ── Background ───────────────────────────────────────────────────────────
+    g.fillAll(RRColors::background);
 
-    // Layout constants — must match resized() exactly
-    constexpr int margin = 20;
-    constexpr int knobW = 85;
-    constexpr int knobH = 100;
-    constexpr int knobGap = 10;
-    constexpr int sectGap = 35;
-    constexpr int row1Y = 110;
-    constexpr int row2Y = 250;
-    constexpr int row3Y = 390;
-    constexpr int eqStep = (700 - 2 * margin - 6 * knobW) / 5;
+    // ── Header bar ───────────────────────────────────────────────────────────
+    g.setColour(RRColors::headerBg);
+    g.fillRect(0, 0, getWidth(), 52);
+    g.setColour(RRColors::sectionBorder);
+    g.fillRect(0, 52, getWidth(), 1);
 
-    const int pitchX = margin;
-    const int ampX = pitchX + 2 * (knobW + knobGap) + sectGap;
-    const int envX = ampX + 2 * (knobW + knobGap) + sectGap;
-    const int transX = margin;
+    // Logo: "RR" bold + "Lite" light
+    g.setColour(juce::Colour(0xffd0d0d0));
+    g.setFont(juce::Font(juce::FontOptions(26.0f)).boldened());
+    g.drawText("RR", 14, 10, 50, 32, juce::Justification::left);
+    g.setColour(juce::Colour(0xff999999));
+    g.setFont(juce::Font(juce::FontOptions(17.0f)));
+    g.drawText("Lite", 56, 14, 50, 26, juce::Justification::left);
 
-    // Helpers
-    auto drawSectionLabel = [&](int x, int y, const juce::String& text, juce::Colour col)
-        {
-            g.setColour(col);
-            g.setFont(juce::Font(10.5f).boldened());
-            g.drawText(text, x, y, 160, 14, juce::Justification::left);
-        };
+    // ── Section boxes ─────────────────────────────────────────────────────────
+    auto drawSectionBox = [&](juce::Rectangle<int> r)
+    {
+        g.setColour(juce::Colours::black.withAlpha(0.15f));
+        g.fillRoundedRectangle(r.toFloat(), 5.0f);
+        g.setColour(RRColors::sectionBorder);
+        g.drawRoundedRectangle(r.toFloat(), 5.0f, 1.0f);
+    };
 
-    auto drawKnobLabel = [&](int x, int knobY, const juce::String& text)
-        {
-            g.setColour(juce::Colour(180, 180, 195));
-            g.setFont(juce::Font(10.0f));
-            g.drawText(text, x, knobY - 19, knobW, 13, juce::Justification::centred);
-        };
+    // Layout constants — must match resized()
+    constexpr int sRowY  = 98;
+    constexpr int sRowH  = 150;
+    constexpr int eRowY  = 254;
+    constexpr int eRowH  = 140;
+    constexpr int margin = 12;
+    constexpr int secGap = 5;
+    const int secW = (getWidth() - 2 * margin - 3 * secGap) / 4;  // ~165
 
-    auto drawDivider = [&](int y)
-        {
-            g.setColour(juce::Colour(55, 55, 65));
-            g.fillRect(margin, y, getWidth() - 2 * margin, 1);
-        };
+    // Four top sections
+    for (int i = 0; i < 4; ++i)
+        drawSectionBox({ margin + i * (secW + secGap), sRowY, secW, sRowH });
 
-    // Header bar
-    g.setColour(juce::Colour(40, 40, 48));
-    g.fillRect(0, 0, getWidth(), 82);
-    g.setColour(juce::Colour(100, 180, 255));
-    g.setFont(juce::Font(13.0f).boldened());
-    g.drawText("ROUND ROBIN LITE", getWidth() - 220, 10, 160, 20, juce::Justification::left);
+    // EQ section
+    const int pbW   = 112;
+    const int eqW   = getWidth() - 2 * margin - secGap - pbW;
+    drawSectionBox({ margin, eRowY, eqW, eRowH });
+    // Playback section
+    drawSectionBox({ margin + eqW + secGap, eRowY, pbW, eRowH });
 
-    // ROW 1 — PITCH
-    drawSectionLabel(pitchX, row1Y - 30, "PITCH", juce::Colour(100, 180, 255));
-    drawKnobLabel(pitchX, row1Y, "Semitone");
-    drawKnobLabel(pitchX + knobW + knobGap, row1Y, "Fine Tune");
+    // ── Section labels ────────────────────────────────────────────────────────
+    auto drawSecLabel = [&](const juce::String& text, int secIdx, juce::Colour col)
+    {
+        g.setColour(col);
+        g.setFont(juce::Font(juce::FontOptions(7.5f)).boldened());
+        g.drawText(text, margin + secIdx * (secW + secGap) + 8, sRowY + 7, secW - 10, 12,
+                   juce::Justification::left);
+    };
+    drawSecLabel("PITCH",     0, RRColors::pitchCol);
+    drawSecLabel("AMPLITUDE", 1, RRColors::ampCol);
+    drawSecLabel("ENVELOPE",  2, RRColors::envCol);
+    drawSecLabel("TRANSIENT", 3, RRColors::transCol);
 
-    // ROW 1 — AMPLITUDE
-    drawSectionLabel(ampX, row1Y - 30, "AMPLITUDE", juce::Colour(100, 210, 140));
-    drawKnobLabel(ampX, row1Y, "Volume");
-    drawKnobLabel(ampX + knobW + knobGap, row1Y, "Pan");
+    g.setColour(RRColors::eqLowCol);
+    g.setFont(juce::Font(juce::FontOptions(7.5f)).boldened());
+    g.drawText("EQ SETTINGS", margin + 8, eRowY + 7, 120, 12, juce::Justification::left);
 
-    // ROW 1 — ENVELOPE
-    drawSectionLabel(envX, row1Y - 30, "ENVELOPE", juce::Colour(210, 170, 90));
-    drawKnobLabel(envX, row1Y, "Atk");
-    drawKnobLabel(envX + knobW + knobGap, row1Y, "Dec");
+    g.setColour(RRColors::eqLowCol);
+    g.drawText("PLAYBACK", margin + eqW + secGap + 8, eRowY + 7,  pbW - 10, 10,
+               juce::Justification::centred);
+    g.drawText("TYPE",     margin + eqW + secGap + 8, eRowY + 17, pbW - 10, 10,
+               juce::Justification::centred);
 
-    drawDivider(row1Y + knobH + 6);
+    // ── Knob labels ───────────────────────────────────────────────────────────
+    g.setFont(juce::Font(juce::FontOptions(7.0f)));
+    g.setColour(juce::Colour(0xff666666));
 
-    // ROW 2 — TRANSIENT
-    drawSectionLabel(transX, row2Y - 30, "TRANSIENT", juce::Colour(220, 110, 110));
-    drawKnobLabel(transX, row2Y, "Attack");
-    drawKnobLabel(transX + knobW + knobGap, row2Y, "Decay");
+    auto drawKnobLabel = [&](const juce::String& text, juce::Slider& s)
+    {
+        auto b = s.getBounds();
+        constexpr int tbH = 16;
+        g.drawText(text, b.getX(), b.getY() - 12, b.getWidth(), 11,
+                   juce::Justification::centred);
+    };
 
-    drawDivider(row2Y + knobH + 6);
+    drawKnobLabel("SEMITONE",  semitoneSlider);
+    drawKnobLabel("FINE TUNE", fineTuneSlider);
+    drawKnobLabel("VOLUME",    volumeSlider);
+    drawKnobLabel("PAN",       panSlider);
+    drawKnobLabel("ATTACK",    envAttackSlider);
+    drawKnobLabel("DECAY",     envDecaySlider);
+    drawKnobLabel("ATTACK",    transientAttackSlider);
+    drawKnobLabel("DECAY",     transientDecaySlider);
+    drawKnobLabel("LOW GAIN",  lowGainSlider);
+    drawKnobLabel("LOW FREQ",  lowFreqSlider);
+    drawKnobLabel("MID GAIN",  midGainSlider);
+    drawKnobLabel("MID FREQ",  midFreqSlider);
+    drawKnobLabel("HIGH GAIN", highGainSlider);
+    drawKnobLabel("HIGH FREQ", highFreqSlider);
 
-    // ROW 3 — EQ
-    drawSectionLabel(margin, row3Y - 30, "3-BAND EQ", juce::Colour(170, 120, 220));
-    juce::StringArray eqLabels{ "Lo Gain", "Lo Freq", "Mid Gain", "Mid Freq", "Hi Gain", "Hi Freq" };
-    for (int i = 0; i < 6; ++i)
-        drawKnobLabel(margin + i * (knobW + eqStep), row3Y, eqLabels[i]);
-
-    drawDivider(row3Y + knobH + 6);
+    // ── Footer ────────────────────────────────────────────────────────────────
+    g.setColour(RRColors::sectionBorder.darker(0.5f));
+    g.fillRect(0, getHeight() - 30, getWidth(), 1);
+    g.setColour(RRColors::companyText);
+    g.setFont(juce::Font(juce::FontOptions(10.0f)));
+    g.drawText("Company Name", 0, getHeight() - 26, getWidth() - 14, 20,
+               juce::Justification::right);
 }
 
 //==============================================================================
+// PluginEditor.cpp — paintOverChildren()
+
 void NewProjectAudioProcessorEditor::paintOverChildren(juce::Graphics& g)
 {
-    // JUCE addArc convention: 0 = 12 o'clock, clockwise positive.
-    // Point at angle A: x = cx + sin(A)*r,  y = cy - cos(A)*r
-    constexpr float pi = juce::MathConstants<float>::pi;
-    constexpr float twoPi = juce::MathConstants<float>::twoPi;
-    constexpr float maxNeg = pi * 0.8f;                // CCW max: 12 -> 6 o'clock (left side)
-    constexpr float maxPos = pi * 0.8f; // CW  max: 12 -> 4 o'clock (right side)
-    constexpr float trackW = 5.0f;
-    constexpr float arcW = 6.5f;
-    constexpr float dotR = 5.5f;
-    constexpr int   tbH = 16; // text box height
+    constexpr float pi      = juce::MathConstants<float>::pi;
+    constexpr float twoPi   = juce::MathConstants<float>::twoPi;
+    constexpr float maxNeg  = pi * 0.8f;
+    constexpr float maxPos  = pi * 0.8f;
+    constexpr float trackW  = 5.0f;
+    constexpr float arcW    = 6.5f;
+    constexpr float dotR    = 5.5f;
+    constexpr int   tbH     = 16;
 
     auto drawRndArcs = [&](juce::Slider& knob,
-        juce::Slider& negSlider,
-        juce::Slider& posSlider)
-        {
-            auto  b = knob.getBounds();
-            float w = (float)b.getWidth();
-            float h = (float)(b.getHeight() - tbH);
-            float cx = b.getX() + w * 0.5f;
-            float cy = b.getY() + h * 0.5f;
-            float radius = juce::jmin(w, h) * 0.5f - 1.0f;
+                           juce::Slider& negSlider,
+                           juce::Slider& posSlider,
+                           juce::Colour  negCol,
+                           juce::Colour  posCol)
+    {
+        auto  b  = knob.getBounds();
+        float w  = (float)b.getWidth();
+        float h  = (float)(b.getHeight() - tbH);
+        float cx = b.getX() + w * 0.5f;
+        float cy = b.getY() + h * 0.5f;
+        float radius = juce::jmin(w, h) * 0.5f - 1.0f;
 
-            auto getNorm = [](juce::Slider& s) -> float {
-                double range = s.getMaximum() - s.getMinimum();
-                if (range == 0.0) return 0.0f;
-                return (float)((s.getValue() - s.getMinimum()) / range);
-                };
-
-            constexpr float dotOffset = 0.15f;
-
-            float negExtent = getNorm(negSlider) * (maxNeg - dotOffset);
-            float posExtent = getNorm(posSlider) * (maxPos - dotOffset);
-
-            // Dim background tracks — always visible
-            // Neg track: CW from 6 o'clock (pi) to 12 o'clock (twoPi) via 9 o'clock
-            juce::Path negTrack;
-            negTrack.addArc(cx - radius, cy - radius, radius * 2.0f, radius * 2.0f,
-                twoPi - maxNeg, twoPi, true);
-            g.setColour(juce::Colour(40, 60, 100).withAlpha(0.55f));
-            g.strokePath(negTrack, juce::PathStrokeType(trackW,
-                juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
-
-            // Pos track: CW from 12 o'clock (0) to 4 o'clock (maxPos)
-            juce::Path posTrack;
-            posTrack.addArc(cx - radius, cy - radius, radius * 2.0f, radius * 2.0f,
-                0.0f, maxPos, true);
-            g.setColour(juce::Colour(100, 30, 30).withAlpha(0.55f));
-            g.strokePath(posTrack, juce::PathStrokeType(trackW,
-                juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
-
-            // Active neg arc: CW from (twoPi - negExtent) to twoPi
-            if (negExtent > 0.01f)
-            {
-                juce::Path negArc;
-                negArc.addArc(cx - radius, cy - radius, radius * 2.0f, radius * 2.0f,
-                    twoPi - negExtent, twoPi, true);
-                g.setColour(juce::Colour(65, 135, 235).withAlpha(0.9f));
-                g.strokePath(negArc, juce::PathStrokeType(arcW,
-                    juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
-            }
-
-            // Active pos arc: CW from 0 to posExtent
-            if (posExtent > 0.01f)
-            {
-                juce::Path posArc;
-                posArc.addArc(cx - radius, cy - radius, radius * 2.0f, radius * 2.0f,
-                    0.0f, posExtent, true);
-                g.setColour(juce::Colour(210, 65, 65).withAlpha(0.9f));
-                g.strokePath(posArc, juce::PathStrokeType(arcW,
-                    juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
-            }
-
-            // Blue dot at neg arc endpoint — always drawn, this is the grab handle
-            // Angle in JUCE convention = twoPi - negExtent
-            // Point formula: x = cx + sin(A)*r,  y = cy - cos(A)*r
-            float negDotX = cx - std::sin(negExtent + dotOffset) * radius;
-            float negDotY = cy - std::cos(negExtent + dotOffset) * radius;
-            g.setColour(juce::Colour(65, 135, 235));
-            g.fillEllipse(negDotX - dotR, negDotY - dotR, dotR * 2.0f, dotR * 2.0f);
-            g.setColour(juce::Colours::white.withAlpha(0.45f));
-            g.drawEllipse(negDotX - dotR, negDotY - dotR, dotR * 2.0f, dotR * 2.0f, 1.0f);
-
-            // Red dot at pos arc endpoint
-            float posDotX = cx + std::sin(posExtent + dotOffset) * radius;
-            float posDotY = cy - std::cos(posExtent + dotOffset) * radius;
-            g.setColour(juce::Colour(210, 65, 65));
-            g.fillEllipse(posDotX - dotR, posDotY - dotR, dotR * 2.0f, dotR * 2.0f);
-            g.setColour(juce::Colours::white.withAlpha(0.45f));
-            g.drawEllipse(posDotX - dotR, posDotY - dotR, dotR * 2.0f, dotR * 2.0f, 1.0f);
+        auto getNorm = [](juce::Slider& s) -> float {
+            double range = s.getMaximum() - s.getMinimum();
+            if (range == 0.0) return 0.0f;
+            return (float)((s.getValue() - s.getMinimum()) / range);
         };
 
-    drawRndArcs(semitoneSlider, semitoneRndNegSlider, semitoneRndPosSlider);
-    drawRndArcs(fineTuneSlider, fineTuneRndNegSlider, fineTuneRndPosSlider);
-    drawRndArcs(volumeSlider, volumeRndNegSlider, volumeRndPosSlider);
-    drawRndArcs(panSlider, panRndNegSlider, panRndPosSlider);
-    drawRndArcs(lowGainSlider, lowGainRndNegSlider, lowGainRndPosSlider);
-    drawRndArcs(lowFreqSlider, lowFreqRndNegSlider, lowFreqRndPosSlider);
-    drawRndArcs(midGainSlider, midGainRndNegSlider, midGainRndPosSlider);
-    drawRndArcs(midFreqSlider, midFreqRndNegSlider, midFreqRndPosSlider);
-    drawRndArcs(highGainSlider, highGainRndNegSlider, highGainRndPosSlider);
-    drawRndArcs(highFreqSlider, highFreqRndNegSlider, highFreqRndPosSlider);
-    drawRndArcs(transientAttackSlider, transAtkRndNegSlider, transAtkRndPosSlider);
-    drawRndArcs(transientDecaySlider, transDecRndNegSlider, transDecRndPosSlider);
-    drawRndArcs(envAttackSlider, envAtkRndNegSlider, envAtkRndPosSlider);
-    drawRndArcs(envDecaySlider, envDecRndNegSlider, envDecRndPosSlider);
+        constexpr float dotOffset = 0.15f;
+        float negExtent = getNorm(negSlider) * (maxNeg - dotOffset);
+        float posExtent = getNorm(posSlider) * (maxPos - dotOffset);
+
+        // Dim background tracks
+        juce::Path negTrack;
+        negTrack.addArc(cx - radius, cy - radius, radius * 2.0f, radius * 2.0f,
+            twoPi - maxNeg, twoPi, true);
+        g.setColour(negCol.withAlpha(0.25f));
+        g.strokePath(negTrack, juce::PathStrokeType(trackW,
+            juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
+
+        juce::Path posTrack;
+        posTrack.addArc(cx - radius, cy - radius, radius * 2.0f, radius * 2.0f,
+            0.0f, maxPos, true);
+        g.setColour(posCol.withAlpha(0.25f));
+        g.strokePath(posTrack, juce::PathStrokeType(trackW,
+            juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
+
+        // Active neg arc
+        if (negExtent > 0.01f)
+        {
+            juce::Path negArc;
+            negArc.addArc(cx - radius, cy - radius, radius * 2.0f, radius * 2.0f,
+                twoPi - negExtent, twoPi, true);
+            g.setColour(negCol.withAlpha(0.9f));
+            g.strokePath(negArc, juce::PathStrokeType(arcW,
+                juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
+        }
+
+        // Active pos arc
+        if (posExtent > 0.01f)
+        {
+            juce::Path posArc;
+            posArc.addArc(cx - radius, cy - radius, radius * 2.0f, radius * 2.0f,
+                0.0f, posExtent, true);
+            g.setColour(posCol.withAlpha(0.9f));
+            g.strokePath(posArc, juce::PathStrokeType(arcW,
+                juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
+        }
+
+        // White dot at neg arc endpoint
+        float negDotX = cx - std::sin(negExtent + dotOffset) * radius;
+        float negDotY = cy - std::cos(negExtent + dotOffset) * radius;
+        g.setColour(juce::Colours::white);
+        g.fillEllipse(negDotX - dotR, negDotY - dotR, dotR * 2.0f, dotR * 2.0f);
+
+        // White dot at pos arc endpoint
+        float posDotX = cx + std::sin(posExtent + dotOffset) * radius;
+        float posDotY = cy - std::cos(posExtent + dotOffset) * radius;
+        g.setColour(juce::Colours::white);
+        g.fillEllipse(posDotX - dotR, posDotY - dotR, dotR * 2.0f, dotR * 2.0f);
+    };
+
+    // PITCH
+    drawRndArcs(semitoneSlider,        semitoneRndNegSlider,  semitoneRndPosSlider,  RRColors::pitchNeg,  RRColors::pitchCol);
+    drawRndArcs(fineTuneSlider,        fineTuneRndNegSlider,  fineTuneRndPosSlider,  RRColors::pitchNeg,  RRColors::pitchCol);
+    // AMPLITUDE
+    drawRndArcs(volumeSlider,          volumeRndNegSlider,    volumeRndPosSlider,    RRColors::ampNeg,    RRColors::ampCol);
+    drawRndArcs(panSlider,             panRndNegSlider,       panRndPosSlider,       RRColors::ampNeg,    RRColors::ampCol);
+    // ENVELOPE
+    drawRndArcs(envAttackSlider,       envAtkRndNegSlider,    envAtkRndPosSlider,    RRColors::envNeg,    RRColors::envCol);
+    drawRndArcs(envDecaySlider,        envDecRndNegSlider,    envDecRndPosSlider,    RRColors::envNeg,    RRColors::envCol);
+    // TRANSIENT
+    drawRndArcs(transientAttackSlider, transAtkRndNegSlider,  transAtkRndPosSlider,  RRColors::transNeg,  RRColors::transCol);
+    drawRndArcs(transientDecaySlider,  transDecRndNegSlider,  transDecRndPosSlider,  RRColors::transNeg,  RRColors::transCol);
+    // EQ LOW
+    drawRndArcs(lowGainSlider,         lowGainRndNegSlider,   lowGainRndPosSlider,   RRColors::eqLowNeg,  RRColors::eqLowCol);
+    drawRndArcs(lowFreqSlider,         lowFreqRndNegSlider,   lowFreqRndPosSlider,   RRColors::eqLowNeg,  RRColors::eqLowCol);
+    // EQ MID
+    drawRndArcs(midGainSlider,         midGainRndNegSlider,   midGainRndPosSlider,   RRColors::eqMidNeg,  RRColors::eqMidCol);
+    drawRndArcs(midFreqSlider,         midFreqRndNegSlider,   midFreqRndPosSlider,   RRColors::eqMidNeg,  RRColors::eqMidCol);
+    // EQ HIGH
+    drawRndArcs(highGainSlider,        highGainRndNegSlider,  highGainRndPosSlider,  RRColors::eqHighNeg, RRColors::eqHighCol);
+    drawRndArcs(highFreqSlider,        highFreqRndNegSlider,  highFreqRndPosSlider,  RRColors::eqHighNeg, RRColors::eqHighCol);
 }
 
 
 //==============================================================================
 void NewProjectAudioProcessorEditor::resized()
 {
-    constexpr int margin = 20;
-    constexpr int btnH = 28;
-    constexpr int knobW = 85;
-    constexpr int knobH = 100;
-    constexpr int knobGap = 10;
-    constexpr int sectGap = 35;
+    constexpr int margin = 12;
+    constexpr int secGap = 5;
+    constexpr int sRowY  = 98;
+    constexpr int sRowH  = 150;
+    constexpr int eRowY  = 254;
+    constexpr int eRowH  = 140;
+    constexpr int knobW  = 68;
+    constexpr int knobH  = 80;   // includes 16px text box
 
-    // BUTTON ROW 1: Load Samples + info label
-    loadSamplesButton.setBounds(margin, 10, 140, btnH);
-    samplesInfoLabel.setBounds(margin + 150, 10, 320, btnH);
+    const int secW = (getWidth() - 2 * margin - 3 * secGap) / 4;  // ~165
 
-    // About button — top-right of header bar
-    aboutButton.setBounds(getWidth() - 52, 10, 24, 24);
+    // ── Header buttons ────────────────────────────────────────────────────────
+    loadSamplesButton.setBounds(margin, 58, 120, 26);
+    samplesInfoLabel.setBounds(margin + 130, 58, 260, 26);
+    savePresetButton.setBounds(getWidth() - 148, 58, 60, 26);
+    loadPresetButton.setBounds(getWidth() - 80,  58, 60, 26);
+    aboutButton.setBounds(getWidth() - 46, 12, 22, 22);
 
-    // BUTTON ROW 2: Save / Load preset / playback mode
-    savePresetButton.setBounds(margin, 46, 110, btnH);
-    loadPresetButton.setBounds(margin + 120, 46, 110, btnH);
+    // ── Top section knob helper ───────────────────────────────────────────────
+    // secIdx 0-3, knobIdx 0-1
+    auto placeTopKnob = [&](juce::Slider& s, int secIdx, int knobIdx)
+    {
+        const int secX  = margin + secIdx * (secW + secGap);
+        const int inner = secW - 2 * 6;               // 153px usable
+        const int gap   = inner - 2 * knobW;          // split remaining
+        const int kx    = secX + 6 + knobIdx * (knobW + gap);
+        const int ky    = sRowY + (sRowH - knobH - 12) / 2 + 16;
+        s.setBounds(kx, ky, knobW, knobH);
+    };
 
-    // KNOB ROW 1: PITCH | AMPLITUDE | ENVELOPE
-    constexpr int row1Y = 110;
+    placeTopKnob(semitoneSlider,        0, 0);
+    placeTopKnob(fineTuneSlider,        0, 1);
+    placeTopKnob(volumeSlider,          1, 0);
+    placeTopKnob(panSlider,             1, 1);
+    placeTopKnob(envAttackSlider,       2, 0);
+    placeTopKnob(envDecaySlider,        2, 1);
+    placeTopKnob(transientAttackSlider, 3, 0);
+    placeTopKnob(transientDecaySlider,  3, 1);
 
-    const int pitchX = margin;
-    semitoneSlider.setBounds(pitchX, row1Y, knobW, knobH);
-    fineTuneSlider.setBounds(pitchX + knobW + knobGap, row1Y, knobW, knobH);
+    // ── EQ knobs ─────────────────────────────────────────────────────────────
+    const int pbW  = 112;
+    const int eqW  = getWidth() - 2 * margin - secGap - pbW;
+    const int eqInner = eqW - 12;
+    const int eqGap   = (eqInner - 6 * knobW) / 5;
+    const int eqKy    = eRowY + (eRowH - knobH - 12) / 2 + 20;
 
-    const int ampX = pitchX + 2 * (knobW + knobGap) + sectGap;
-    volumeSlider.setBounds(ampX, row1Y, knobW, knobH);
-    panSlider.setBounds(ampX + knobW + knobGap, row1Y, knobW, knobH);
+    auto placeEQKnob = [&](juce::Slider& s, int idx)
+    {
+        s.setBounds(margin + 6 + idx * (knobW + eqGap), eqKy, knobW, knobH);
+    };
 
-    const int envX = ampX + 2 * (knobW + knobGap) + sectGap;
-    envAttackSlider.setBounds(envX, row1Y, knobW, knobH);
-    envDecaySlider.setBounds(envX + knobW + knobGap, row1Y, knobW, knobH);
+    placeEQKnob(lowGainSlider,  0);
+    placeEQKnob(lowFreqSlider,  1);
+    placeEQKnob(midGainSlider,  2);
+    placeEQKnob(midFreqSlider,  3);
+    placeEQKnob(highGainSlider, 4);
+    placeEQKnob(highFreqSlider, 5);
 
-    // KNOB ROW 2: TRANSIENT
-    constexpr int row2Y = 250;
-    const int     transX = margin;
-    transientAttackSlider.setBounds(transX, row2Y, knobW, knobH);
-    transientDecaySlider.setBounds(transX + knobW + knobGap, row2Y, knobW, knobH);
+    // ── Playback toggle ───────────────────────────────────────────────────────
+    const int pbX = margin + eqW + secGap;
+    playbackModeButton.setBounds(pbX + (pbW - 90) / 2, eRowY + 26, 90, 90);
+    playbackTypeLabel.setBounds(pbX, eRowY + 7, pbW, 14);  // hidden but harmless
 
-    // Toggle to the right of transient knobs, vertically centred in row
-    constexpr int toggleX = transX + 2 * (knobW + knobGap) + sectGap;
-    playbackTypeLabel.setBounds(toggleX, row2Y + 28, 150, 14);
-    playbackModeButton.setBounds(toggleX, row2Y + 46, 150, 34);
-
-    // KNOB ROW 3: EQ
-    constexpr int row3Y = 390;
-    constexpr int eqStep = (700 - 2 * margin - 6 * knobW) / 5;
-
-    lowGainSlider.setBounds(margin + 0 * (knobW + eqStep), row3Y, knobW, knobH);
-    lowFreqSlider.setBounds(margin + 1 * (knobW + eqStep), row3Y, knobW, knobH);
-    midGainSlider.setBounds(margin + 2 * (knobW + eqStep), row3Y, knobW, knobH);
-    midFreqSlider.setBounds(margin + 3 * (knobW + eqStep), row3Y, knobW, knobH);
-    highGainSlider.setBounds(margin + 4 * (knobW + eqStep), row3Y, knobW, knobH);
-    highFreqSlider.setBounds(margin + 5 * (knobW + eqStep), row3Y, knobW, knobH);
-
+    // ── Arc overlay (full canvas) ─────────────────────────────────────────────
     arcOverlay.setBounds(getLocalBounds());
 }
 
