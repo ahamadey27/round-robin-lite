@@ -4,7 +4,7 @@
 #include "Parameters/ParametersIDs.h"
 #include "UI/RRLookAndFeel.h"  
 
-class NewProjectAudioProcessorEditor : public juce::AudioProcessorEditor
+class NewProjectAudioProcessorEditor : public juce::AudioProcessorEditor, public juce::ComponentListener
 {
 public:
     NewProjectAudioProcessorEditor(NewProjectAudioProcessor&);
@@ -12,6 +12,7 @@ public:
     void paint(juce::Graphics&) override;
     void resized() override;
     void paintOverChildren(juce::Graphics&) override;
+    void componentVisibilityChanged(juce::Component&) override;
 
 private:
     NewProjectAudioProcessor& audioProcessor;

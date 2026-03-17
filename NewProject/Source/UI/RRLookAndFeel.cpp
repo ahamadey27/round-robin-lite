@@ -6,22 +6,18 @@
 void RRKnobLAF::drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height,
     float sliderPos, float rotaryStartAngle, float rotaryEndAngle, juce::Slider& slider)
 {
-    constexpr int tbH = 16;   // text box height — must match overlay
+    // IMPORTANT: JUCE already subtracts the text box height before calling here.
+    // 'height' is the knob-only area. Do NOT subtract tbH again — that was the bug.
 
-    // ── Use h_inner so cy matches paintOverChildren exactly ──────────────────
-    const float h_inner  = (float)(height - tbH);
-    const float cx       = x + width * 0.5f;
-    const float cy       = y + h_inner * 0.5f;              // matches overlay cy
+    const float cx = x + width  * 0.5f;
+    const float cy = y + height * 0.5f;   // now matches paintOverChildren cy exactly
 
-    // Arc overlay sits at: knobRadius + 5px, trackW = 5px
-    // Arc inner edge = knobRadius + 5 - 2.5 = knobRadius + 2.5
-    // Knob body should reach that inner edge minus 1px breathing room:
-    // bodyRadius = knobRadius + 1.5  where knobRadius = jmin(w, h_inner)*0.5 - 4
-    // => bodyRadius = jmin(w, h_inner)*0.5 - 2.5
-    const float bodyRadius = juce::jmin((float)width, h_inner) * 0.5f - 2.5f;
-
-    // Track arc uses same center + slightly smaller radius for the grey groove
-    const float trackRadius = bodyRadius - 1.0f;
+    // paintOverChildren arc: knobRadius = jmin(w, h_inner)*0.5 - 4, arc at knobRadius + 5
+    // Arc inner edge = (knobRadius + 5) - trackW/2 = knobRadius + 2.5
+    // Body fills to just inside arc inner edge: bodyRadius = knobRadius + 1.5
+    //   = jmin(width, height)*0.5 - 4 + 1.5 = jmin(width, height)*0.5 - 2.5
+    const float bodyRadius  = juce::jmin((float)width, (float)height) * 0.5f - 2.5f;
+    const float trackRadius = bodyRadius * 0.96f;   // grey groove slightly inside body edge
 
     // ── Shadow ───────────────────────────────────────────────────────────────
     g.setColour(juce::Colours::black.withAlpha(0.4f));
@@ -45,9 +41,9 @@ void RRKnobLAF::drawRotarySlider(juce::Graphics& g, int x, int y, int width, int
     g.strokePath(track, juce::PathStrokeType(3.0f,
         juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
 
-    // ── Indicator line (section color, from center outward ~55%) ─────────────
+    // ── Indicator line ────────────────────────────────────────────────────────
     const juce::Colour lineCol = slider.findColour(juce::Slider::rotarySliderFillColourId);
-    const float angle    = rotaryStartAngle + sliderPos * (rotaryEndAngle - rotaryStartAngle);
+    const float angle     = rotaryStartAngle + sliderPos * (rotaryEndAngle - rotaryStartAngle);
     const float lineInner = bodyRadius * 0.18f;
     const float lineOuter = bodyRadius * 0.55f;
     g.setColour(lineCol);

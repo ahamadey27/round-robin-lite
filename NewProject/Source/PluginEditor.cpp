@@ -59,8 +59,11 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
             aboutWindow.setTopLeftPosition(getWidth() / 2 - 170, getHeight() / 2 - 100); 
             addAndMakeVisible(aboutWindow);
             aboutWindow.toFront(true);
+            repaint();   // ← ADD: hides dots immediately when window opens
         };
+    
     addAndMakeVisible(aboutButton);
+    aboutWindow.addComponentListener(this);   // ← ADD: watch for visibility changes
 
     // User Presets
     savePresetButton.setButtonText("Save Preset");
@@ -180,7 +183,7 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
     resized();
 }
 
-static constexpr float kRndDotOffset = 0.21f;   // ~15 degrees
+static constexpr float kRndDotOffset = 0.18f;   // ~15 degrees
 
 //==============================================================================
 NewProjectAudioProcessorEditor::~NewProjectAudioProcessorEditor()
@@ -348,12 +351,16 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
     g.setColour(RRColors::sectionBorder);
     g.fillRect(0, 52, getWidth(), 1);
 
+    juce::Font rrFont(juce::FontOptions(26.0f));
+    rrFont = rrFont.boldened();
+    g.setFont(rrFont);
     g.setColour(juce::Colour(0xffd0d0d0));
-    g.setFont(juce::Font(juce::FontOptions(26.0f)).boldened());
-    g.drawText("RR", 14, 10, 50, 32, juce::Justification::left);
+    g.drawText("RoundRobin", 14, 10, 200, 32, juce::Justification::left);  // wider rect
+
+    const int liteX = 14 + rrFont.getStringWidth("RoundRobin") + 3;  // measure + 3px gap
     g.setColour(juce::Colour(0xff999999));
     g.setFont(juce::Font(juce::FontOptions(17.0f)));
-    g.drawText("Lite", 56, 14, 50, 26, juce::Justification::left);
+    g.drawText("Lite", liteX, 14, 60, 26, juce::Justification::left);
 
     // ── Section boxes ─────────────────────────────────────────────────────────
     auto drawSectionBox = [&](juce::Rectangle<int> r)
@@ -425,7 +432,7 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
     g.fillRect(0, getHeight() - 30, getWidth(), 1);
     g.setColour(RRColors::companyText);
     g.setFont(juce::Font(juce::FontOptions(10.0f)));
-    g.drawText("Company Name", 0, getHeight() - 26, getWidth() - 14, 20,
+    g.drawText("Alex Hamadey", 0, getHeight() - 26, getWidth() - 14, 20,
                juce::Justification::right);
 }
 
@@ -434,6 +441,14 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
 
 void NewProjectAudioProcessorEditor::paintOverChildren(juce::Graphics& g)
 {
+    // Skip drawing arc overlay entirely when about window is open
+    if (aboutWindow.isVisible())
+    {
+        juce::RectangleList<int> clip(getLocalBounds());
+        clip.subtract(aboutWindow.getBounds());
+        g.reduceClipRegion(clip);   // ← arcs render outside window bounds only
+    }
+            
     constexpr float pi     = juce::MathConstants<float>::pi;
     constexpr float twoPi  = juce::MathConstants<float>::twoPi;
     constexpr float maxNeg = pi * 0.8f;
@@ -545,20 +560,30 @@ void NewProjectAudioProcessorEditor::paintOverChildren(juce::Graphics& g)
     drawRndArcs(highFreqSlider,        highFreqRndNegSlider,  highFreqRndPosSlider,  RRColors::eqHighNeg, RRColors::eqHighCol);
 }
 
+void NewProjectAudioProcessorEditor::componentVisibilityChanged(juce::Component& component)
+{
+    if (&component == &aboutWindow)
+        repaint();   // redraws arcs when window opens OR closes
+}
 
 //==============================================================================
 void NewProjectAudioProcessorEditor::resized()
 {
-    constexpr int margin = 12;
-    constexpr int secGap = 5;
-    constexpr int sRowY  = 98;
-    constexpr int sRowH  = 150;
-    constexpr int eRowY  = 254;
-    constexpr int eRowH  = 140;
-    constexpr int knobW  = 68;
-    constexpr int knobH  = 80;   // includes 16px text box
+    constexpr int margin  = 12;
+    constexpr int secGap  = 5;
+    constexpr int sRowY   = 98;
+    constexpr int sRowH   = 150;
+    constexpr int eRowY   = 254;
+    constexpr int eRowH   = 150;   // was 140 — match paint()
+    constexpr int knobW   = 68;
+    constexpr int knobH   = 80;    // knob draw area + 16px text box
+    constexpr int tbH     = 16;
 
-    const int secW = (getWidth() - 2 * margin - 3 * secGap) / 4;  // ~165
+    // Section bottom edges — used to center text boxes in remaining gap
+    constexpr int sRowBottom = sRowY + sRowH;   // 248
+    constexpr int eRowBottom = eRowY + eRowH;   // 404
+
+    const int secW = (getWidth() - 2 * margin - 3 * secGap) / 4;
 
     // ── Header buttons ────────────────────────────────────────────────────────
     loadSamplesButton.setBounds(margin, 58, 120, 26);
@@ -568,15 +593,23 @@ void NewProjectAudioProcessorEditor::resized()
     aboutButton.setBounds(getWidth() - 46, 12, 22, 22);
 
     // ── Top section knob helper ───────────────────────────────────────────────
-    // secIdx 0-3, knobIdx 0-1
+    // Component height is extended so the text box (always drawn at the very
+    // bottom of the component) lands centered between knob bottom and section border.
     auto placeTopKnob = [&](juce::Slider& s, int secIdx, int knobIdx)
     {
         const int secX  = margin + secIdx * (secW + secGap);
-        const int inner = secW - 2 * 6;               // 153px usable
-        const int gap   = inner - 2 * knobW;          // split remaining
+        const int inner = secW - 2 * 6;
+        const int gap   = inner - 2 * knobW;
         const int kx    = secX + 6 + knobIdx * (knobW + gap);
         const int ky    = sRowY + (sRowH - knobH - 12) / 2 + 16;
-        s.setBounds(kx, ky, knobW, knobH);
+
+        // knob draw area ends at ky + (knobH - tbH)
+        const int knobDrawBottom = ky + knobH - tbH;
+        const int spaceBelow     = sRowBottom - knobDrawBottom;
+        const int extraPad       = (spaceBelow - tbH) / 2;
+        const int totalH         = knobH + extraPad;
+
+        s.setBounds(kx, ky, knobW, totalH);
     };
 
     placeTopKnob(semitoneSlider,        0, 0);
@@ -589,15 +622,21 @@ void NewProjectAudioProcessorEditor::resized()
     placeTopKnob(transientDecaySlider,  3, 1);
 
     // ── EQ knobs ─────────────────────────────────────────────────────────────
-    const int pbW  = 112;
-    const int eqW  = getWidth() - 2 * margin - secGap - pbW;
+    const int pbW     = 112;
+    const int eqW     = getWidth() - 2 * margin - secGap - pbW;
     const int eqInner = eqW - 12;
     const int eqGap   = (eqInner - 6 * knobW) / 5;
     const int eqKy    = eRowY + (eRowH - knobH - 12) / 2 + 20;
 
     auto placeEQKnob = [&](juce::Slider& s, int idx)
     {
-        s.setBounds(margin + 6 + idx * (knobW + eqGap), eqKy, knobW, knobH);
+        const int kx             = margin + 6 + idx * (knobW + eqGap);
+        const int knobDrawBottom = eqKy + knobH - tbH;
+        const int spaceBelow     = eRowBottom - knobDrawBottom;
+        const int extraPad       = (spaceBelow - tbH) / 2;
+        const int totalH         = knobH + extraPad;
+
+        s.setBounds(kx, eqKy, knobW, totalH);
     };
 
     placeEQKnob(lowGainSlider,  0);
@@ -659,6 +698,10 @@ static void getDotPositions(juce::Slider& knob,
 
 bool NewProjectAudioProcessorEditor::RndArcOverlay::hitTest(int x, int y)
 {
+    
+    if (editor.aboutWindow.isVisible())   // ← ADD THIS
+            return false;
+    
     constexpr float hitR = 14.0f;
     auto pos = juce::Point<float>((float)x, (float)y);
 
