@@ -149,13 +149,38 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
 
         for (auto* s : { &highGainSlider, &highFreqSlider })
             s->setColour(juce::Slider::rotarySliderFillColourId, RRColors::eqHighCol);
+    
+    // NEW: value box text + border color matches section label color
+        auto setValueBoxColors = [](juce::Slider& s, juce::Colour col)
+        {
+            s.setColour(juce::Slider::textBoxTextColourId,       col);
+            s.setColour(juce::Slider::textBoxOutlineColourId,    col.withAlpha(0.55f));
+            s.setColour(juce::Slider::textBoxBackgroundColourId, juce::Colour(0xff111111));
+        };
+
+        setValueBoxColors(semitoneSlider,        RRColors::pitchCol);
+        setValueBoxColors(fineTuneSlider,        RRColors::pitchCol);
+        setValueBoxColors(volumeSlider,          RRColors::ampCol);
+        setValueBoxColors(panSlider,             RRColors::ampCol);
+        setValueBoxColors(envAttackSlider,       RRColors::envCol);
+        setValueBoxColors(envDecaySlider,        RRColors::envCol);
+        setValueBoxColors(transientAttackSlider, RRColors::transCol);
+        setValueBoxColors(transientDecaySlider,  RRColors::transCol);
+        setValueBoxColors(lowGainSlider,         RRColors::eqLowCol);
+        setValueBoxColors(lowFreqSlider,         RRColors::eqLowCol);
+        setValueBoxColors(midGainSlider,         RRColors::eqMidCol);
+        setValueBoxColors(midFreqSlider,         RRColors::eqMidCol);
+        setValueBoxColors(highGainSlider,        RRColors::eqHighCol);
+        setValueBoxColors(highFreqSlider,        RRColors::eqHighCol);
 
 
-    setSize(700, 520);
+    setSize(700, 440);
     // Overlay must be added AFTER all knobs so it sits on top
     addAndMakeVisible(arcOverlay);
     resized();
 }
+
+static constexpr float kRndDotOffset = 0.21f;   // ~15 degrees
 
 //==============================================================================
 NewProjectAudioProcessorEditor::~NewProjectAudioProcessorEditor()
@@ -288,6 +313,32 @@ void NewProjectAudioProcessorEditor::loadPreset()
 //==============================================================================
 void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
 {
+    // Layout constants — must match resized() exactly
+    constexpr int margin = 12;
+    constexpr int secGap = 5;
+    constexpr int sRowY  = 98;
+    constexpr int sRowH  = 150;
+    constexpr int eRowY  = 254;
+    constexpr int eRowH  = 150;
+    constexpr int knobW  = 68;
+    constexpr int knobH  = 80;
+    constexpr int tbH    = 16;
+    const int secW = (getWidth() - 2 * margin - 3 * secGap) / 4;
+    const int pbW  = 112;
+    const int eqW  = getWidth() - 2 * margin - secGap - pbW;
+    const int pbX  = margin + eqW + secGap;
+
+    // Knob center Y (matches new drawRotarySlider: cy = y + (h-tbH)*0.5)
+    const float h_inner = (float)(knobH - tbH);
+    // Top-row knob Y from resized: ky = sRowY + (sRowH-knobH-12)/2 + 16
+    const int ky    = sRowY + (sRowH - knobH - 12) / 2 + 16;
+    // EQ knob Y from resized: eqKy = eRowY + (eRowH-knobH-12)/2 + 20
+    const int eqKy  = eRowY + (eRowH - knobH - 12) / 2 + 20;
+
+    // Section label bottom (9pt font + 7px top margin)
+    const int topSecLabelBottom = sRowY  + 7 + 9;   // = sRowY + 16
+    const int eqSecLabelBottom  = eRowY  + 7 + 9;   // = eRowY + 16
+
     // ── Background ───────────────────────────────────────────────────────────
     g.fillAll(RRColors::background);
 
@@ -297,7 +348,6 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
     g.setColour(RRColors::sectionBorder);
     g.fillRect(0, 52, getWidth(), 1);
 
-    // Logo: "RR" bold + "Lite" light
     g.setColour(juce::Colour(0xffd0d0d0));
     g.setFont(juce::Font(juce::FontOptions(26.0f)).boldened());
     g.drawText("RR", 14, 10, 50, 32, juce::Justification::left);
@@ -314,75 +364,61 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
         g.drawRoundedRectangle(r.toFloat(), 5.0f, 1.0f);
     };
 
-    // Layout constants — must match resized()
-    constexpr int sRowY  = 98;
-    constexpr int sRowH  = 150;
-    constexpr int eRowY  = 254;
-    constexpr int eRowH  = 140;
-    constexpr int margin = 12;
-    constexpr int secGap = 5;
-    const int secW = (getWidth() - 2 * margin - 3 * secGap) / 4;  // ~165
-
-    // Four top sections
     for (int i = 0; i < 4; ++i)
         drawSectionBox({ margin + i * (secW + secGap), sRowY, secW, sRowH });
 
-    // EQ section
-    const int pbW   = 112;
-    const int eqW   = getWidth() - 2 * margin - secGap - pbW;
-    drawSectionBox({ margin, eRowY, eqW, eRowH });
-    // Playback section
-    drawSectionBox({ margin + eqW + secGap, eRowY, pbW, eRowH });
+    drawSectionBox({ margin,        eRowY, eqW, eRowH });   // EQ
+    drawSectionBox({ pbX,           eRowY, pbW, eRowH });   // Playback
 
-    // ── Section labels ────────────────────────────────────────────────────────
+    // ── Section category labels (9pt, 120% of original 7.5pt) ────────────────
     auto drawSecLabel = [&](const juce::String& text, int secIdx, juce::Colour col)
     {
         g.setColour(col);
-        g.setFont(juce::Font(juce::FontOptions(7.5f)).boldened());
-        g.drawText(text, margin + secIdx * (secW + secGap) + 8, sRowY + 7, secW - 10, 12,
-                   juce::Justification::left);
+        g.setFont(juce::Font(juce::FontOptions(9.0f)).boldened());
+        g.drawText(text, margin + secIdx * (secW + secGap) + 8, sRowY + 7,
+                   secW - 10, 10, juce::Justification::left);
     };
     drawSecLabel("PITCH",     0, RRColors::pitchCol);
     drawSecLabel("AMPLITUDE", 1, RRColors::ampCol);
     drawSecLabel("ENVELOPE",  2, RRColors::envCol);
     drawSecLabel("TRANSIENT", 3, RRColors::transCol);
 
+    g.setFont(juce::Font(juce::FontOptions(9.0f)).boldened());
     g.setColour(RRColors::eqLowCol);
-    g.setFont(juce::Font(juce::FontOptions(7.5f)).boldened());
-    g.drawText("EQ SETTINGS", margin + 8, eRowY + 7, 120, 12, juce::Justification::left);
+    g.drawText("EQ SETTINGS", margin + 8, eRowY + 7, 120, 10, juce::Justification::left);
 
+    // PLAYBACK TYPE — centered within pbW
     g.setColour(RRColors::eqLowCol);
-    g.drawText("PLAYBACK", margin + eqW + secGap + 8, eRowY + 7,  pbW - 10, 10,
-               juce::Justification::centred);
-    g.drawText("TYPE",     margin + eqW + secGap + 8, eRowY + 17, pbW - 10, 10,
-               juce::Justification::centred);
+    g.drawText("PLAYBACK TYPE", pbX, eRowY + 6, pbW, 10, juce::Justification::centred);
 
-    // ── Knob labels ───────────────────────────────────────────────────────────
-    g.setFont(juce::Font(juce::FontOptions(7.0f)));
-    g.setColour(juce::Colour(0xff666666));
+    // ── Knob parameter name labels (12pt, 75% of original 7pt → ~12pt) ───────
+    // Vertically centered between section label bottom and knob top
+    g.setFont(juce::Font(juce::FontOptions(12.0f)));
 
-    auto drawKnobLabel = [&](const juce::String& text, juce::Slider& s)
+    auto drawKnobLabel = [&](const juce::String& text, juce::Slider& s, int secLabelBottom)
     {
         auto b = s.getBounds();
-        constexpr int tbH = 16;
-        g.drawText(text, b.getX(), b.getY() - 12, b.getWidth(), 11,
+        int knobTop  = b.getY();
+        int centerY  = (secLabelBottom + knobTop) / 2;
+        g.setColour(juce::Colour(0xff666666));
+        g.drawText(text, b.getX() - 8, centerY - 6, b.getWidth() + 16, 12,
                    juce::Justification::centred);
     };
 
-    drawKnobLabel("SEMITONE",  semitoneSlider);
-    drawKnobLabel("FINE TUNE", fineTuneSlider);
-    drawKnobLabel("VOLUME",    volumeSlider);
-    drawKnobLabel("PAN",       panSlider);
-    drawKnobLabel("ATTACK",    envAttackSlider);
-    drawKnobLabel("DECAY",     envDecaySlider);
-    drawKnobLabel("ATTACK",    transientAttackSlider);
-    drawKnobLabel("DECAY",     transientDecaySlider);
-    drawKnobLabel("LOW GAIN",  lowGainSlider);
-    drawKnobLabel("LOW FREQ",  lowFreqSlider);
-    drawKnobLabel("MID GAIN",  midGainSlider);
-    drawKnobLabel("MID FREQ",  midFreqSlider);
-    drawKnobLabel("HIGH GAIN", highGainSlider);
-    drawKnobLabel("HIGH FREQ", highFreqSlider);
+    drawKnobLabel("SEMITONE",  semitoneSlider,        topSecLabelBottom);
+    drawKnobLabel("FINE TUNE", fineTuneSlider,         topSecLabelBottom);
+    drawKnobLabel("VOLUME",    volumeSlider,            topSecLabelBottom);
+    drawKnobLabel("PAN",       panSlider,               topSecLabelBottom);
+    drawKnobLabel("ATTACK",    envAttackSlider,         topSecLabelBottom);
+    drawKnobLabel("DECAY",     envDecaySlider,          topSecLabelBottom);
+    drawKnobLabel("ATTACK",    transientAttackSlider,   topSecLabelBottom);
+    drawKnobLabel("DECAY",     transientDecaySlider,    topSecLabelBottom);
+    drawKnobLabel("LOW GAIN",  lowGainSlider,           eqSecLabelBottom);
+    drawKnobLabel("LOW FREQ",  lowFreqSlider,           eqSecLabelBottom);
+    drawKnobLabel("MID GAIN",  midGainSlider,           eqSecLabelBottom);
+    drawKnobLabel("MID FREQ",  midFreqSlider,           eqSecLabelBottom);
+    drawKnobLabel("HIGH GAIN", highGainSlider,          eqSecLabelBottom);
+    drawKnobLabel("HIGH FREQ", highFreqSlider,          eqSecLabelBottom);
 
     // ── Footer ────────────────────────────────────────────────────────────────
     g.setColour(RRColors::sectionBorder.darker(0.5f));
@@ -398,14 +434,17 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
 
 void NewProjectAudioProcessorEditor::paintOverChildren(juce::Graphics& g)
 {
-    constexpr float pi      = juce::MathConstants<float>::pi;
-    constexpr float twoPi   = juce::MathConstants<float>::twoPi;
-    constexpr float maxNeg  = pi * 0.8f;
-    constexpr float maxPos  = pi * 0.8f;
-    constexpr float trackW  = 5.0f;
-    constexpr float arcW    = 6.5f;
-    constexpr float dotR    = 5.5f;
-    constexpr int   tbH     = 16;
+    constexpr float pi     = juce::MathConstants<float>::pi;
+    constexpr float twoPi  = juce::MathConstants<float>::twoPi;
+    constexpr float maxNeg = pi * 0.8f;
+    constexpr float maxPos = pi * 0.8f;
+    constexpr float trackW = 5.0f;
+    constexpr float arcW   = 6.5f;
+    constexpr float dotR   = 5.0f;
+    constexpr int   tbH    = 16;
+
+    // Muted gray-green dot color — fits dark forest palette, not harsh white
+    const juce::Colour dotCol { 0xff8a9a8a };
 
     auto drawRndArcs = [&](juce::Slider& knob,
                            juce::Slider& negSlider,
@@ -416,9 +455,14 @@ void NewProjectAudioProcessorEditor::paintOverChildren(juce::Graphics& g)
         auto  b  = knob.getBounds();
         float w  = (float)b.getWidth();
         float h  = (float)(b.getHeight() - tbH);
+
+        // cy matches new drawRotarySlider: cy = y + (height-tbH)*0.5
         float cx = b.getX() + w * 0.5f;
         float cy = b.getY() + h * 0.5f;
-        float radius = juce::jmin(w, h) * 0.5f - 1.0f;
+
+        // Arc sits 5px outside the knob rim — same knob radius formula as LAF
+        float knobRadius = juce::jmin(w, h) * 0.5f - 4.0f;
+        float radius     = knobRadius + 5.0f;
 
         auto getNorm = [](juce::Slider& s) -> float {
             double range = s.getMaximum() - s.getMinimum();
@@ -426,9 +470,8 @@ void NewProjectAudioProcessorEditor::paintOverChildren(juce::Graphics& g)
             return (float)((s.getValue() - s.getMinimum()) / range);
         };
 
-        constexpr float dotOffset = 0.15f;
-        float negExtent = getNorm(negSlider) * (maxNeg - dotOffset);
-        float posExtent = getNorm(posSlider) * (maxPos - dotOffset);
+        float negExtent = getNorm(negSlider) * (maxNeg - kRndDotOffset);
+        float posExtent = getNorm(posSlider) * (maxPos - kRndDotOffset);
 
         // Dim background tracks
         juce::Path negTrack;
@@ -467,16 +510,15 @@ void NewProjectAudioProcessorEditor::paintOverChildren(juce::Graphics& g)
                 juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
         }
 
-        // White dot at neg arc endpoint
-        float negDotX = cx - std::sin(negExtent + dotOffset) * radius;
-        float negDotY = cy - std::cos(negExtent + dotOffset) * radius;
-        g.setColour(juce::Colours::white);
+        // Muted gray-green dots at arc endpoints (grab handles)
+        float negDotX = cx - std::sin(negExtent + kRndDotOffset) * radius;
+        float negDotY = cy - std::cos(negExtent + kRndDotOffset) * radius;
+        g.setColour(dotCol);
         g.fillEllipse(negDotX - dotR, negDotY - dotR, dotR * 2.0f, dotR * 2.0f);
 
-        // White dot at pos arc endpoint
-        float posDotX = cx + std::sin(posExtent + dotOffset) * radius;
-        float posDotY = cy - std::cos(posExtent + dotOffset) * radius;
-        g.setColour(juce::Colours::white);
+        float posDotX = cx + std::sin(posExtent + kRndDotOffset) * radius;
+        float posDotY = cy - std::cos(posExtent + kRndDotOffset) * radius;
+        g.setColour(dotCol);
         g.fillEllipse(posDotX - dotR, posDotY - dotR, dotR * 2.0f, dotR * 2.0f);
     };
 
@@ -579,38 +621,40 @@ void NewProjectAudioProcessorEditor::resized()
 // hitTest returns true only near arc dots, so knobs still receive
 // normal mouse events everywhere else.
 
+// PluginEditor.cpp — before RndArcOverlay::hitTest
+
 static void getDotPositions(juce::Slider& knob,
     juce::Slider& negSlider,
     juce::Slider& posSlider,
     juce::Point<float>& negPt,
     juce::Point<float>& posPt)
 {
-    constexpr float pi = juce::MathConstants<float>::pi;
+    constexpr float pi     = juce::MathConstants<float>::pi;
     constexpr float maxNeg = pi * 0.8f;
     constexpr float maxPos = pi * 0.8f;
-    constexpr float dotOffset = 0.15f;
-    constexpr int   tbH = 16;
+    constexpr int   tbH    = 16;
 
-    auto b = knob.getBounds();
+    auto b  = knob.getBounds();
     float w = (float)b.getWidth();
-    float h = (float)(b.getHeight() - tbH);
+    float h = (float)(b.getHeight() - tbH);    // match new drawRotarySlider
     float cx = b.getX() + w * 0.5f;
-    float cy = b.getY() + h * 0.5f;
-    float radius = juce::jmin(w, h) * 0.5f - 1.0f;
+    float cy = b.getY() + h * 0.5f;            // match new drawRotarySlider
+    float knobRadius = juce::jmin(w, h) * 0.5f - 4.0f;
+    float radius     = knobRadius + 5.0f;       // arc sits 5px outside knob rim
 
     auto getNorm = [](juce::Slider& s) -> float {
         double range = s.getMaximum() - s.getMinimum();
         if (range == 0.0) return 0.0f;
         return (float)((s.getValue() - s.getMinimum()) / range);
-        };
+    };
 
-    float negExtent = getNorm(negSlider) * (maxNeg - dotOffset);
-    float posExtent = getNorm(posSlider) * (maxPos - dotOffset);
+    float negExtent = getNorm(negSlider) * (maxNeg - kRndDotOffset);
+    float posExtent = getNorm(posSlider) * (maxPos - kRndDotOffset);
 
-    negPt = { cx - std::sin(negExtent + dotOffset) * radius,
-              cy - std::cos(negExtent + dotOffset) * radius };
-    posPt = { cx + std::sin(posExtent + dotOffset) * radius,
-              cy - std::cos(posExtent + dotOffset) * radius };
+    negPt = { cx - std::sin(negExtent + kRndDotOffset) * radius,
+              cy - std::cos(negExtent + kRndDotOffset) * radius };
+    posPt = { cx + std::sin(posExtent + kRndDotOffset) * radius,
+              cy - std::cos(posExtent + kRndDotOffset) * radius };
 }
 
 bool NewProjectAudioProcessorEditor::RndArcOverlay::hitTest(int x, int y)
@@ -650,7 +694,6 @@ void NewProjectAudioProcessorEditor::RndArcOverlay::mouseDown(const juce::MouseE
 {
     activeSlider = nullptr;
     auto pos = e.position;
-    constexpr float hitR = 14.0f;
 
     struct Trio { juce::Slider* k; juce::Slider* n; juce::Slider* p; };
     Trio trios[] = {
@@ -670,29 +713,41 @@ void NewProjectAudioProcessorEditor::RndArcOverlay::mouseDown(const juce::MouseE
         { &editor.envDecaySlider,        &editor.envDecRndNegSlider,    &editor.envDecRndPosSlider    },
     };
 
+    // FIX: use closest-dot selection instead of first-found.
+    // Prevents neg dot being grabbed when clicking the pos dot at 0% (both near top).
+    float        closestDist = 18.0f;   // hit radius
+    juce::Slider* closestSlider = nullptr;
+    bool          closestIsNeg  = false;
+
     for (auto& t : trios)
     {
         juce::Point<float> negPt, posPt;
         getDotPositions(*t.k, *t.n, *t.p, negPt, posPt);
 
-        if (pos.getDistanceFrom(negPt) < hitR)
+        float negDist = pos.getDistanceFrom(negPt);
+        float posDist = pos.getDistanceFrom(posPt);
+
+        if (negDist < closestDist)
         {
-            activeSlider = t.n; 
-            activeIsNeg = true;
-            break;
+            closestDist   = negDist;
+            closestSlider = t.n;
+            closestIsNeg  = true;
         }
-        if (pos.getDistanceFrom(posPt) < hitR)
+        if (posDist < closestDist)
         {
-            activeSlider = t.p; 
-            activeIsNeg = false;
-            break;
+            closestDist   = posDist;
+            closestSlider = t.p;
+            closestIsNeg  = false;
         }
     }
 
+    activeSlider = closestSlider;
+    activeIsNeg  = closestIsNeg;
+
     if (activeSlider != nullptr)
     {
-        dragStartY = e.position.y;
-        dragStartX = e.position.x;           // ← ADD
+        dragStartY   = e.position.y;
+        dragStartX   = e.position.x;
         dragStartVal = (float)activeSlider->getValue();
     }
 }

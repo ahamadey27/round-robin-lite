@@ -1,41 +1,55 @@
 #include "RRLookAndFeel.h"
 
 //==============================================================================
+// RRLookAndFeel.cpp
+
 void RRKnobLAF::drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height,
     float sliderPos, float rotaryStartAngle, float rotaryEndAngle, juce::Slider& slider)
 {
-    // tbH = text box height JUCE reserves at the bottom of the component
-    constexpr int tbH = 16;
-    const float w = (float)width;
-    const float h = (float)(height - tbH);
-    const float cx = x + w * 0.5f;
-    const float cy = y + h * 0.5f;
-    const float radius = juce::jmin(w, h) * 0.5f - 4.0f;
+    constexpr int tbH = 16;   // text box height — must match overlay
+
+    // ── Use h_inner so cy matches paintOverChildren exactly ──────────────────
+    const float h_inner  = (float)(height - tbH);
+    const float cx       = x + width * 0.5f;
+    const float cy       = y + h_inner * 0.5f;              // matches overlay cy
+
+    // Arc overlay sits at: knobRadius + 5px, trackW = 5px
+    // Arc inner edge = knobRadius + 5 - 2.5 = knobRadius + 2.5
+    // Knob body should reach that inner edge minus 1px breathing room:
+    // bodyRadius = knobRadius + 1.5  where knobRadius = jmin(w, h_inner)*0.5 - 4
+    // => bodyRadius = jmin(w, h_inner)*0.5 - 2.5
+    const float bodyRadius = juce::jmin((float)width, h_inner) * 0.5f - 2.5f;
+
+    // Track arc uses same center + slightly smaller radius for the grey groove
+    const float trackRadius = bodyRadius - 1.0f;
 
     // ── Shadow ───────────────────────────────────────────────────────────────
-    g.setColour(juce::Colours::black.withAlpha(0.45f));
-    g.fillEllipse(cx - radius + 1.0f, cy - radius + 2.0f, radius * 2.0f, radius * 2.0f);
+    g.setColour(juce::Colours::black.withAlpha(0.4f));
+    g.fillEllipse(cx - bodyRadius + 1.0f, cy - bodyRadius + 2.0f,
+                  bodyRadius * 2.0f, bodyRadius * 2.0f);
 
     // ── Knob body ────────────────────────────────────────────────────────────
-    g.setColour(RRColors::knobBody);
-    g.fillEllipse(cx - radius, cy - radius, radius * 2.0f, radius * 2.0f);
+    g.setColour(juce::Colour(0xff1c1c1c));
+    g.fillEllipse(cx - bodyRadius, cy - bodyRadius,
+                  bodyRadius * 2.0f, bodyRadius * 2.0f);
     g.setColour(juce::Colour(0xff0a0a0a));
-    g.drawEllipse(cx - radius, cy - radius, radius * 2.0f, radius * 2.0f, 1.5f);
+    g.drawEllipse(cx - bodyRadius, cy - bodyRadius,
+                  bodyRadius * 2.0f, bodyRadius * 2.0f, 1.2f);
 
     // ── Track arc (grey, 275° sweep) ─────────────────────────────────────────
     juce::Path track;
-    track.addArc(cx - radius, cy - radius, radius * 2.0f, radius * 2.0f,
-        rotaryStartAngle, rotaryEndAngle, true);
-    g.setColour(RRColors::knobTrack);
+    track.addArc(cx - trackRadius, cy - trackRadius,
+                 trackRadius * 2.0f, trackRadius * 2.0f,
+                 rotaryStartAngle, rotaryEndAngle, true);
+    g.setColour(juce::Colour(0xff2a2a2a));
     g.strokePath(track, juce::PathStrokeType(3.0f,
         juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
 
-    // ── Indicator line (12 o'clock to halfway down) ──────────────────────────
-    // Color is set per-slider via setColour(rotarySliderFillColourId, ...)
+    // ── Indicator line (section color, from center outward ~55%) ─────────────
     const juce::Colour lineCol = slider.findColour(juce::Slider::rotarySliderFillColourId);
-    const float angle = rotaryStartAngle + sliderPos * (rotaryEndAngle - rotaryStartAngle);
-    const float lineInner = radius * 0.18f;
-    const float lineOuter = radius * 0.55f;
+    const float angle    = rotaryStartAngle + sliderPos * (rotaryEndAngle - rotaryStartAngle);
+    const float lineInner = bodyRadius * 0.18f;
+    const float lineOuter = bodyRadius * 0.55f;
     g.setColour(lineCol);
     g.drawLine(cx + std::sin(angle) * lineInner,
                cy - std::cos(angle) * lineInner,
@@ -94,27 +108,33 @@ void RRPosSliderLAF::drawLinearSlider(juce::Graphics& g, int x, int y, int width
 }
 
 // ── RRToggleLAF — vertical pill, SERIES top / RANDOM bottom ─────────────────
+// RRLookAndFeel.cpp
+
 void RRToggleLAF::drawButtonBackground(juce::Graphics& g, juce::Button& button,
     const juce::Colour&, bool, bool)
 {
-    const bool isRandom = button.getToggleState();   // false=SERIES, true=RANDOM
+    const bool isRandom = button.getToggleState();
     const auto b = button.getLocalBounds().toFloat();
 
-    // Text areas (top/bottom thirds) and pill in middle
-    const float textH = b.getHeight() * 0.28f;
-    const float pillH = b.getHeight() * 0.5f;
+    // Fixed sizes that fit comfortably in the button bounds
+    constexpr float textH = 16.0f;
+    constexpr float pillH = 44.0f;
+    const float totalContent = textH * 2.0f + pillH;
+    const float topPad = (b.getHeight() - totalContent) * 0.5f;
+
     const float pillW = 18.0f;
     const float pillX = b.getCentreX() - pillW * 0.5f;
-    const float pillY = textH + (b.getHeight() - textH * 2.0f - pillH) * 0.5f;
+    const float pillY = b.getY() + topPad + textH;
 
-    // SERIES label
-    g.setColour(isRandom ? juce::Colour(0xff555555) : juce::Colour(0xff8aba6a));
+    // SERIES label — bright when active (top = not random)
     g.setFont(juce::Font(juce::FontOptions(9.0f)).boldened());
-    g.drawText("SERIES", b.withHeight(textH), juce::Justification::centred);
+    g.setColour(isRandom ? juce::Colour(0xff555555) : juce::Colour(0xff8aba6a));
+    g.drawText("SERIES", b.getX(), b.getY() + topPad, b.getWidth(), textH,
+               juce::Justification::centred);
 
-    // RANDOM label
+    // RANDOM label — bright when active (bottom = random)
     g.setColour(isRandom ? juce::Colour(0xff8aba6a) : juce::Colour(0xff555555));
-    g.drawText("RANDOM", b.withY(b.getBottom() - textH).withHeight(textH),
+    g.drawText("RANDOM", b.getX(), b.getY() + topPad + textH + pillH, b.getWidth(), textH,
                juce::Justification::centred);
 
     // Pill track
@@ -123,12 +143,12 @@ void RRToggleLAF::drawButtonBackground(juce::Graphics& g, juce::Button& button,
     g.setColour(juce::Colour(0xff3a5a3a));
     g.drawRoundedRectangle(pillX, pillY, pillW, pillH, pillW * 0.5f, 1.0f);
 
-    // Knob inside pill
+    // Knob inside pill — top = SERIES, bottom = RANDOM
     const float knobD = pillW - 4.0f;
     const float knobX = pillX + 2.0f;
     const float knobY = isRandom
-        ? pillY + pillH - 2.0f - knobD   // bottom = RANDOM
-        : pillY + 2.0f;                   // top    = SERIES
+        ? pillY + pillH - 2.0f - knobD   // bottom
+        : pillY + 2.0f;                   // top
     g.setColour(juce::Colour(0xffc87030));
     g.fillEllipse(knobX, knobY, knobD, knobD);
 }
