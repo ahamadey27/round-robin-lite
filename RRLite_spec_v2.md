@@ -70,20 +70,20 @@ The following systems are fully implemented and working:
 
 ### Step 1.5: Restructure Header Layout
 
-- [ ] Move "Load Preset" and "Save Preset" buttons to the top-right header bar area (inside the header, not below it)
-- [ ] Position the "?" (About) button to the right of Save Preset
-- [ ] Remove the old sub-header row that held Load Samples, samples info, and preset buttons
-- [ ] The "Load Samples" button moves into the Sample Manager panel (Phase 3)
-- [ ] The playback mode toggle (Series/Random) moves into the Sample Manager panel (Phase 3)
+- [x] Move "Load Preset" and "Save Preset" buttons to the top-right header bar area (inside the header, not below it)
+- [x] Position the "?" (About) button to the right of Save Preset
+- [x] Remove the old sub-header row that held Load Samples, samples info, and preset buttons
+- [x] The "Load Samples" button moves into the Sample Manager panel (Phase 3)
+- [x] The playback mode toggle (Series/Random) moves into the Sample Manager panel (Phase 3)
 
 ### Step 1.6: Adjust Remaining Layout
 
-- [ ] With only Amplitude (Volume + Pan) and Pitch (Semitone + Fine Tune) remaining as knob sections, reposition them to the right side of the plugin
-- [ ] Amplitude section: top-right area with Volume and Pan knobs plus their randomization arcs
-- [ ] Pitch section: below Amplitude or center-right, with Semitone and Fine Tune knobs plus randomization arcs
-- [ ] The left half of the plugin is reserved for the Sample Manager (Phase 3)
-- [ ] The center area above Pitch is reserved for the Random Algorithm knob (Phase 5)
-- [ ] Leave placeholder space for Sample Start/End section (Phase 2)
+- [x] With only Amplitude (Volume + Pan) and Pitch (Semitone + Fine Tune) remaining as knob sections, reposition them to the right side of the plugin
+- [x] Amplitude section: top-right area with Volume and Pan knobs plus their randomization arcs
+- [x] Pitch section: below Amplitude or center-right, with Semitone and Fine Tune knobs plus randomization arcs
+- [x] The left half of the plugin is reserved for the Sample Manager (Phase 3)
+- [x] The center area above Pitch is reserved for the Random Algorithm knob (Phase 5)
+- [x] Leave placeholder space for Sample Start/End section (Phase 2)
 
 **Test:**
 - [ ] Build compiles with 0 errors and 0 warnings related to removed code
