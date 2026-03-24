@@ -1,4 +1,4 @@
-﻿#include "RRvoice.h"
+#include "RRvoice.h"
 #include "../DSP/RandomizationEngine.h"
 #include "../Parameters/ParametersIDs.h"
 

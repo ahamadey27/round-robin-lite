@@ -1,0 +1,35 @@
+#!/bin/sh
+set -e
+if test "$CONFIGURATION" = "Debug"; then :
+  cd /Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX
+  /opt/homebrew/bin/cmake -E copy /Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/RoundRobinLite_artefacts/JuceLibraryCode/RoundRobinLite_AU/PkgInfo /Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/RoundRobinLite_artefacts/Debug/AU/round-robin-lite.component/Contents
+  cd /Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX
+  /opt/homebrew/bin/cmake -Dsrc=/Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/RoundRobinLite_artefacts/Debug/AU/round-robin-lite.component -P /Users/alex/Documents/JUCE/extras/Build/CMake/checkBundleSigning.cmake
+  cd /Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX
+  /opt/homebrew/bin/cmake -Dsrc=/Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/RoundRobinLite_artefacts/Debug/AU/round-robin-lite.component -Ddest=/Users/alex/Library/Audio/Plug-Ins/Components -P /Users/alex/Documents/JUCE/extras/Build/CMake/copyDir.cmake
+fi
+if test "$CONFIGURATION" = "Release"; then :
+  cd /Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX
+  /opt/homebrew/bin/cmake -E copy /Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/RoundRobinLite_artefacts/JuceLibraryCode/RoundRobinLite_AU/PkgInfo /Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/RoundRobinLite_artefacts/Release/AU/round-robin-lite.component/Contents
+  cd /Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX
+  /opt/homebrew/bin/cmake -Dsrc=/Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/RoundRobinLite_artefacts/Release/AU/round-robin-lite.component -P /Users/alex/Documents/JUCE/extras/Build/CMake/checkBundleSigning.cmake
+  cd /Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX
+  /opt/homebrew/bin/cmake -Dsrc=/Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/RoundRobinLite_artefacts/Release/AU/round-robin-lite.component -Ddest=/Users/alex/Library/Audio/Plug-Ins/Components -P /Users/alex/Documents/JUCE/extras/Build/CMake/copyDir.cmake
+fi
+if test "$CONFIGURATION" = "MinSizeRel"; then :
+  cd /Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX
+  /opt/homebrew/bin/cmake -E copy /Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/RoundRobinLite_artefacts/JuceLibraryCode/RoundRobinLite_AU/PkgInfo /Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/RoundRobinLite_artefacts/MinSizeRel/AU/round-robin-lite.component/Contents
+  cd /Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX
+  /opt/homebrew/bin/cmake -Dsrc=/Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/RoundRobinLite_artefacts/MinSizeRel/AU/round-robin-lite.component -P /Users/alex/Documents/JUCE/extras/Build/CMake/checkBundleSigning.cmake
+  cd /Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX
+  /opt/homebrew/bin/cmake -Dsrc=/Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/RoundRobinLite_artefacts/MinSizeRel/AU/round-robin-lite.component -Ddest=/Users/alex/Library/Audio/Plug-Ins/Components -P /Users/alex/Documents/JUCE/extras/Build/CMake/copyDir.cmake
+fi
+if test "$CONFIGURATION" = "RelWithDebInfo"; then :
+  cd /Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX
+  /opt/homebrew/bin/cmake -E copy /Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/RoundRobinLite_artefacts/JuceLibraryCode/RoundRobinLite_AU/PkgInfo /Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/RoundRobinLite_artefacts/RelWithDebInfo/AU/round-robin-lite.component/Contents
+  cd /Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX
+  /opt/homebrew/bin/cmake -Dsrc=/Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/RoundRobinLite_artefacts/RelWithDebInfo/AU/round-robin-lite.component -P /Users/alex/Documents/JUCE/extras/Build/CMake/checkBundleSigning.cmake
+  cd /Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX
+  /opt/homebrew/bin/cmake -Dsrc=/Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/RoundRobinLite_artefacts/RelWithDebInfo/AU/round-robin-lite.component -Ddest=/Users/alex/Library/Audio/Plug-Ins/Components -P /Users/alex/Documents/JUCE/extras/Build/CMake/copyDir.cmake
+fi
+

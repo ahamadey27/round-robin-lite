@@ -1,4 +1,4 @@
-﻿/*
+/*
   ==============================================================================
 
     Custom SynthesiserVoice class for Round Robin Lite.
@@ -132,7 +132,7 @@ private:
     float randomizedSemitones = 0.0f;
     float randomizedCents = 0.0f;
     float randomizedAttackMs = 0.0f;
-    float randomizedDecayMs = 0.0f;
+    float randomizedDecayMs = 5000.0f;
     float randomizedVolume = 0.75f;
     float randomizedPan = 0.0f;
     float randomizedLowGain = 0.0f;

@@ -390,6 +390,7 @@ void NewProjectAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
         copyXmlToBinary(*xml, destData);
         DBG("State saved successfully");
         DBG("  Parameters saved: " + juce::String(apvts.state.getNumChildren()));
+        DBG("  Samples saved:    " + juce::String(sampleData.getNumChildren()));
         DBG("========================");
     }
     else
@@ -460,6 +461,7 @@ void NewProjectAudioProcessor::setStateInformation(const void* data, int sizeInB
                 }
 
                 rebuildLoadedIndices();
+                sampleLoader.updateSynthesiserSounds();
 
                 if (!missingSamples.isEmpty())
                 {
