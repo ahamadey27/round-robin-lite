@@ -327,23 +327,6 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
             buffer.getWritePointer(channel)[sample] *= volumeGain;
     }
 
-    //==============================================================================
-    // LOG MIDI ACTIVITY (debug)
-
-    if (!midiMessages.isEmpty())
-    {
-        DBG("Processing " + juce::String(midiMessages.getNumEvents()) + " MIDI events");
-
-        for (const auto metadata : midiMessages)
-        {
-            const auto msg = metadata.getMessage();
-            if (msg.isNoteOn())
-                DBG("MIDI Note ON: " + juce::String(msg.getNoteNumber()) +
-                    " Velocity: " + juce::String(msg.getVelocity()));
-            else if (msg.isNoteOff())
-                DBG("MIDI Note OFF: " + juce::String(msg.getNoteNumber()));
-        }
-    }
 }
 
 //==============================================================================

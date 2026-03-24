@@ -296,13 +296,29 @@ void NewProjectAudioProcessorEditor::updateSamplesInfo()
 
 void NewProjectAudioProcessorEditor::savePreset()
 {
+    // Warn the user early if no samples are loaded — the preset would be empty
+    if (audioProcessor.loadedSlotIndices.empty())
+    {
+        juce::AlertWindow::showMessageBoxAsync(
+            juce::AlertWindow::WarningIcon,
+            "No Samples Loaded",
+            "Please load at least one sample before saving a preset.");
+        return;
+    }
+
+    // useOSNativeDialogBox = false: JUCE 8 on macOS has a bug where the native
+    // file chooser always creates NSOpenPanel even when saveMode is set, causing
+    // "Ignoring NSSavePanel method sent to NSOpenPanel" and empty getResult().
+    // JUCE's own cross-platform dialog correctly handles save mode.
     fileChooser = std::make_unique<juce::FileChooser>(
         "Save Preset",
         juce::File::getSpecialLocation(juce::File::userDocumentsDirectory),
-        "*.rrpreset");
+        "*.rrpreset",
+        false);   // false = use JUCE dialog, not native macOS panel
 
     fileChooser->launchAsync(
         juce::FileBrowserComponent::saveMode |
+        juce::FileBrowserComponent::canSelectFiles |
         juce::FileBrowserComponent::warnAboutOverwriting,
         [this](const juce::FileChooser& fc)
         {
