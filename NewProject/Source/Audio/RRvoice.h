@@ -87,14 +87,15 @@ public:
         juce::AudioProcessorValueTreeState* params);
 
     float getRandomizedVolume() const { return randomizedVolume; }
-    float getRandomizedLowGain() const { return randomizedLowGain; }
-    float getRandomizedLowFreq() const { return randomizedLowFreq; }
-    float getRandomizedMidGain() const { return randomizedMidGain; }
-    float getRandomizedMidFreq() const { return randomizedMidFreq; }
-    float getRandomizedHighGain() const { return randomizedHighGain; }
-    float getRandomizedHighFreq() const { return randomizedHighFreq; }
-    float getRandomizedTransientAttack() const { return randomizedTransientAttack; }
-    float getRandomizedTransientDecay() const { return randomizedTransientDecay; }
+    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
+    //float getRandomizedLowGain() const { return randomizedLowGain; }
+    //float getRandomizedLowFreq() const { return randomizedLowFreq; }
+    //float getRandomizedMidGain() const { return randomizedMidGain; }
+    //float getRandomizedMidFreq() const { return randomizedMidFreq; }
+    //float getRandomizedHighGain() const { return randomizedHighGain; }
+    //float getRandomizedHighFreq() const { return randomizedHighFreq; }
+    //float getRandomizedTransientAttack() const { return randomizedTransientAttack; }
+    //float getRandomizedTransientDecay() const { return randomizedTransientDecay; }
 
 private:
     //==============================================================================

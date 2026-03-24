@@ -32,7 +32,8 @@ private:
     juce::TextButton savePresetButton;
     juce::TextButton loadPresetButton;
     juce::TextButton playbackModeButton;
-    juce::Label      samplesInfoLabel;
+    // REMOVED FOR LITE: samplesInfoLabel
+    //juce::Label      samplesInfoLabel;
     juce::Label      playbackTypeLabel;
     std::unique_ptr<juce::FileChooser> fileChooser;
     ButtonAttachment playbackModeAttachment;
@@ -40,50 +41,54 @@ private:
     // Main sliders — before attachments
     juce::Slider semitoneSlider, fineTuneSlider;
     juce::Slider volumeSlider, panSlider;
-    juce::Slider lowGainSlider, lowFreqSlider;
-    juce::Slider midGainSlider, midFreqSlider;
-    juce::Slider highGainSlider, highFreqSlider;
-    juce::Slider transientAttackSlider, transientDecaySlider;
-    juce::Slider envAttackSlider, envDecaySlider;
+    // COMMENTED FOR LITE â€” ACTIVE IN PREMIUM
+    //juce::Slider lowGainSlider, lowFreqSlider;
+    //juce::Slider midGainSlider, midFreqSlider;
+    //juce::Slider highGainSlider, highFreqSlider;
+    //juce::Slider transientAttackSlider, transientDecaySlider;
+    //juce::Slider envAttackSlider, envDecaySlider;
 
     SliderAttachment semitoneAttachment, fineTuneAttachment;
     SliderAttachment volumeAttachment, panAttachment;
-    SliderAttachment lowGainAttachment, lowFreqAttachment;
-    SliderAttachment midGainAttachment, midFreqAttachment;
-    SliderAttachment highGainAttachment, highFreqAttachment;
-    SliderAttachment transientAttackAttachment, transientDecayAttachment;
-    SliderAttachment envAttackAttachment, envDecayAttachment;
+    // COMMENTED FOR LITE â€” ACTIVE IN PREMIUM
+    //SliderAttachment lowGainAttachment, lowFreqAttachment;
+    //SliderAttachment midGainAttachment, midFreqAttachment;
+    //SliderAttachment highGainAttachment, highFreqAttachment;
+    //SliderAttachment transientAttackAttachment, transientDecayAttachment;
+    //SliderAttachment envAttackAttachment, envDecayAttachment;
 
     // Rnd sliders — before attachments
     juce::Slider semitoneRndNegSlider, semitoneRndPosSlider;
     juce::Slider fineTuneRndNegSlider, fineTuneRndPosSlider;
     juce::Slider volumeRndNegSlider, volumeRndPosSlider;
     juce::Slider panRndNegSlider, panRndPosSlider;
-    juce::Slider lowGainRndNegSlider, lowGainRndPosSlider;
-    juce::Slider lowFreqRndNegSlider, lowFreqRndPosSlider;
-    juce::Slider midGainRndNegSlider, midGainRndPosSlider;
-    juce::Slider midFreqRndNegSlider, midFreqRndPosSlider;
-    juce::Slider highGainRndNegSlider, highGainRndPosSlider;
-    juce::Slider highFreqRndNegSlider, highFreqRndPosSlider;
-    juce::Slider transAtkRndNegSlider, transAtkRndPosSlider;
-    juce::Slider transDecRndNegSlider, transDecRndPosSlider;
-    juce::Slider envAtkRndNegSlider, envAtkRndPosSlider;
-    juce::Slider envDecRndNegSlider, envDecRndPosSlider;
+    // COMMENTED FOR LITE â€” ACTIVE IN PREMIUM
+    //juce::Slider lowGainRndNegSlider, lowGainRndPosSlider;
+    //juce::Slider lowFreqRndNegSlider, lowFreqRndPosSlider;
+    //juce::Slider midGainRndNegSlider, midGainRndPosSlider;
+    //juce::Slider midFreqRndNegSlider, midFreqRndPosSlider;
+    //juce::Slider highGainRndNegSlider, highGainRndPosSlider;
+    //juce::Slider highFreqRndNegSlider, highFreqRndPosSlider;
+    //juce::Slider transAtkRndNegSlider, transAtkRndPosSlider;
+    //juce::Slider transDecRndNegSlider, transDecRndPosSlider;
+    //juce::Slider envAtkRndNegSlider, envAtkRndPosSlider;
+    //juce::Slider envDecRndNegSlider, envDecRndPosSlider;
 
     SliderAttachment semitoneRndNegAttachment, semitoneRndPosAttachment;
     SliderAttachment fineTuneRndNegAttachment, fineTuneRndPosAttachment;
     SliderAttachment volumeRndNegAttachment, volumeRndPosAttachment;
     SliderAttachment panRndNegAttachment, panRndPosAttachment;
-    SliderAttachment lowGainRndNegAttachment, lowGainRndPosAttachment;
-    SliderAttachment lowFreqRndNegAttachment, lowFreqRndPosAttachment;
-    SliderAttachment midGainRndNegAttachment, midGainRndPosAttachment;
-    SliderAttachment midFreqRndNegAttachment, midFreqRndPosAttachment;
-    SliderAttachment highGainRndNegAttachment, highGainRndPosAttachment;
-    SliderAttachment highFreqRndNegAttachment, highFreqRndPosAttachment;
-    SliderAttachment transAtkRndNegAttachment, transAtkRndPosAttachment;
-    SliderAttachment transDecRndNegAttachment, transDecRndPosAttachment;
-    SliderAttachment envAtkRndNegAttachment, envAtkRndPosAttachment;
-    SliderAttachment envDecRndNegAttachment, envDecRndPosAttachment;
+    // COMMENTED FOR LITE â€” ACTIVE IN PREMIUM
+    //SliderAttachment lowGainRndNegAttachment, lowGainRndPosAttachment;
+    //SliderAttachment lowFreqRndNegAttachment, lowFreqRndPosAttachment;
+    //SliderAttachment midGainRndNegAttachment, midGainRndPosAttachment;
+    //SliderAttachment midFreqRndNegAttachment, midFreqRndPosAttachment;
+    //SliderAttachment highGainRndNegAttachment, highGainRndPosAttachment;
+    //SliderAttachment highFreqRndNegAttachment, highFreqRndPosAttachment;
+    //SliderAttachment transAtkRndNegAttachment, transAtkRndPosAttachment;
+    //SliderAttachment transDecRndNegAttachment, transDecRndPosAttachment;
+    //SliderAttachment envAtkRndNegAttachment, envAtkRndPosAttachment;
+    //SliderAttachment envDecRndNegAttachment, envDecRndPosAttachment;
 
     // AboutWindow — inline popup component
     class AboutWindow : public juce::Component

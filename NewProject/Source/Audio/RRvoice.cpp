@@ -31,16 +31,17 @@ void RRVoice::setRandomizationReferences(RandomizationEngine* engine,
     rndPtrs.semitone = params->getRawParameterValue(ParameterIDs::semitone);
     rndPtrs.fineTune = params->getRawParameterValue(ParameterIDs::fineTune);
     rndPtrs.volume = params->getRawParameterValue(ParameterIDs::volume);
-    rndPtrs.envAttack = params->getRawParameterValue(ParameterIDs::envAttack);
-    rndPtrs.envDecay = params->getRawParameterValue(ParameterIDs::envDecay);
-    rndPtrs.lowGain = params->getRawParameterValue(ParameterIDs::lowGain);
-    rndPtrs.lowFreq = params->getRawParameterValue(ParameterIDs::lowFreq);
-    rndPtrs.midGain = params->getRawParameterValue(ParameterIDs::midGain);
-    rndPtrs.midFreq = params->getRawParameterValue(ParameterIDs::midFreq);
-    rndPtrs.highGain = params->getRawParameterValue(ParameterIDs::highGain);
-    rndPtrs.highFreq = params->getRawParameterValue(ParameterIDs::highFreq);
-    rndPtrs.transAtk = params->getRawParameterValue(ParameterIDs::transientAttack);
-    rndPtrs.transDec = params->getRawParameterValue(ParameterIDs::transientDecay);
+    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
+    //rndPtrs.envAttack = params->getRawParameterValue(ParameterIDs::envAttack);
+    //rndPtrs.envDecay = params->getRawParameterValue(ParameterIDs::envDecay);
+    //rndPtrs.lowGain = params->getRawParameterValue(ParameterIDs::lowGain);
+    //rndPtrs.lowFreq = params->getRawParameterValue(ParameterIDs::lowFreq);
+    //rndPtrs.midGain = params->getRawParameterValue(ParameterIDs::midGain);
+    //rndPtrs.midFreq = params->getRawParameterValue(ParameterIDs::midFreq);
+    //rndPtrs.highGain = params->getRawParameterValue(ParameterIDs::highGain);
+    //rndPtrs.highFreq = params->getRawParameterValue(ParameterIDs::highFreq);
+    //rndPtrs.transAtk = params->getRawParameterValue(ParameterIDs::transientAttack);
+    //rndPtrs.transDec = params->getRawParameterValue(ParameterIDs::transientDecay);
 
     rndPtrs.semitoneNeg = params->getRawParameterValue(ParameterIDs::semitoneRndNeg);
     rndPtrs.semitonePos = params->getRawParameterValue(ParameterIDs::semitoneRndPos);
@@ -51,26 +52,27 @@ void RRVoice::setRandomizationReferences(RandomizationEngine* engine,
     rndPtrs.pan = params->getRawParameterValue(ParameterIDs::pan);
     rndPtrs.panNeg = params->getRawParameterValue(ParameterIDs::panRndNeg);
     rndPtrs.panPos = params->getRawParameterValue(ParameterIDs::panRndPos);
-    rndPtrs.atkNeg = params->getRawParameterValue(ParameterIDs::envAttackRndNeg);
-    rndPtrs.atkPos = params->getRawParameterValue(ParameterIDs::envAttackRndPos);
-    rndPtrs.decNeg = params->getRawParameterValue(ParameterIDs::envDecayRndNeg);
-    rndPtrs.decPos = params->getRawParameterValue(ParameterIDs::envDecayRndPos);
-    rndPtrs.lowGainNeg = params->getRawParameterValue(ParameterIDs::lowGainRndNeg);
-    rndPtrs.lowGainPos = params->getRawParameterValue(ParameterIDs::lowGainRndPos);
-    rndPtrs.lowFreqNeg = params->getRawParameterValue(ParameterIDs::lowFreqRndNeg);
-    rndPtrs.lowFreqPos = params->getRawParameterValue(ParameterIDs::lowFreqRndPos);
-    rndPtrs.midGainNeg = params->getRawParameterValue(ParameterIDs::midGainRndNeg);
-    rndPtrs.midGainPos = params->getRawParameterValue(ParameterIDs::midGainRndPos);
-    rndPtrs.midFreqNeg = params->getRawParameterValue(ParameterIDs::midFreqRndNeg);
-    rndPtrs.midFreqPos = params->getRawParameterValue(ParameterIDs::midFreqRndPos);
-    rndPtrs.highGainNeg = params->getRawParameterValue(ParameterIDs::highGainRndNeg);
-    rndPtrs.highGainPos = params->getRawParameterValue(ParameterIDs::highGainRndPos);
-    rndPtrs.highFreqNeg = params->getRawParameterValue(ParameterIDs::highFreqRndNeg);
-    rndPtrs.highFreqPos = params->getRawParameterValue(ParameterIDs::highFreqRndPos);
-    rndPtrs.transAtkNeg = params->getRawParameterValue(ParameterIDs::transientAttackRndNeg);
-    rndPtrs.transAtkPos = params->getRawParameterValue(ParameterIDs::transientAttackRndPos);
-    rndPtrs.transDecNeg = params->getRawParameterValue(ParameterIDs::transientDecayRndNeg);
-    rndPtrs.transDecPos = params->getRawParameterValue(ParameterIDs::transientDecayRndPos);
+    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
+    //rndPtrs.atkNeg = params->getRawParameterValue(ParameterIDs::envAttackRndNeg);
+    //rndPtrs.atkPos = params->getRawParameterValue(ParameterIDs::envAttackRndPos);
+    //rndPtrs.decNeg = params->getRawParameterValue(ParameterIDs::envDecayRndNeg);
+    //rndPtrs.decPos = params->getRawParameterValue(ParameterIDs::envDecayRndPos);
+    //rndPtrs.lowGainNeg = params->getRawParameterValue(ParameterIDs::lowGainRndNeg);
+    //rndPtrs.lowGainPos = params->getRawParameterValue(ParameterIDs::lowGainRndPos);
+    //rndPtrs.lowFreqNeg = params->getRawParameterValue(ParameterIDs::lowFreqRndNeg);
+    //rndPtrs.lowFreqPos = params->getRawParameterValue(ParameterIDs::lowFreqRndPos);
+    //rndPtrs.midGainNeg = params->getRawParameterValue(ParameterIDs::midGainRndNeg);
+    //rndPtrs.midGainPos = params->getRawParameterValue(ParameterIDs::midGainRndPos);
+    //rndPtrs.midFreqNeg = params->getRawParameterValue(ParameterIDs::midFreqRndNeg);
+    //rndPtrs.midFreqPos = params->getRawParameterValue(ParameterIDs::midFreqRndPos);
+    //rndPtrs.highGainNeg = params->getRawParameterValue(ParameterIDs::highGainRndNeg);
+    //rndPtrs.highGainPos = params->getRawParameterValue(ParameterIDs::highGainRndPos);
+    //rndPtrs.highFreqNeg = params->getRawParameterValue(ParameterIDs::highFreqRndNeg);
+    //rndPtrs.highFreqPos = params->getRawParameterValue(ParameterIDs::highFreqRndPos);
+    //rndPtrs.transAtkNeg = params->getRawParameterValue(ParameterIDs::transientAttackRndNeg);
+    //rndPtrs.transAtkPos = params->getRawParameterValue(ParameterIDs::transientAttackRndPos);
+    //rndPtrs.transDecNeg = params->getRawParameterValue(ParameterIDs::transientDecayRndNeg);
+    //rndPtrs.transDecPos = params->getRawParameterValue(ParameterIDs::transientDecayRndPos);
 }
 
 // Destructor
@@ -139,81 +141,85 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
             rndPtrs.panPos->load());
         randomizedPan = juce::jlimit(-1.0f, 1.0f, randomizedPan);
 
+        // COMMENTED FOR LITE — ACTIVE IN PREMIUM
         // Envelope attack randomization
-        randomizedAttackMs = randEngine->generateRandomValue(
-            rndPtrs.envAttack->load(),
-            rndPtrs.atkNeg->load(),
-            rndPtrs.atkPos->load());
+        //randomizedAttackMs = randEngine->generateRandomValue(
+        //    rndPtrs.envAttack->load(),
+        //    rndPtrs.atkNeg->load(),
+        //    rndPtrs.atkPos->load());
 
         // Envelope decay randomization
-        randomizedDecayMs = randEngine->generateRandomValue(
-            rndPtrs.envDecay->load(),
-            rndPtrs.decNeg->load(),
-            rndPtrs.decPos->load());
+        //randomizedDecayMs = randEngine->generateRandomValue(
+        //    rndPtrs.envDecay->load(),
+        //    rndPtrs.decNeg->load(),
+        //    rndPtrs.decPos->load());
 
+        // COMMENTED FOR LITE — ACTIVE IN PREMIUM
         // Low EQ randomization
-        randomizedLowGain = randEngine->generateRandomValue(
-            rndPtrs.lowGain->load(),
-            rndPtrs.lowGainNeg->load(),
-            rndPtrs.lowGainPos->load());
-        randomizedLowGain = juce::jlimit(-24.0f, 24.0f, randomizedLowGain);
+        //randomizedLowGain = randEngine->generateRandomValue(
+        //    rndPtrs.lowGain->load(),
+        //    rndPtrs.lowGainNeg->load(),
+        //    rndPtrs.lowGainPos->load());
+        //randomizedLowGain = juce::jlimit(-24.0f, 24.0f, randomizedLowGain);
 
-        randomizedLowFreq = randEngine->generateRandomValue(
-            rndPtrs.lowFreq->load(),
-            rndPtrs.lowFreqNeg->load(),
-            rndPtrs.lowFreqPos->load());
-        randomizedLowFreq = juce::jlimit(20.0f, 500.0f, randomizedLowFreq);
+        //randomizedLowFreq = randEngine->generateRandomValue(
+        //    rndPtrs.lowFreq->load(),
+        //    rndPtrs.lowFreqNeg->load(),
+        //    rndPtrs.lowFreqPos->load());
+        //randomizedLowFreq = juce::jlimit(20.0f, 500.0f, randomizedLowFreq);
 
         // Mid EQ randomization
-        randomizedMidGain = randEngine->generateRandomValue(
-            rndPtrs.midGain->load(),
-            rndPtrs.midGainNeg->load(),
-            rndPtrs.midGainPos->load());
-        randomizedMidGain = juce::jlimit(-24.0f, 24.0f, randomizedMidGain);
+        //randomizedMidGain = randEngine->generateRandomValue(
+        //    rndPtrs.midGain->load(),
+        //    rndPtrs.midGainNeg->load(),
+        //    rndPtrs.midGainPos->load());
+        //randomizedMidGain = juce::jlimit(-24.0f, 24.0f, randomizedMidGain);
 
-        randomizedMidFreq = randEngine->generateRandomValue(
-            rndPtrs.midFreq->load(),
-            rndPtrs.midFreqNeg->load(),
-            rndPtrs.midFreqPos->load());
-        randomizedMidFreq = juce::jlimit(200.0f, 5000.0f, randomizedMidFreq);
+        //randomizedMidFreq = randEngine->generateRandomValue(
+        //    rndPtrs.midFreq->load(),
+        //    rndPtrs.midFreqNeg->load(),
+        //    rndPtrs.midFreqPos->load());
+        //randomizedMidFreq = juce::jlimit(200.0f, 5000.0f, randomizedMidFreq);
 
         // High EQ randomization
-        randomizedHighGain = randEngine->generateRandomValue(
-            rndPtrs.highGain->load(),
-            rndPtrs.highGainNeg->load(),
-            rndPtrs.highGainPos->load());
-        randomizedHighGain = juce::jlimit(-24.0f, 24.0f, randomizedHighGain);
+        //randomizedHighGain = randEngine->generateRandomValue(
+        //    rndPtrs.highGain->load(),
+        //    rndPtrs.highGainNeg->load(),
+        //    rndPtrs.highGainPos->load());
+        //randomizedHighGain = juce::jlimit(-24.0f, 24.0f, randomizedHighGain);
 
-        randomizedHighFreq = randEngine->generateRandomValue(
-            rndPtrs.highFreq->load(),
-            rndPtrs.highFreqNeg->load(),
-            rndPtrs.highFreqPos->load());
-        randomizedHighFreq = juce::jlimit(2000.0f, 20000.0f, randomizedHighFreq);
+        //randomizedHighFreq = randEngine->generateRandomValue(
+        //    rndPtrs.highFreq->load(),
+        //    rndPtrs.highFreqNeg->load(),
+        //    rndPtrs.highFreqPos->load());
+        //randomizedHighFreq = juce::jlimit(2000.0f, 20000.0f, randomizedHighFreq);
 
+        // COMMENTED FOR LITE — ACTIVE IN PREMIUM
         // Transient randomization
-        randomizedTransientAttack = randEngine->generateRandomValue(
-            rndPtrs.transAtk->load(),
-            rndPtrs.transAtkNeg->load(),
-            rndPtrs.transAtkPos->load());
-        randomizedTransientAttack = juce::jlimit(-127.0f, 127.0f, randomizedTransientAttack);
+        //randomizedTransientAttack = randEngine->generateRandomValue(
+        //    rndPtrs.transAtk->load(),
+        //    rndPtrs.transAtkNeg->load(),
+        //    rndPtrs.transAtkPos->load());
+        //randomizedTransientAttack = juce::jlimit(-127.0f, 127.0f, randomizedTransientAttack);
 
-        randomizedTransientDecay = randEngine->generateRandomValue(
-            rndPtrs.transDec->load(),
-            rndPtrs.transDecNeg->load(),
-            rndPtrs.transDecPos->load());
-        randomizedTransientDecay = juce::jlimit(-127.0f, 127.0f, randomizedTransientDecay);
+        //randomizedTransientDecay = randEngine->generateRandomValue(
+        //    rndPtrs.transDec->load(),
+        //    rndPtrs.transDecNeg->load(),
+        //    rndPtrs.transDecPos->load());
+        //randomizedTransientDecay = juce::jlimit(-127.0f, 127.0f, randomizedTransientDecay);
     }
     else
     {
         randomizedVolume = 0.75f;
-        randomizedLowGain = 0.0f;
-        randomizedLowFreq = 100.0f;
-        randomizedMidGain = 0.0f;
-        randomizedMidFreq = 1000.0f;
-        randomizedHighGain = 0.0f;
-        randomizedHighFreq = 5000.0f;
-        randomizedTransientAttack = 0.0f;
-        randomizedTransientDecay = 0.0f;
+        // COMMENTED FOR LITE — ACTIVE IN PREMIUM
+        //randomizedLowGain = 0.0f;
+        //randomizedLowFreq = 100.0f;
+        //randomizedMidGain = 0.0f;
+        //randomizedMidFreq = 1000.0f;
+        //randomizedHighGain = 0.0f;
+        //randomizedHighFreq = 5000.0f;
+        //randomizedTransientAttack = 0.0f;
+        //randomizedTransientDecay = 0.0f;
     }
 
     //==========================================================================

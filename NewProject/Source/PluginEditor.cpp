@@ -7,16 +7,17 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
     fineTuneAttachment(p.apvts, ParameterIDs::fineTune, fineTuneSlider),
     volumeAttachment(p.apvts, ParameterIDs::volume, volumeSlider),
     panAttachment(p.apvts, ParameterIDs::pan, panSlider),
-    lowGainAttachment(p.apvts, ParameterIDs::lowGain, lowGainSlider),
-    lowFreqAttachment(p.apvts, ParameterIDs::lowFreq, lowFreqSlider),
-    midGainAttachment(p.apvts, ParameterIDs::midGain, midGainSlider),
-    midFreqAttachment(p.apvts, ParameterIDs::midFreq, midFreqSlider),
-    highGainAttachment(p.apvts, ParameterIDs::highGain, highGainSlider),
-    highFreqAttachment(p.apvts, ParameterIDs::highFreq, highFreqSlider),
-    transientAttackAttachment(p.apvts, ParameterIDs::transientAttack, transientAttackSlider),
-    transientDecayAttachment(p.apvts, ParameterIDs::transientDecay, transientDecaySlider),
-    envAttackAttachment(p.apvts, ParameterIDs::envAttack, envAttackSlider),
-    envDecayAttachment(p.apvts, ParameterIDs::envDecay, envDecaySlider),
+    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
+    //lowGainAttachment(p.apvts, ParameterIDs::lowGain, lowGainSlider),
+    //lowFreqAttachment(p.apvts, ParameterIDs::lowFreq, lowFreqSlider),
+    //midGainAttachment(p.apvts, ParameterIDs::midGain, midGainSlider),
+    //midFreqAttachment(p.apvts, ParameterIDs::midFreq, midFreqSlider),
+    //highGainAttachment(p.apvts, ParameterIDs::highGain, highGainSlider),
+    //highFreqAttachment(p.apvts, ParameterIDs::highFreq, highFreqSlider),
+    //transientAttackAttachment(p.apvts, ParameterIDs::transientAttack, transientAttackSlider),
+    //transientDecayAttachment(p.apvts, ParameterIDs::transientDecay, transientDecaySlider),
+    //envAttackAttachment(p.apvts, ParameterIDs::envAttack, envAttackSlider),
+    //envDecayAttachment(p.apvts, ParameterIDs::envDecay, envDecaySlider),
     semitoneRndNegAttachment(p.apvts, ParameterIDs::semitoneRndNeg, semitoneRndNegSlider),
     semitoneRndPosAttachment(p.apvts, ParameterIDs::semitoneRndPos, semitoneRndPosSlider),
     fineTuneRndNegAttachment(p.apvts, ParameterIDs::fineTuneRndNeg, fineTuneRndNegSlider),
@@ -25,26 +26,27 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
     volumeRndPosAttachment(p.apvts, ParameterIDs::volumeRndPos, volumeRndPosSlider),
     panRndNegAttachment(p.apvts, ParameterIDs::panRndNeg, panRndNegSlider),
     panRndPosAttachment(p.apvts, ParameterIDs::panRndPos, panRndPosSlider),
-    lowGainRndNegAttachment(p.apvts, ParameterIDs::lowGainRndNeg, lowGainRndNegSlider),
-    lowGainRndPosAttachment(p.apvts, ParameterIDs::lowGainRndPos, lowGainRndPosSlider),
-    lowFreqRndNegAttachment(p.apvts, ParameterIDs::lowFreqRndNeg, lowFreqRndNegSlider),
-    lowFreqRndPosAttachment(p.apvts, ParameterIDs::lowFreqRndPos, lowFreqRndPosSlider),
-    midGainRndNegAttachment(p.apvts, ParameterIDs::midGainRndNeg, midGainRndNegSlider),
-    midGainRndPosAttachment(p.apvts, ParameterIDs::midGainRndPos, midGainRndPosSlider),
-    midFreqRndNegAttachment(p.apvts, ParameterIDs::midFreqRndNeg, midFreqRndNegSlider),
-    midFreqRndPosAttachment(p.apvts, ParameterIDs::midFreqRndPos, midFreqRndPosSlider),
-    highGainRndNegAttachment(p.apvts, ParameterIDs::highGainRndNeg, highGainRndNegSlider),
-    highGainRndPosAttachment(p.apvts, ParameterIDs::highGainRndPos, highGainRndPosSlider),
-    highFreqRndNegAttachment(p.apvts, ParameterIDs::highFreqRndNeg, highFreqRndNegSlider),
-    highFreqRndPosAttachment(p.apvts, ParameterIDs::highFreqRndPos, highFreqRndPosSlider),
-    transAtkRndNegAttachment(p.apvts, ParameterIDs::transientAttackRndNeg, transAtkRndNegSlider),
-    transAtkRndPosAttachment(p.apvts, ParameterIDs::transientAttackRndPos, transAtkRndPosSlider),
-    transDecRndNegAttachment(p.apvts, ParameterIDs::transientDecayRndNeg, transDecRndNegSlider),
-    transDecRndPosAttachment(p.apvts, ParameterIDs::transientDecayRndPos, transDecRndPosSlider),
-    envAtkRndNegAttachment(p.apvts, ParameterIDs::envAttackRndNeg, envAtkRndNegSlider),
-    envAtkRndPosAttachment(p.apvts, ParameterIDs::envAttackRndPos, envAtkRndPosSlider),
-    envDecRndNegAttachment(p.apvts, ParameterIDs::envDecayRndNeg, envDecRndNegSlider),
-    envDecRndPosAttachment(p.apvts, ParameterIDs::envDecayRndPos, envDecRndPosSlider),
+    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
+    //lowGainRndNegAttachment(p.apvts, ParameterIDs::lowGainRndNeg, lowGainRndNegSlider),
+    //lowGainRndPosAttachment(p.apvts, ParameterIDs::lowGainRndPos, lowGainRndPosSlider),
+    //lowFreqRndNegAttachment(p.apvts, ParameterIDs::lowFreqRndNeg, lowFreqRndNegSlider),
+    //lowFreqRndPosAttachment(p.apvts, ParameterIDs::lowFreqRndPos, lowFreqRndPosSlider),
+    //midGainRndNegAttachment(p.apvts, ParameterIDs::midGainRndNeg, midGainRndNegSlider),
+    //midGainRndPosAttachment(p.apvts, ParameterIDs::midGainRndPos, midGainRndPosSlider),
+    //midFreqRndNegAttachment(p.apvts, ParameterIDs::midFreqRndNeg, midFreqRndNegSlider),
+    //midFreqRndPosAttachment(p.apvts, ParameterIDs::midFreqRndPos, midFreqRndPosSlider),
+    //highGainRndNegAttachment(p.apvts, ParameterIDs::highGainRndNeg, highGainRndNegSlider),
+    //highGainRndPosAttachment(p.apvts, ParameterIDs::highGainRndPos, highGainRndPosSlider),
+    //highFreqRndNegAttachment(p.apvts, ParameterIDs::highFreqRndNeg, highFreqRndNegSlider),
+    //highFreqRndPosAttachment(p.apvts, ParameterIDs::highFreqRndPos, highFreqRndPosSlider),
+    //transAtkRndNegAttachment(p.apvts, ParameterIDs::transientAttackRndNeg, transAtkRndNegSlider),
+    //transAtkRndPosAttachment(p.apvts, ParameterIDs::transientAttackRndPos, transAtkRndPosSlider),
+    //transDecRndNegAttachment(p.apvts, ParameterIDs::transientDecayRndNeg, transDecRndNegSlider),
+    //transDecRndPosAttachment(p.apvts, ParameterIDs::transientDecayRndPos, transDecRndPosSlider),
+    //envAtkRndNegAttachment(p.apvts, ParameterIDs::envAttackRndNeg, envAtkRndNegSlider),
+    //envAtkRndPosAttachment(p.apvts, ParameterIDs::envAttackRndPos, envAtkRndPosSlider),
+    //envDecRndNegAttachment(p.apvts, ParameterIDs::envDecayRndNeg, envDecRndNegSlider),
+    //envDecRndPosAttachment(p.apvts, ParameterIDs::envDecayRndPos, envDecRndPosSlider),
     playbackModeAttachment(p.apvts, ParameterIDs::playbackMode, playbackModeButton)
 {
     // Sample Load Button
@@ -74,10 +76,10 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
     loadPresetButton.onClick = [this]() { loadPreset(); };
     addAndMakeVisible(loadPresetButton);
 
-    // Sample Info Label
-    samplesInfoLabel.setText("No samples loaded", juce::dontSendNotification);
-    samplesInfoLabel.setColour(juce::Label::textColourId, juce::Colours::white);
-    addAndMakeVisible(samplesInfoLabel);
+    // REMOVED FOR LITE: samplesInfoLabel
+    //samplesInfoLabel.setText("No samples loaded", juce::dontSendNotification);
+    //samplesInfoLabel.setColour(juce::Label::textColourId, juce::Colours::white);
+    //addAndMakeVisible(samplesInfoLabel);
 
     // Playback mode button
     playbackModeButton.setButtonText("Series");
@@ -98,37 +100,43 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
     //addAndMakeVisible(playbackTypeLabel);
 
     // Main parameter knobs — visible, on the editor
-    for (auto* s : { &semitoneSlider, &fineTuneSlider, &volumeSlider, &panSlider,
-                     &lowGainSlider,  &lowFreqSlider,
-                     &midGainSlider,  &midFreqSlider,
-                     &highGainSlider, &highFreqSlider,
-                     &transientAttackSlider, &transientDecaySlider,
-                     &envAttackSlider, &envDecaySlider })
+    for (auto* s : { &semitoneSlider, &fineTuneSlider, &volumeSlider, &panSlider
+                     // COMMENTED FOR LITE — ACTIVE IN PREMIUM
+                     //,&lowGainSlider,  &lowFreqSlider,
+                     //,&midGainSlider,  &midFreqSlider,
+                     //,&highGainSlider, &highFreqSlider,
+                     //,&transientAttackSlider, &transientDecaySlider,
+                     //,&envAttackSlider, &envDecaySlider
+                     })
         setupKnob(*s);
 
     // Rnd sliders — hidden, APVTS-bound, values read by paintOverChildren
     for (auto* s : { &semitoneRndNegSlider,  &semitoneRndPosSlider,
                      &fineTuneRndNegSlider,  &fineTuneRndPosSlider,
                      &volumeRndNegSlider,    &volumeRndPosSlider,
-                     &panRndNegSlider,       &panRndPosSlider,
-                     &lowGainRndNegSlider,   &lowGainRndPosSlider,
-                     &lowFreqRndNegSlider,   &lowFreqRndPosSlider,
-                     &midGainRndNegSlider,   &midGainRndPosSlider,
-                     &midFreqRndNegSlider,   &midFreqRndPosSlider,
-                     &highGainRndNegSlider,  &highGainRndPosSlider,
-                     &highFreqRndNegSlider,  &highFreqRndPosSlider,
-                     &transAtkRndNegSlider,  &transAtkRndPosSlider,
-                     &transDecRndNegSlider,  &transDecRndPosSlider,
-                     &envAtkRndNegSlider,    &envAtkRndPosSlider,
-                     &envDecRndNegSlider,    &envDecRndPosSlider })
+                     &panRndNegSlider,       &panRndPosSlider
+                     // COMMENTED FOR LITE — ACTIVE IN PREMIUM
+                     //,&lowGainRndNegSlider,   &lowGainRndPosSlider,
+                     //,&lowFreqRndNegSlider,   &lowFreqRndPosSlider,
+                     //,&midGainRndNegSlider,   &midGainRndPosSlider,
+                     //,&midFreqRndNegSlider,   &midFreqRndPosSlider,
+                     //,&highGainRndNegSlider,  &highGainRndPosSlider,
+                     //,&highFreqRndNegSlider,  &highFreqRndPosSlider,
+                     //,&transAtkRndNegSlider,  &transAtkRndPosSlider,
+                     //,&transDecRndNegSlider,  &transDecRndPosSlider,
+                     //,&envAtkRndNegSlider,    &envAtkRndPosSlider,
+                     //,&envDecRndNegSlider,    &envDecRndPosSlider
+                     })
         setupSlider(*s);
 
     // Apply knob LAF to main parameter sliders
-    for (auto* s : { &semitoneSlider, &fineTuneSlider, &volumeSlider, &panSlider,
-                     &lowGainSlider, &lowFreqSlider, &midGainSlider, &midFreqSlider,
-                     &highGainSlider, &highFreqSlider,
-                     &transientAttackSlider, &transientDecaySlider,
-                     &envAttackSlider, &envDecaySlider })
+    for (auto* s : { &semitoneSlider, &fineTuneSlider, &volumeSlider, &panSlider
+                     // COMMENTED FOR LITE — ACTIVE IN PREMIUM
+                     //,&lowGainSlider, &lowFreqSlider, &midGainSlider, &midFreqSlider,
+                     //,&highGainSlider, &highFreqSlider,
+                     //,&transientAttackSlider, &transientDecaySlider,
+                     //,&envAttackSlider, &envDecaySlider
+                     })
         s->setLookAndFeel(&knobLAF);
     
     // NEW: set indicator line color per section (rotarySliderFillColourId)
@@ -138,20 +146,21 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
         for (auto* s : { &volumeSlider, &panSlider })
             s->setColour(juce::Slider::rotarySliderFillColourId, RRColors::ampCol);
 
-        for (auto* s : { &envAttackSlider, &envDecaySlider })
-            s->setColour(juce::Slider::rotarySliderFillColourId, RRColors::envCol);
+        // COMMENTED FOR LITE — ACTIVE IN PREMIUM
+        //for (auto* s : { &envAttackSlider, &envDecaySlider })
+        //    s->setColour(juce::Slider::rotarySliderFillColourId, RRColors::envCol);
 
-        for (auto* s : { &transientAttackSlider, &transientDecaySlider })
-            s->setColour(juce::Slider::rotarySliderFillColourId, RRColors::transCol);
+        //for (auto* s : { &transientAttackSlider, &transientDecaySlider })
+        //    s->setColour(juce::Slider::rotarySliderFillColourId, RRColors::transCol);
 
-        for (auto* s : { &lowGainSlider, &lowFreqSlider })
-            s->setColour(juce::Slider::rotarySliderFillColourId, RRColors::eqLowCol);
+        //for (auto* s : { &lowGainSlider, &lowFreqSlider })
+        //    s->setColour(juce::Slider::rotarySliderFillColourId, RRColors::eqLowCol);
 
-        for (auto* s : { &midGainSlider, &midFreqSlider })
-            s->setColour(juce::Slider::rotarySliderFillColourId, RRColors::eqMidCol);
+        //for (auto* s : { &midGainSlider, &midFreqSlider })
+        //    s->setColour(juce::Slider::rotarySliderFillColourId, RRColors::eqMidCol);
 
-        for (auto* s : { &highGainSlider, &highFreqSlider })
-            s->setColour(juce::Slider::rotarySliderFillColourId, RRColors::eqHighCol);
+        //for (auto* s : { &highGainSlider, &highFreqSlider })
+        //    s->setColour(juce::Slider::rotarySliderFillColourId, RRColors::eqHighCol);
     
     // NEW: value box text + border color matches section label color
         auto setValueBoxColors = [](juce::Slider& s, juce::Colour col)
@@ -165,16 +174,17 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
         setValueBoxColors(fineTuneSlider,        RRColors::pitchCol);
         setValueBoxColors(volumeSlider,          RRColors::ampCol);
         setValueBoxColors(panSlider,             RRColors::ampCol);
-        setValueBoxColors(envAttackSlider,       RRColors::envCol);
-        setValueBoxColors(envDecaySlider,        RRColors::envCol);
-        setValueBoxColors(transientAttackSlider, RRColors::transCol);
-        setValueBoxColors(transientDecaySlider,  RRColors::transCol);
-        setValueBoxColors(lowGainSlider,         RRColors::eqLowCol);
-        setValueBoxColors(lowFreqSlider,         RRColors::eqLowCol);
-        setValueBoxColors(midGainSlider,         RRColors::eqMidCol);
-        setValueBoxColors(midFreqSlider,         RRColors::eqMidCol);
-        setValueBoxColors(highGainSlider,        RRColors::eqHighCol);
-        setValueBoxColors(highFreqSlider,        RRColors::eqHighCol);
+        // COMMENTED FOR LITE — ACTIVE IN PREMIUM
+        //setValueBoxColors(envAttackSlider,       RRColors::envCol);
+        //setValueBoxColors(envDecaySlider,        RRColors::envCol);
+        //setValueBoxColors(transientAttackSlider, RRColors::transCol);
+        //setValueBoxColors(transientDecaySlider,  RRColors::transCol);
+        //setValueBoxColors(lowGainSlider,         RRColors::eqLowCol);
+        //setValueBoxColors(lowFreqSlider,         RRColors::eqLowCol);
+        //setValueBoxColors(midGainSlider,         RRColors::eqMidCol);
+        //setValueBoxColors(midFreqSlider,         RRColors::eqMidCol);
+        //setValueBoxColors(highGainSlider,        RRColors::eqHighCol);
+        //setValueBoxColors(highFreqSlider,        RRColors::eqHighCol);
 
 
     setSize(700, 440);
@@ -188,27 +198,32 @@ static constexpr float kRndDotOffset = 0.18f;   // ~15 degrees
 //==============================================================================
 NewProjectAudioProcessorEditor::~NewProjectAudioProcessorEditor()
 {
-    for (auto* s : { &semitoneSlider, &fineTuneSlider, &volumeSlider, &panSlider,
-                     &lowGainSlider, &lowFreqSlider, &midGainSlider, &midFreqSlider,
-                     &highGainSlider, &highFreqSlider,
-                     &transientAttackSlider, &transientDecaySlider,
-                     &envAttackSlider, &envDecaySlider })
+    for (auto* s : { &semitoneSlider, &fineTuneSlider, &volumeSlider, &panSlider
+                     // COMMENTED FOR LITE — ACTIVE IN PREMIUM
+                     //,&lowGainSlider, &lowFreqSlider, &midGainSlider, &midFreqSlider,
+                     //,&highGainSlider, &highFreqSlider,
+                     //,&transientAttackSlider, &transientDecaySlider,
+                     //,&envAttackSlider, &envDecaySlider
+                     })
         s->setLookAndFeel(nullptr);
 
     for (auto* s : { &semitoneRndNegSlider, &fineTuneRndNegSlider,
                      &volumeRndNegSlider,   &panRndNegSlider,
-                     &lowGainRndNegSlider,  &lowFreqRndNegSlider,
-                     &midGainRndNegSlider,  &midFreqRndNegSlider,
-                     &highGainRndNegSlider, &highFreqRndNegSlider,
-                     &transAtkRndNegSlider, &transDecRndNegSlider,
-                     &envAtkRndNegSlider,   &envDecRndNegSlider,
+                     // COMMENTED FOR LITE — ACTIVE IN PREMIUM
+                     //&lowGainRndNegSlider,  &lowFreqRndNegSlider,
+                     //&midGainRndNegSlider,  &midFreqRndNegSlider,
+                     //&highGainRndNegSlider, &highFreqRndNegSlider,
+                     //&transAtkRndNegSlider, &transDecRndNegSlider,
+                     //&envAtkRndNegSlider,   &envDecRndNegSlider,
                      &semitoneRndPosSlider, &fineTuneRndPosSlider,
-                     &volumeRndPosSlider,   &panRndPosSlider,
-                     &lowGainRndPosSlider,  &lowFreqRndPosSlider,
-                     &midGainRndPosSlider,  &midFreqRndPosSlider,
-                     &highGainRndPosSlider, &highFreqRndPosSlider,
-                     &transAtkRndPosSlider, &transDecRndPosSlider,
-                     &envAtkRndPosSlider,   &envDecRndPosSlider })
+                     &volumeRndPosSlider,   &panRndPosSlider
+                     // COMMENTED FOR LITE — ACTIVE IN PREMIUM
+                     //,&lowGainRndPosSlider,  &lowFreqRndPosSlider,
+                     //,&midGainRndPosSlider,  &midFreqRndPosSlider,
+                     //,&highGainRndPosSlider, &highFreqRndPosSlider,
+                     //,&transAtkRndPosSlider, &transDecRndPosSlider,
+                     //,&envAtkRndPosSlider,   &envDecRndPosSlider
+                     })
         s->setLookAndFeel(nullptr);
 
         playbackModeButton.setLookAndFeel(nullptr);
@@ -270,12 +285,13 @@ void NewProjectAudioProcessorEditor::loadSamplesFromFiles()
 
 void NewProjectAudioProcessorEditor::updateSamplesInfo()
 {
-    int count = (int)audioProcessor.loadedSlotIndices.size();
-    if (count == 0)
-        samplesInfoLabel.setText("No Samples Loaded", juce::dontSendNotification);
-    else
-        samplesInfoLabel.setText(juce::String(count) + " sample(s) loaded",
-            juce::dontSendNotification);
+    // REMOVED FOR LITE: samplesInfoLabel removed — no-op
+    //int count = (int)audioProcessor.loadedSlotIndices.size();
+    //if (count == 0)
+    //    samplesInfoLabel.setText("No Samples Loaded", juce::dontSendNotification);
+    //else
+    //    samplesInfoLabel.setText(juce::String(count) + " sample(s) loaded",
+    //        juce::dontSendNotification);
 }
 
 void NewProjectAudioProcessorEditor::savePreset()
@@ -371,10 +387,17 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
         g.drawRoundedRectangle(r.toFloat(), 5.0f, 1.0f);
     };
 
-    for (int i = 0; i < 4; ++i)
-        drawSectionBox({ margin + i * (secW + secGap), sRowY, secW, sRowH });
+    // COMMENTED FOR LITE — draw only Pitch (0) and Amplitude (1) sections
+    //for (int i = 0; i < 4; ++i)
+    //    drawSectionBox({ margin + i * (secW + secGap), sRowY, secW, sRowH });
+    drawSectionBox({ margin + 0 * (secW + secGap), sRowY, secW, sRowH }); // Pitch
+    drawSectionBox({ margin + 1 * (secW + secGap), sRowY, secW, sRowH }); // Amplitude
+    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
+    //drawSectionBox({ margin + 2 * (secW + secGap), sRowY, secW, sRowH }); // Envelope
+    //drawSectionBox({ margin + 3 * (secW + secGap), sRowY, secW, sRowH }); // Transient
 
-    drawSectionBox({ margin,        eRowY, eqW, eRowH });   // EQ
+    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
+    //drawSectionBox({ margin,        eRowY, eqW, eRowH });   // EQ
     drawSectionBox({ pbX,           eRowY, pbW, eRowH });   // Playback
 
     // ── Section category labels (9pt, 120% of original 7.5pt) ────────────────
@@ -387,12 +410,14 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
     };
     drawSecLabel("PITCH",     0, RRColors::pitchCol);
     drawSecLabel("AMPLITUDE", 1, RRColors::ampCol);
-    drawSecLabel("ENVELOPE",  2, RRColors::envCol);
-    drawSecLabel("TRANSIENT", 3, RRColors::transCol);
+    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
+    //drawSecLabel("ENVELOPE",  2, RRColors::envCol);
+    //drawSecLabel("TRANSIENT", 3, RRColors::transCol);
 
-    g.setFont(juce::Font(juce::FontOptions(9.0f)).boldened());
-    g.setColour(RRColors::eqLowCol);
-    g.drawText("EQ SETTINGS", margin + 8, eRowY + 7, 120, 10, juce::Justification::left);
+    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
+    //g.setFont(juce::Font(juce::FontOptions(9.0f)).boldened());
+    //g.setColour(RRColors::eqLowCol);
+    //g.drawText("EQ SETTINGS", margin + 8, eRowY + 7, 120, 10, juce::Justification::left);
 
     // PLAYBACK TYPE — centered within pbW
     g.setColour(RRColors::eqLowCol);
@@ -416,16 +441,17 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
     drawKnobLabel("FINE TUNE", fineTuneSlider,         topSecLabelBottom);
     drawKnobLabel("VOLUME",    volumeSlider,            topSecLabelBottom);
     drawKnobLabel("PAN",       panSlider,               topSecLabelBottom);
-    drawKnobLabel("ATTACK",    envAttackSlider,         topSecLabelBottom);
-    drawKnobLabel("DECAY",     envDecaySlider,          topSecLabelBottom);
-    drawKnobLabel("ATTACK",    transientAttackSlider,   topSecLabelBottom);
-    drawKnobLabel("DECAY",     transientDecaySlider,    topSecLabelBottom);
-    drawKnobLabel("LOW GAIN",  lowGainSlider,           eqSecLabelBottom);
-    drawKnobLabel("LOW FREQ",  lowFreqSlider,           eqSecLabelBottom);
-    drawKnobLabel("MID GAIN",  midGainSlider,           eqSecLabelBottom);
-    drawKnobLabel("MID FREQ",  midFreqSlider,           eqSecLabelBottom);
-    drawKnobLabel("HIGH GAIN", highGainSlider,          eqSecLabelBottom);
-    drawKnobLabel("HIGH FREQ", highFreqSlider,          eqSecLabelBottom);
+    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
+    //drawKnobLabel("ATTACK",    envAttackSlider,         topSecLabelBottom);
+    //drawKnobLabel("DECAY",     envDecaySlider,          topSecLabelBottom);
+    //drawKnobLabel("ATTACK",    transientAttackSlider,   topSecLabelBottom);
+    //drawKnobLabel("DECAY",     transientDecaySlider,    topSecLabelBottom);
+    //drawKnobLabel("LOW GAIN",  lowGainSlider,           eqSecLabelBottom);
+    //drawKnobLabel("LOW FREQ",  lowFreqSlider,           eqSecLabelBottom);
+    //drawKnobLabel("MID GAIN",  midGainSlider,           eqSecLabelBottom);
+    //drawKnobLabel("MID FREQ",  midFreqSlider,           eqSecLabelBottom);
+    //drawKnobLabel("HIGH GAIN", highGainSlider,          eqSecLabelBottom);
+    //drawKnobLabel("HIGH FREQ", highFreqSlider,          eqSecLabelBottom);
 
     // ── Footer ────────────────────────────────────────────────────────────────
     g.setColour(RRColors::sectionBorder.darker(0.5f));
@@ -543,21 +569,22 @@ void NewProjectAudioProcessorEditor::paintOverChildren(juce::Graphics& g)
     // AMPLITUDE
     drawRndArcs(volumeSlider,          volumeRndNegSlider,    volumeRndPosSlider,    RRColors::ampNeg,    RRColors::ampCol);
     drawRndArcs(panSlider,             panRndNegSlider,       panRndPosSlider,       RRColors::ampNeg,    RRColors::ampCol);
+    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
     // ENVELOPE
-    drawRndArcs(envAttackSlider,       envAtkRndNegSlider,    envAtkRndPosSlider,    RRColors::envNeg,    RRColors::envCol);
-    drawRndArcs(envDecaySlider,        envDecRndNegSlider,    envDecRndPosSlider,    RRColors::envNeg,    RRColors::envCol);
+    //drawRndArcs(envAttackSlider,       envAtkRndNegSlider,    envAtkRndPosSlider,    RRColors::envNeg,    RRColors::envCol);
+    //drawRndArcs(envDecaySlider,        envDecRndNegSlider,    envDecRndPosSlider,    RRColors::envNeg,    RRColors::envCol);
     // TRANSIENT
-    drawRndArcs(transientAttackSlider, transAtkRndNegSlider,  transAtkRndPosSlider,  RRColors::transNeg,  RRColors::transCol);
-    drawRndArcs(transientDecaySlider,  transDecRndNegSlider,  transDecRndPosSlider,  RRColors::transNeg,  RRColors::transCol);
+    //drawRndArcs(transientAttackSlider, transAtkRndNegSlider,  transAtkRndPosSlider,  RRColors::transNeg,  RRColors::transCol);
+    //drawRndArcs(transientDecaySlider,  transDecRndNegSlider,  transDecRndPosSlider,  RRColors::transNeg,  RRColors::transCol);
     // EQ LOW
-    drawRndArcs(lowGainSlider,         lowGainRndNegSlider,   lowGainRndPosSlider,   RRColors::eqLowNeg,  RRColors::eqLowCol);
-    drawRndArcs(lowFreqSlider,         lowFreqRndNegSlider,   lowFreqRndPosSlider,   RRColors::eqLowNeg,  RRColors::eqLowCol);
+    //drawRndArcs(lowGainSlider,         lowGainRndNegSlider,   lowGainRndPosSlider,   RRColors::eqLowNeg,  RRColors::eqLowCol);
+    //drawRndArcs(lowFreqSlider,         lowFreqRndNegSlider,   lowFreqRndPosSlider,   RRColors::eqLowNeg,  RRColors::eqLowCol);
     // EQ MID
-    drawRndArcs(midGainSlider,         midGainRndNegSlider,   midGainRndPosSlider,   RRColors::eqMidNeg,  RRColors::eqMidCol);
-    drawRndArcs(midFreqSlider,         midFreqRndNegSlider,   midFreqRndPosSlider,   RRColors::eqMidNeg,  RRColors::eqMidCol);
+    //drawRndArcs(midGainSlider,         midGainRndNegSlider,   midGainRndPosSlider,   RRColors::eqMidNeg,  RRColors::eqMidCol);
+    //drawRndArcs(midFreqSlider,         midFreqRndNegSlider,   midFreqRndPosSlider,   RRColors::eqMidNeg,  RRColors::eqMidCol);
     // EQ HIGH
-    drawRndArcs(highGainSlider,        highGainRndNegSlider,  highGainRndPosSlider,  RRColors::eqHighNeg, RRColors::eqHighCol);
-    drawRndArcs(highFreqSlider,        highFreqRndNegSlider,  highFreqRndPosSlider,  RRColors::eqHighNeg, RRColors::eqHighCol);
+    //drawRndArcs(highGainSlider,        highGainRndNegSlider,  highGainRndPosSlider,  RRColors::eqHighNeg, RRColors::eqHighCol);
+    //drawRndArcs(highFreqSlider,        highFreqRndNegSlider,  highFreqRndPosSlider,  RRColors::eqHighNeg, RRColors::eqHighCol);
 }
 
 void NewProjectAudioProcessorEditor::componentVisibilityChanged(juce::Component& component)
@@ -587,7 +614,8 @@ void NewProjectAudioProcessorEditor::resized()
 
     // ── Header buttons ────────────────────────────────────────────────────────
     loadSamplesButton.setBounds(margin, 58, 120, 26);
-    samplesInfoLabel.setBounds(margin + 130, 58, 260, 26);
+    // REMOVED FOR LITE: samplesInfoLabel
+    //samplesInfoLabel.setBounds(margin + 130, 58, 260, 26);
     savePresetButton.setBounds(getWidth() - 148, 58, 60, 26);
     loadPresetButton.setBounds(getWidth() - 80,  58, 60, 26);
     aboutButton.setBounds(getWidth() - 46, 12, 22, 22);
@@ -616,10 +644,11 @@ void NewProjectAudioProcessorEditor::resized()
     placeTopKnob(fineTuneSlider,        0, 1);
     placeTopKnob(volumeSlider,          1, 0);
     placeTopKnob(panSlider,             1, 1);
-    placeTopKnob(envAttackSlider,       2, 0);
-    placeTopKnob(envDecaySlider,        2, 1);
-    placeTopKnob(transientAttackSlider, 3, 0);
-    placeTopKnob(transientDecaySlider,  3, 1);
+    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
+    //placeTopKnob(envAttackSlider,       2, 0);
+    //placeTopKnob(envDecaySlider,        2, 1);
+    //placeTopKnob(transientAttackSlider, 3, 0);
+    //placeTopKnob(transientDecaySlider,  3, 1);
 
     // ── EQ knobs ─────────────────────────────────────────────────────────────
     const int pbW     = 112;
@@ -639,12 +668,13 @@ void NewProjectAudioProcessorEditor::resized()
         s.setBounds(kx, eqKy, knobW, totalH);
     };
 
-    placeEQKnob(lowGainSlider,  0);
-    placeEQKnob(lowFreqSlider,  1);
-    placeEQKnob(midGainSlider,  2);
-    placeEQKnob(midFreqSlider,  3);
-    placeEQKnob(highGainSlider, 4);
-    placeEQKnob(highFreqSlider, 5);
+    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
+    //placeEQKnob(lowGainSlider,  0);
+    //placeEQKnob(lowFreqSlider,  1);
+    //placeEQKnob(midGainSlider,  2);
+    //placeEQKnob(midFreqSlider,  3);
+    //placeEQKnob(highGainSlider, 4);
+    //placeEQKnob(highFreqSlider, 5);
 
     // ── Playback toggle ───────────────────────────────────────────────────────
     const int pbX = margin + eqW + secGap;
@@ -711,16 +741,17 @@ bool NewProjectAudioProcessorEditor::RndArcOverlay::hitTest(int x, int y)
         { &editor.fineTuneSlider,        &editor.fineTuneRndNegSlider,  &editor.fineTuneRndPosSlider  },
         { &editor.volumeSlider,          &editor.volumeRndNegSlider,    &editor.volumeRndPosSlider    },
         { &editor.panSlider,             &editor.panRndNegSlider,       &editor.panRndPosSlider       },
-        { &editor.lowGainSlider,         &editor.lowGainRndNegSlider,   &editor.lowGainRndPosSlider   },
-        { &editor.lowFreqSlider,         &editor.lowFreqRndNegSlider,   &editor.lowFreqRndPosSlider   },
-        { &editor.midGainSlider,         &editor.midGainRndNegSlider,   &editor.midGainRndPosSlider   },
-        { &editor.midFreqSlider,         &editor.midFreqRndNegSlider,   &editor.midFreqRndPosSlider   },
-        { &editor.highGainSlider,        &editor.highGainRndNegSlider,  &editor.highGainRndPosSlider  },
-        { &editor.highFreqSlider,        &editor.highFreqRndNegSlider,  &editor.highFreqRndPosSlider  },
-        { &editor.transientAttackSlider, &editor.transAtkRndNegSlider,  &editor.transAtkRndPosSlider  },
-        { &editor.transientDecaySlider,  &editor.transDecRndNegSlider,  &editor.transDecRndPosSlider  },
-        { &editor.envAttackSlider,       &editor.envAtkRndNegSlider,    &editor.envAtkRndPosSlider    },
-        { &editor.envDecaySlider,        &editor.envDecRndNegSlider,    &editor.envDecRndPosSlider    },
+        // COMMENTED FOR LITE — ACTIVE IN PREMIUM
+        //{ &editor.lowGainSlider,         &editor.lowGainRndNegSlider,   &editor.lowGainRndPosSlider   },
+        //{ &editor.lowFreqSlider,         &editor.lowFreqRndNegSlider,   &editor.lowFreqRndPosSlider   },
+        //{ &editor.midGainSlider,         &editor.midGainRndNegSlider,   &editor.midGainRndPosSlider   },
+        //{ &editor.midFreqSlider,         &editor.midFreqRndNegSlider,   &editor.midFreqRndPosSlider   },
+        //{ &editor.highGainSlider,        &editor.highGainRndNegSlider,  &editor.highGainRndPosSlider  },
+        //{ &editor.highFreqSlider,        &editor.highFreqRndNegSlider,  &editor.highFreqRndPosSlider  },
+        //{ &editor.transientAttackSlider, &editor.transAtkRndNegSlider,  &editor.transAtkRndPosSlider  },
+        //{ &editor.transientDecaySlider,  &editor.transDecRndNegSlider,  &editor.transDecRndPosSlider  },
+        //{ &editor.envAttackSlider,       &editor.envAtkRndNegSlider,    &editor.envAtkRndPosSlider    },
+        //{ &editor.envDecaySlider,        &editor.envDecRndNegSlider,    &editor.envDecRndPosSlider    },
     };
 
     for (auto& t : trios)
@@ -744,16 +775,17 @@ void NewProjectAudioProcessorEditor::RndArcOverlay::mouseDown(const juce::MouseE
         { &editor.fineTuneSlider,        &editor.fineTuneRndNegSlider,  &editor.fineTuneRndPosSlider  },
         { &editor.volumeSlider,          &editor.volumeRndNegSlider,    &editor.volumeRndPosSlider    },
         { &editor.panSlider,             &editor.panRndNegSlider,       &editor.panRndPosSlider       },
-        { &editor.lowGainSlider,         &editor.lowGainRndNegSlider,   &editor.lowGainRndPosSlider   },
-        { &editor.lowFreqSlider,         &editor.lowFreqRndNegSlider,   &editor.lowFreqRndPosSlider   },
-        { &editor.midGainSlider,         &editor.midGainRndNegSlider,   &editor.midGainRndPosSlider   },
-        { &editor.midFreqSlider,         &editor.midFreqRndNegSlider,   &editor.midFreqRndPosSlider   },
-        { &editor.highGainSlider,        &editor.highGainRndNegSlider,  &editor.highGainRndPosSlider  },
-        { &editor.highFreqSlider,        &editor.highFreqRndNegSlider,  &editor.highFreqRndPosSlider  },
-        { &editor.transientAttackSlider, &editor.transAtkRndNegSlider,  &editor.transAtkRndPosSlider  },
-        { &editor.transientDecaySlider,  &editor.transDecRndNegSlider,  &editor.transDecRndPosSlider  },
-        { &editor.envAttackSlider,       &editor.envAtkRndNegSlider,    &editor.envAtkRndPosSlider    },
-        { &editor.envDecaySlider,        &editor.envDecRndNegSlider,    &editor.envDecRndPosSlider    },
+        // COMMENTED FOR LITE — ACTIVE IN PREMIUM
+        //{ &editor.lowGainSlider,         &editor.lowGainRndNegSlider,   &editor.lowGainRndPosSlider   },
+        //{ &editor.lowFreqSlider,         &editor.lowFreqRndNegSlider,   &editor.lowFreqRndPosSlider   },
+        //{ &editor.midGainSlider,         &editor.midGainRndNegSlider,   &editor.midGainRndPosSlider   },
+        //{ &editor.midFreqSlider,         &editor.midFreqRndNegSlider,   &editor.midFreqRndPosSlider   },
+        //{ &editor.highGainSlider,        &editor.highGainRndNegSlider,  &editor.highGainRndPosSlider  },
+        //{ &editor.highFreqSlider,        &editor.highFreqRndNegSlider,  &editor.highFreqRndPosSlider  },
+        //{ &editor.transientAttackSlider, &editor.transAtkRndNegSlider,  &editor.transAtkRndPosSlider  },
+        //{ &editor.transientDecaySlider,  &editor.transDecRndNegSlider,  &editor.transDecRndPosSlider  },
+        //{ &editor.envAttackSlider,       &editor.envAtkRndNegSlider,    &editor.envAtkRndPosSlider    },
+        //{ &editor.envDecaySlider,        &editor.envDecRndNegSlider,    &editor.envDecRndPosSlider    },
     };
 
     // FIX: use closest-dot selection instead of first-found.

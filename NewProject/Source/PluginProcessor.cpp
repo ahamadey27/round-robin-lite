@@ -134,15 +134,17 @@ void NewProjectAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBl
 
     synthesiser.setCurrentPlaybackSampleRate(sampleRate);
 
+    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
     //==============================================================================
     // INITIALIZE 3-BAND EQ
 
-    threeBandEQ.prepareToPlay(sampleRate, samplesPerBlock);
+    //threeBandEQ.prepareToPlay(sampleRate, samplesPerBlock);
 
+    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
     //==============================================================================
     // INITIALIZE TRANSIENT SHAPER
 
-    transientShaper.prepareToPlay(sampleRate, samplesPerBlock);
+    //transientShaper.prepareToPlay(sampleRate, samplesPerBlock);
 
     //==============================================================================
     // INITIALIZE PARAMETER SMOOTHING
@@ -160,12 +162,13 @@ void NewProjectAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBl
     smoothedVolume.reset(sampleRate, rampTimeSeconds);
     smoothedVolume.setCurrentAndTargetValue(apvts.getRawParameterValue(ParameterIDs::volume)->load());
 
+    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
     // Amplitude Envelope
-    smoothedEnvAttack.reset(sampleRate, rampTimeSeconds);
-    smoothedEnvAttack.setCurrentAndTargetValue(apvts.getRawParameterValue(ParameterIDs::envAttack)->load());
+    //smoothedEnvAttack.reset(sampleRate, rampTimeSeconds);
+    //smoothedEnvAttack.setCurrentAndTargetValue(apvts.getRawParameterValue(ParameterIDs::envAttack)->load());
 
-    smoothedEnvDecay.reset(sampleRate, rampTimeSeconds);
-    smoothedEnvDecay.setCurrentAndTargetValue(apvts.getRawParameterValue(ParameterIDs::envDecay)->load());
+    //smoothedEnvDecay.reset(sampleRate, rampTimeSeconds);
+    //smoothedEnvDecay.setCurrentAndTargetValue(apvts.getRawParameterValue(ParameterIDs::envDecay)->load());
 
     // NOTE: Transient attack/decay read directly from APVTS — no smoothers needed
 
@@ -213,8 +216,9 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     smoothedSemitone.setTargetValue(apvts.getRawParameterValue(ParameterIDs::semitone)->load());
     smoothedFineTune.setTargetValue(apvts.getRawParameterValue(ParameterIDs::fineTune)->load());
     smoothedVolume.setTargetValue(apvts.getRawParameterValue(ParameterIDs::volume)->load());
-    smoothedEnvAttack.setTargetValue(apvts.getRawParameterValue(ParameterIDs::envAttack)->load());
-    smoothedEnvDecay.setTargetValue(apvts.getRawParameterValue(ParameterIDs::envDecay)->load());
+    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
+    //smoothedEnvAttack.setTargetValue(apvts.getRawParameterValue(ParameterIDs::envAttack)->load());
+    //smoothedEnvDecay.setTargetValue(apvts.getRawParameterValue(ParameterIDs::envDecay)->load());
 
     //==============================================================================
     // CLEAR OUTPUT BUFFERS
@@ -230,21 +234,23 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
 
     globalSemitones.store(smoothedSemitone.getCurrentValue());
     globalCents.store(smoothedFineTune.getCurrentValue());
-    globalAttackMs.store(smoothedEnvAttack.getCurrentValue());
-    globalDecayMs.store(smoothedEnvDecay.getCurrentValue());
+    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
+    //globalAttackMs.store(smoothedEnvAttack.getCurrentValue());
+    //globalDecayMs.store(smoothedEnvDecay.getCurrentValue());
 
     //==============================================================================
     // UPDATE ALL VOICES WITH CURRENT GLOBAL PARAMETERS
 
     float semitones = static_cast<float>(apvts.getRawParameterValue(ParameterIDs::semitone)->load());
     float cents = static_cast<float>(apvts.getRawParameterValue(ParameterIDs::fineTune)->load());
-    float attackMs = apvts.getRawParameterValue(ParameterIDs::envAttack)->load();
-    float decayMs = apvts.getRawParameterValue(ParameterIDs::envDecay)->load();
+    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
+    //float attackMs = apvts.getRawParameterValue(ParameterIDs::envAttack)->load();
+    //float decayMs = apvts.getRawParameterValue(ParameterIDs::envDecay)->load();
 
     for (int i = 0; i < synthesiser.getNumVoices(); ++i)
     {
         if (auto* voice = dynamic_cast<RRVoice*>(synthesiser.getVoice(i)))
-            voice->updateGlobalParameters(semitones, cents, attackMs, decayMs);
+            voice->updateGlobalParameters(semitones, cents, 0.0f, 0.0f); // LITE: attack/decay removed from APVTS
     }
 
     //==============================================================================
@@ -264,45 +270,47 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
 
     synthesiser.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 
+    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
     //==============================================================================
     // APPLY 3-BAND EQ (AFTER SYNTH, BEFORE TRANSIENT)
 
-    // Read live from APVTS — always reflects current knob positions
-    float eqLowGain = apvts.getRawParameterValue(ParameterIDs::lowGain)->load();
-    float eqLowFreq = apvts.getRawParameterValue(ParameterIDs::lowFreq)->load();
-    float eqMidGain = apvts.getRawParameterValue(ParameterIDs::midGain)->load();
-    float eqMidFreq = apvts.getRawParameterValue(ParameterIDs::midFreq)->load();
-    float eqHighGain = apvts.getRawParameterValue(ParameterIDs::highGain)->load();
-    float eqHighFreq = apvts.getRawParameterValue(ParameterIDs::highFreq)->load();
-    float transAtk = apvts.getRawParameterValue(ParameterIDs::transientAttack)->load();
-    float transDec = apvts.getRawParameterValue(ParameterIDs::transientDecay)->load();
+    //// Read live from APVTS — always reflects current knob positions
+    //float eqLowGain = apvts.getRawParameterValue(ParameterIDs::lowGain)->load();
+    //float eqLowFreq = apvts.getRawParameterValue(ParameterIDs::lowFreq)->load();
+    //float eqMidGain = apvts.getRawParameterValue(ParameterIDs::midGain)->load();
+    //float eqMidFreq = apvts.getRawParameterValue(ParameterIDs::midFreq)->load();
+    //float eqHighGain = apvts.getRawParameterValue(ParameterIDs::highGain)->load();
+    //float eqHighFreq = apvts.getRawParameterValue(ParameterIDs::highFreq)->load();
+    //float transAtk = apvts.getRawParameterValue(ParameterIDs::transientAttack)->load();
+    //float transDec = apvts.getRawParameterValue(ParameterIDs::transientDecay)->load();
 
-    // OVERRIDE with randomized values when a voice is actively playing
-    if (auto* voice = dynamic_cast<RRVoice*>(synthesiser.getVoice(0)))
-    {
-        if (voice->isVoiceActive())
-        {
-            eqLowGain = voice->getRandomizedLowGain();
-            eqLowFreq = voice->getRandomizedLowFreq();
-            eqMidGain = voice->getRandomizedMidGain();
-            eqMidFreq = voice->getRandomizedMidFreq();
-            eqHighGain = voice->getRandomizedHighGain();
-            eqHighFreq = voice->getRandomizedHighFreq();
-            transAtk = voice->getRandomizedTransientAttack();
-            transDec = voice->getRandomizedTransientDecay();
-        }
+    //// OVERRIDE with randomized values when a voice is actively playing
+    //if (auto* voice = dynamic_cast<RRVoice*>(synthesiser.getVoice(0)))
+    //{
+    //    if (voice->isVoiceActive())
+    //    {
+    //        eqLowGain = voice->getRandomizedLowGain();
+    //        eqLowFreq = voice->getRandomizedLowFreq();
+    //        eqMidGain = voice->getRandomizedMidGain();
+    //        eqMidFreq = voice->getRandomizedMidFreq();
+    //        eqHighGain = voice->getRandomizedHighGain();
+    //        eqHighFreq = voice->getRandomizedHighFreq();
+    //        transAtk = voice->getRandomizedTransientAttack();
+    //        transDec = voice->getRandomizedTransientDecay();
+    //    }
 
-        threeBandEQ.updateFilters(eqLowGain, eqLowFreq, eqMidGain, eqMidFreq, eqHighGain, eqHighFreq);
-        threeBandEQ.processBlock(buffer);
-    }
+    //    threeBandEQ.updateFilters(eqLowGain, eqLowFreq, eqMidGain, eqMidFreq, eqHighGain, eqHighFreq);
+    //    threeBandEQ.processBlock(buffer);
+    //}
 
+    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
     //==============================================================================
     // APPLY TRANSIENT SHAPING (AFTER EQ, BEFORE VOLUME)
 
     //float transAtk = apvts.getRawParameterValue(ParameterIDs::transientAttack)->load();
     //float transDec = apvts.getRawParameterValue(ParameterIDs::transientDecay)->load();
 
-    transientShaper.processBlock(buffer, transAtk, transDec);
+    //transientShaper.processBlock(buffer, transAtk, transDec);
 
     //==============================================================================
     // APPLY VOLUME CONTROL
@@ -545,28 +553,29 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
         juce::ParameterID(ParameterIDs::panRndPos, 1),
         "Pan Rnd Pos", 0.0f, 1.0f, 0.0f));
 
+    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
     //==============================================================================
     // AMPLITUDE ENVELOPE
 
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID(ParameterIDs::envAttack, 1),
-        "Env Attack",
-        juce::NormalisableRange<float>(0.0f, 1000.0f, 0.1f, 0.3f),
-        0.0f,
-        "ms",
-        juce::AudioProcessorParameter::genericParameter,
-        [](float value, int) { return juce::String(value, 1) + " ms"; }
-    ));
+    //layout.add(std::make_unique<juce::AudioParameterFloat>(
+    //    juce::ParameterID(ParameterIDs::envAttack, 1),
+    //    "Env Attack",
+    //    juce::NormalisableRange<float>(0.0f, 1000.0f, 0.1f, 0.3f),
+    //    0.0f,
+    //    "ms",
+    //    juce::AudioProcessorParameter::genericParameter,
+    //    [](float value, int) { return juce::String(value, 1) + " ms"; }
+    //));
 
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID(ParameterIDs::envDecay, 1),
-        "Env Decay",
-        juce::NormalisableRange<float>(0.0f, 5000.0f, 1.0f, 0.4f),
-        5000.0f,
-        "ms",
-        juce::AudioProcessorParameter::genericParameter,
-        [](float value, int) { return juce::String(value, 1) + " ms"; }
-    ));
+    //layout.add(std::make_unique<juce::AudioParameterFloat>(
+    //    juce::ParameterID(ParameterIDs::envDecay, 1),
+    //    "Env Decay",
+    //    juce::NormalisableRange<float>(0.0f, 5000.0f, 1.0f, 0.4f),
+    //    5000.0f,
+    //    "ms",
+    //    juce::AudioProcessorParameter::genericParameter,
+    //    [](float value, int) { return juce::String(value, 1) + " ms"; }
+    //));
 
 
     //==============================================================================
@@ -576,65 +585,67 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
         juce::ParameterID(ParameterIDs::playbackMode, 1),
         "Playback Mode", false));  // false = Series, true = Random
 
+    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
     //==============================================================================
     // 3-BAND EQ
 
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID(ParameterIDs::lowGain, 1),
-        "Low Gain",
-        juce::NormalisableRange<float>(-24.0f, 24.0f, 0.1f),
-        0.0f, "dB"
-    ));
+    //layout.add(std::make_unique<juce::AudioParameterFloat>(
+    //    juce::ParameterID(ParameterIDs::lowGain, 1),
+    //    "Low Gain",
+    //    juce::NormalisableRange<float>(-24.0f, 24.0f, 0.1f),
+    //    0.0f, "dB"
+    //));
 
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID(ParameterIDs::lowFreq, 1),
-        "Low Freq",
-        juce::NormalisableRange<float>(20.0f, 500.0f, 1.0f, 0.25f),
-        100.0f, "Hz"
-    ));
+    //layout.add(std::make_unique<juce::AudioParameterFloat>(
+    //    juce::ParameterID(ParameterIDs::lowFreq, 1),
+    //    "Low Freq",
+    //    juce::NormalisableRange<float>(20.0f, 500.0f, 1.0f, 0.25f),
+    //    100.0f, "Hz"
+    //));
 
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID(ParameterIDs::midGain, 1),
-        "Mid Gain",
-        juce::NormalisableRange<float>(-24.0f, 24.0f, 0.1f),
-        0.0f, "dB"
-    ));
+    //layout.add(std::make_unique<juce::AudioParameterFloat>(
+    //    juce::ParameterID(ParameterIDs::midGain, 1),
+    //    "Mid Gain",
+    //    juce::NormalisableRange<float>(-24.0f, 24.0f, 0.1f),
+    //    0.0f, "dB"
+    //));
 
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID(ParameterIDs::midFreq, 1),
-        "Mid Freq",
-        juce::NormalisableRange<float>(200.0f, 5000.0f, 1.0f, 0.3f),
-        1000.0f, "Hz"
-    ));
+    //layout.add(std::make_unique<juce::AudioParameterFloat>(
+    //    juce::ParameterID(ParameterIDs::midFreq, 1),
+    //    "Mid Freq",
+    //    juce::NormalisableRange<float>(200.0f, 5000.0f, 1.0f, 0.3f),
+    //    1000.0f, "Hz"
+    //));
 
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID(ParameterIDs::highGain, 1),
-        "High Gain",
-        juce::NormalisableRange<float>(-24.0f, 24.0f, 0.1f),
-        0.0f, "dB"
-    ));
+    //layout.add(std::make_unique<juce::AudioParameterFloat>(
+    //    juce::ParameterID(ParameterIDs::highGain, 1),
+    //    "High Gain",
+    //    juce::NormalisableRange<float>(-24.0f, 24.0f, 0.1f),
+    //    0.0f, "dB"
+    //));
 
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID(ParameterIDs::highFreq, 1),
-        "High Freq",
-        juce::NormalisableRange<float>(2000.0f, 20000.0f, 1.0f, 0.3f),
-        5000.0f, "Hz"
-    ));
+    //layout.add(std::make_unique<juce::AudioParameterFloat>(
+    //    juce::ParameterID(ParameterIDs::highFreq, 1),
+    //    "High Freq",
+    //    juce::NormalisableRange<float>(2000.0f, 20000.0f, 1.0f, 0.3f),
+    //    5000.0f, "Hz"
+    //));
 
+    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
     //==============================================================================
     // TRANSIENT MASTER
 
-    layout.add(std::make_unique<juce::AudioParameterInt>(
-        juce::ParameterID(ParameterIDs::transientAttack, 1),
-        "Transient Attack",
-        -127, 127, 0
-    ));
+    //layout.add(std::make_unique<juce::AudioParameterInt>(
+    //    juce::ParameterID(ParameterIDs::transientAttack, 1),
+    //    "Transient Attack",
+    //    -127, 127, 0
+    //));
 
-    layout.add(std::make_unique<juce::AudioParameterInt>(
-        juce::ParameterID(ParameterIDs::transientDecay, 1),
-        "Transient Decay",
-        -127, 127, 0
-    ));
+    //layout.add(std::make_unique<juce::AudioParameterInt>(
+    //    juce::ParameterID(ParameterIDs::transientDecay, 1),
+    //    "Transient Decay",
+    //    -127, 127, 0
+    //));
 
     DBG("Parameter layout created with " + juce::String(ParameterIDs::totalParameters) + " parameters");
 
@@ -665,85 +676,88 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
         juce::ParameterID(ParameterIDs::volumeRndPos, 1),
         "Volume Rnd Pos", 0.0f, 1.0f, 0.0f));
 
+    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
     // Envelope Attack
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID(ParameterIDs::envAttackRndNeg, 1),
-        "Env Attack Rnd Neg", 0.0f, 1000.0f, 0.0f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID(ParameterIDs::envAttackRndPos, 1),
-        "Env Attack Rnd Pos", 0.0f, 1000.0f, 0.0f));
+    //layout.add(std::make_unique<juce::AudioParameterFloat>(
+    //    juce::ParameterID(ParameterIDs::envAttackRndNeg, 1),
+    //    "Env Attack Rnd Neg", 0.0f, 1000.0f, 0.0f));
+    //layout.add(std::make_unique<juce::AudioParameterFloat>(
+    //    juce::ParameterID(ParameterIDs::envAttackRndPos, 1),
+    //    "Env Attack Rnd Pos", 0.0f, 1000.0f, 0.0f));
 
     // Envelope Decay
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID(ParameterIDs::envDecayRndNeg, 1),
-        "Env Decay Rnd Neg", 0.0f, 5000.0f, 0.0f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID(ParameterIDs::envDecayRndPos, 1),
-        "Env Decay Rnd Pos", 0.0f, 5000.0f, 0.0f));
+    //layout.add(std::make_unique<juce::AudioParameterFloat>(
+    //    juce::ParameterID(ParameterIDs::envDecayRndNeg, 1),
+    //    "Env Decay Rnd Neg", 0.0f, 5000.0f, 0.0f));
+    //layout.add(std::make_unique<juce::AudioParameterFloat>(
+    //    juce::ParameterID(ParameterIDs::envDecayRndPos, 1),
+    //    "Env Decay Rnd Pos", 0.0f, 5000.0f, 0.0f));
 
+    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
     // Low EQ Gain
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID(ParameterIDs::lowGainRndNeg, 1),
-        "Low Gain Rnd Neg", 0.0f, 24.0f, 0.0f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID(ParameterIDs::lowGainRndPos, 1),
-        "Low Gain Rnd Pos", 0.0f, 24.0f, 0.0f));
+    //layout.add(std::make_unique<juce::AudioParameterFloat>(
+    //    juce::ParameterID(ParameterIDs::lowGainRndNeg, 1),
+    //    "Low Gain Rnd Neg", 0.0f, 24.0f, 0.0f));
+    //layout.add(std::make_unique<juce::AudioParameterFloat>(
+    //    juce::ParameterID(ParameterIDs::lowGainRndPos, 1),
+    //    "Low Gain Rnd Pos", 0.0f, 24.0f, 0.0f));
 
     // Low EQ Frequency
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID(ParameterIDs::lowFreqRndNeg, 1),
-        "Low Freq Rnd Neg", 0.0f, 480.0f, 0.0f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID(ParameterIDs::lowFreqRndPos, 1),
-        "Low Freq Rnd Pos", 0.0f, 480.0f, 0.0f));
+    //layout.add(std::make_unique<juce::AudioParameterFloat>(
+    //    juce::ParameterID(ParameterIDs::lowFreqRndNeg, 1),
+    //    "Low Freq Rnd Neg", 0.0f, 480.0f, 0.0f));
+    //layout.add(std::make_unique<juce::AudioParameterFloat>(
+    //    juce::ParameterID(ParameterIDs::lowFreqRndPos, 1),
+    //    "Low Freq Rnd Pos", 0.0f, 480.0f, 0.0f));
 
     // Mid EQ Gain
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID(ParameterIDs::midGainRndNeg, 1),
-        "Mid Gain Rnd Neg", 0.0f, 24.0f, 0.0f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID(ParameterIDs::midGainRndPos, 1),
-        "Mid Gain Rnd Pos", 0.0f, 24.0f, 0.0f));
+    //layout.add(std::make_unique<juce::AudioParameterFloat>(
+    //    juce::ParameterID(ParameterIDs::midGainRndNeg, 1),
+    //    "Mid Gain Rnd Neg", 0.0f, 24.0f, 0.0f));
+    //layout.add(std::make_unique<juce::AudioParameterFloat>(
+    //    juce::ParameterID(ParameterIDs::midGainRndPos, 1),
+    //    "Mid Gain Rnd Pos", 0.0f, 24.0f, 0.0f));
 
     // Mid EQ Frequency
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID(ParameterIDs::midFreqRndNeg, 1),
-        "Mid Freq Rnd Neg", 0.0f, 4800.0f, 0.0f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID(ParameterIDs::midFreqRndPos, 1),
-        "Mid Freq Rnd Pos", 0.0f, 4800.0f, 0.0f));
+    //layout.add(std::make_unique<juce::AudioParameterFloat>(
+    //    juce::ParameterID(ParameterIDs::midFreqRndNeg, 1),
+    //    "Mid Freq Rnd Neg", 0.0f, 4800.0f, 0.0f));
+    //layout.add(std::make_unique<juce::AudioParameterFloat>(
+    //    juce::ParameterID(ParameterIDs::midFreqRndPos, 1),
+    //    "Mid Freq Rnd Pos", 0.0f, 4800.0f, 0.0f));
 
     // High EQ Gain
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID(ParameterIDs::highGainRndNeg, 1),
-        "High Gain Rnd Neg", 0.0f, 24.0f, 0.0f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID(ParameterIDs::highGainRndPos, 1),
-        "High Gain Rnd Pos", 0.0f, 24.0f, 0.0f));
+    //layout.add(std::make_unique<juce::AudioParameterFloat>(
+    //    juce::ParameterID(ParameterIDs::highGainRndNeg, 1),
+    //    "High Gain Rnd Neg", 0.0f, 24.0f, 0.0f));
+    //layout.add(std::make_unique<juce::AudioParameterFloat>(
+    //    juce::ParameterID(ParameterIDs::highGainRndPos, 1),
+    //    "High Gain Rnd Pos", 0.0f, 24.0f, 0.0f));
 
     // High EQ Frequency
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID(ParameterIDs::highFreqRndNeg, 1),
-        "High Freq Rnd Neg", 0.0f, 18000.0f, 0.0f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID(ParameterIDs::highFreqRndPos, 1),
-        "High Freq Rnd Pos", 0.0f, 18000.0f, 0.0f));
+    //layout.add(std::make_unique<juce::AudioParameterFloat>(
+    //    juce::ParameterID(ParameterIDs::highFreqRndNeg, 1),
+    //    "High Freq Rnd Neg", 0.0f, 18000.0f, 0.0f));
+    //layout.add(std::make_unique<juce::AudioParameterFloat>(
+    //    juce::ParameterID(ParameterIDs::highFreqRndPos, 1),
+    //    "High Freq Rnd Pos", 0.0f, 18000.0f, 0.0f));
 
+    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
     // Transient Attack
-    layout.add(std::make_unique<juce::AudioParameterInt>(
-        juce::ParameterID(ParameterIDs::transientAttackRndNeg, 1),
-        "Trans Atk Rnd Neg", 0, 127, 0));
-    layout.add(std::make_unique<juce::AudioParameterInt>(
-        juce::ParameterID(ParameterIDs::transientAttackRndPos, 1),
-        "Trans Atk Rnd Pos", 0, 127, 0));
+    //layout.add(std::make_unique<juce::AudioParameterInt>(
+    //    juce::ParameterID(ParameterIDs::transientAttackRndNeg, 1),
+    //    "Trans Atk Rnd Neg", 0, 127, 0));
+    //layout.add(std::make_unique<juce::AudioParameterInt>(
+    //    juce::ParameterID(ParameterIDs::transientAttackRndPos, 1),
+    //    "Trans Atk Rnd Pos", 0, 127, 0));
 
     // Transient Decay
-    layout.add(std::make_unique<juce::AudioParameterInt>(
-        juce::ParameterID(ParameterIDs::transientDecayRndNeg, 1),
-        "Trans Dec Rnd Neg", 0, 127, 0));
-    layout.add(std::make_unique<juce::AudioParameterInt>(
-        juce::ParameterID(ParameterIDs::transientDecayRndPos, 1),
-        "Trans Dec Rnd Pos", 0, 127, 0));
+    //layout.add(std::make_unique<juce::AudioParameterInt>(
+    //    juce::ParameterID(ParameterIDs::transientDecayRndNeg, 1),
+    //    "Trans Dec Rnd Neg", 0, 127, 0));
+    //layout.add(std::make_unique<juce::AudioParameterInt>(
+    //    juce::ParameterID(ParameterIDs::transientDecayRndPos, 1),
+    //    "Trans Dec Rnd Pos", 0, 127, 0));
 
     return layout;
 }
