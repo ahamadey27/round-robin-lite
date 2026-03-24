@@ -296,6 +296,9 @@ void NewProjectAudioProcessorEditor::updateSamplesInfo()
 
 void NewProjectAudioProcessorEditor::savePreset()
 {
+    DBG("=== SAVE PRESET BUTTON CLICKED ===");
+    DBG("  loadedSlotIndices.size() = " + juce::String((int)audioProcessor.loadedSlotIndices.size()));
+
     // Warn the user early if no samples are loaded — the preset would be empty
     if (audioProcessor.loadedSlotIndices.empty())
     {
