@@ -518,4 +518,5 @@ So at tick 9, the additional randomization per parameter would be:
 - Source/Data/SampleSlot.h
 
 **CMake build command:**
-- cd /Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX && cmake ../..
+- cd /Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX && cmake ../.. 
+- cmake -B Builds/MacOSX -G Xcode -S

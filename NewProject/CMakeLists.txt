@@ -23,16 +23,11 @@ juce_add_plugin(RoundRobinLite
     NEEDS_MIDI_OUTPUT               FALSE
     IS_MIDI_EFFECT                  FALSE
     EDITOR_WANTS_KEYBOARD_FOCUS     FALSE
-    COPY_PLUGIN_AFTER_BUILD         FALSE
+    COPY_PLUGIN_AFTER_BUILD         TRUE
+    VST3_COPY_DIR                   "$ENV{HOME}/Library/Audio/Plug-Ins/VST3"
 
     FORMATS                         VST3 AU Standalone
 )
-
-set(VST3_COPY_DIR "/Library/Audio/Plug-Ins/VST3")
-add_custom_command(TARGET RoundRobinLite_VST3 POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    "$<TARGET_FILE_DIR:RoundRobinLite_VST3>/../round-robin-lite.vst3"
-    "${VST3_COPY_DIR}/round-robin-lite.vst3")
     
 # Generate JuceHeader.h (required because source files use #include <JuceHeader.h>)
 juce_generate_juce_header(RoundRobinLite)
