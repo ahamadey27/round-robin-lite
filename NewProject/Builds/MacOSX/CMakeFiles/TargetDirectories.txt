@@ -1,0 +1,15 @@
+/Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/CMakeFiles/RoundRobinLite.dir
+/Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/CMakeFiles/RoundRobinLite_All.dir
+/Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/CMakeFiles/RoundRobinLite_Standalone.dir
+/Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/CMakeFiles/RoundRobinLite_AU.dir
+/Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/CMakeFiles/RoundRobinLite_VST3.dir
+/Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/CMakeFiles/RoundRobinLite_vst3_helper.dir
+/Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/CMakeFiles/install.dir
+/Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/CMakeFiles/ALL_BUILD.dir
+/Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/CMakeFiles/ZERO_CHECK.dir
+/Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/JUCE/CMakeFiles/install.dir
+/Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/JUCE/CMakeFiles/ALL_BUILD.dir
+/Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/JUCE/CMakeFiles/ZERO_CHECK.dir
+/Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/JUCE/modules/CMakeFiles/install.dir
+/Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/JUCE/extras/Build/CMakeFiles/install.dir
+/Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/JUCE/extras/Build/juceaide/CMakeFiles/install.dir

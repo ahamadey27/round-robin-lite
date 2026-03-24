@@ -1,40 +1,46 @@
-# ============================================================
-# round-robin-lite — JUCE Audio Plugin
-# ============================================================
+cmake_minimum_required(VERSION 3.22)
+project(RoundRobinLite VERSION 1.0.0)
 
-juce_add_plugin(round-robin-lite
-    # Identity
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# ============================================================
+# JUCE — absolute path to local installation
+# ============================================================
+add_subdirectory(/Users/alex/Documents/JUCE "${CMAKE_BINARY_DIR}/JUCE")
+
+# ============================================================
+# Plugin target
+# ============================================================
+juce_add_plugin(RoundRobinLite
     COMPANY_NAME                    "roundrobinlite"
     PLUGIN_CODE                     "rrll"
     PLUGIN_MANUFACTURER_CODE        "Rrlt"
     PRODUCT_NAME                    "round-robin-lite"
 
-    # Plugin behaviour
     IS_SYNTH                        TRUE
     NEEDS_MIDI_INPUT                TRUE
     NEEDS_MIDI_OUTPUT               FALSE
     IS_MIDI_EFFECT                  FALSE
     EDITOR_WANTS_KEYBOARD_FOCUS     FALSE
-
-    # Build formats (matches .jucer: buildStandalone, buildVST3)
-    FORMATS                         VST3 Standalone
-
-    # Don't auto-copy on build by default; set to TRUE to enable
     COPY_PLUGIN_AFTER_BUILD         FALSE
+
+    FORMATS                         VST3 AU Standalone
 )
 
 # ============================================================
-# Source Files
+# Source files
+# NOTE: RRvoice uses lowercase 'v' to match filenames on disk
 # ============================================================
-target_sources(round-robin-lite
+target_sources(RoundRobinLite
     PRIVATE
         Source/PluginProcessor.cpp
         Source/PluginProcessor.h
         Source/PluginEditor.cpp
         Source/PluginEditor.h
 
-        Source/Audio/RRVoice.cpp
-        Source/Audio/RRVoice.h
+        Source/Audio/RRvoice.cpp
+        Source/Audio/RRvoice.h
         Source/Audio/RRSound.cpp
         Source/Audio/RRSound.h
         Source/Audio/MidiMapper.h
@@ -58,9 +64,9 @@ target_sources(round-robin-lite
 )
 
 # ============================================================
-# Include Directories
+# Include directories
 # ============================================================
-target_include_directories(round-robin-lite
+target_include_directories(RoundRobinLite
     PRIVATE
         Source
         Source/Audio
@@ -71,37 +77,21 @@ target_include_directories(round-robin-lite
 )
 
 # ============================================================
-# Compile Definitions
-# Matches JUCEOPTIONS in NewProject.jucer
+# Compile definitions
 # ============================================================
-target_compile_definitions(round-robin-lite
+target_compile_definitions(RoundRobinLite
     PUBLIC
-        # Disable unused JUCE subsystems to reduce build time
         JUCE_WEB_BROWSER=0
         JUCE_USE_CURL=0
-        # Match .jucer JUCEOPTIONS
         JUCE_VST3_CAN_REPLACE_VST2=0
     PRIVATE
         JUCE_STRICT_REFCOUNTEDPOINTER=1
 )
 
 # ============================================================
-# Compiler Flags
-# /W4 on MSVC matches the VS export in .jucer
+# Linked libraries — all modules from NewProject.jucer
 # ============================================================
-if(MSVC)
-    target_compile_options(round-robin-lite PRIVATE /W4)
-elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang|GNU")
-    target_compile_options(round-robin-lite PRIVATE -Wall -Wextra)
-endif()
-
-# ============================================================
-# Linked Libraries
-# All 14 modules listed in .jucer MODULES section
-# (juce_audio_processors_headless is bundled inside
-#  juce_audio_processors in the CMake API)
-# ============================================================
-target_link_libraries(round-robin-lite
+target_link_libraries(RoundRobinLite
     PRIVATE
         juce::juce_audio_basics
         juce::juce_audio_devices

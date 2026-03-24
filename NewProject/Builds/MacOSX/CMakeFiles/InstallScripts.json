@@ -1,0 +1,11 @@
+{
+	"InstallScripts" : 
+	[
+		"/Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/cmake_install.cmake",
+		"/Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/JUCE/cmake_install.cmake",
+		"/Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/JUCE/modules/cmake_install.cmake",
+		"/Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/JUCE/extras/Build/cmake_install.cmake",
+		"/Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX/JUCE/extras/Build/juceaide/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

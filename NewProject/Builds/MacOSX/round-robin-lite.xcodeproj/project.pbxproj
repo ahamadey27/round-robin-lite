@@ -236,7 +236,6 @@
 		E82243D8DA91AE1B16EE8F28 /* PluginEditor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PluginEditor.h; path = ../../Source/PluginEditor.h; sourceTree = SOURCE_ROOT; };
 		F2CFB77D662388A4673C1EA5 /* include_juce_dsp.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = include_juce_dsp.mm; path = ../../JuceLibraryCode/include_juce_dsp.mm; sourceTree = SOURCE_ROOT; };
 		F2EA5710B19B3B7D7F18F60F /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
-		FA5163E22F7249D700C1A0A2 /* rrlite-spec-v2.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "rrlite-spec-v2.md"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -358,7 +357,6 @@
 				10F07760AAAF4154D757204E /* Frameworks */,
 				886FD4B19F2E08D3FB6D6DB8 /* Products */,
 				FA5163DA2F72499700C1A0A2 /* Recovered References */,
-				FA5163E22F7249D700C1A0A2 /* rrlite-spec-v2.md */,
 			);
 			name = Source;
 			sourceTree = "<group>";
