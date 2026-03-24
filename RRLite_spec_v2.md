@@ -87,11 +87,11 @@ The following systems are fully implemented and working:
 
 **Test:**
 - [x] Build compiles with 0 errors and 0 warnings related to removed code
-- [ ] Plugin loads in AudioPluginHost / DAW
-- [ ] Volume, Pan, Semitone, Fine Tune knobs all function with randomization
-- [ ] Samples load and play back correctly
-- [ ] No EQ/Transient/Envelope UI visible
-- [ ] Header shows plugin name on left, Load Preset / Save Preset / ? on right
+- [x] Plugin loads in AudioPluginHost / DAW
+- [x] Volume, Pan, Semitone, Fine Tune knobs all function with randomization
+- [x] Samples load and play back correctly
+- [x] No EQ/Transient/Envelope UI visible
+- [x] Header shows plugin name on left, Load Preset / Save Preset / ? on right
 - [ ] Preset save/load still works (missing parameters gracefully default)
 
 ---

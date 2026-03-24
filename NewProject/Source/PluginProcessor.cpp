@@ -379,6 +379,7 @@ void NewProjectAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
     {
         if (sampleSlots[i].isLoaded)
         {
+            DBG("  Saving slot " + juce::String(i) + ": " + sampleSlots[i].sourceFile.getFullPathName());
             juce::ValueTree slot("Slot");
             slot.setProperty("index", i, nullptr);
             slot.setProperty("path", sampleSlots[i].sourceFile.getFullPathName(), nullptr);
@@ -431,9 +432,11 @@ void NewProjectAudioProcessor::setStateInformation(const void* data, int sizeInB
         return;
     }
 
-    apvts.replaceState(state);
-
-    // Restore sample file paths
+    // ── Extract sample data BEFORE apvts.replaceState ─────────────────────────
+    // apvts.replaceState() reorganises the tree internally and empties deep
+    // children (Slot nodes inside CustomData/SampleData lose their children).
+    // Taking a deep copy first keeps the data safe across that call.
+    juce::ValueTree sampleDataCopy;
     {
         juce::ValueTree customData = state.getChildWithName("CustomData");
         DBG("  CustomData found: " + juce::String(customData.isValid() ? "yes" : "no"));
@@ -443,56 +446,61 @@ void NewProjectAudioProcessor::setStateInformation(const void* data, int sizeInB
             DBG("  SampleData found: " + juce::String(sampleData.isValid() ? "yes" : "no")
                 + "  children: " + juce::String(sampleData.getNumChildren()));
             if (sampleData.isValid())
+                sampleDataCopy = sampleData.createCopy();   // deep copy — survives replaceState
+        }
+    }
+
+    apvts.replaceState(state);
+
+    // ── Restore sample file paths from the pre-extracted copy ─────────────────
+    if (sampleDataCopy.isValid())
+    {
+        for (int i = 0; i < NUM_SAMPLE_SLOTS; ++i)
+            sampleLoader.clearSlot(i);
+
+        juce::StringArray missingSamples;
+
+        for (auto slot : sampleDataCopy)
+        {
+            int index        = slot.getProperty("index",       -1);
+            juce::String path = slot.getProperty("path",       "");
+            juce::String name = slot.getProperty("displayName","");
+
+            DBG("  Restoring slot " + juce::String(index) + ": " + path);
+
+            if (index < 0 || index >= NUM_SAMPLE_SLOTS)
+                continue;
+
+            juce::File file(path);
+            if (file.existsAsFile())
             {
-                for (int i = 0; i < NUM_SAMPLE_SLOTS; ++i)
-                    sampleLoader.clearSlot(i);
-
-                juce::StringArray missingSamples;
-
-                for (auto slot : sampleData)
-                {
-                    int index = slot.getProperty("index", -1);
-                    juce::String path = slot.getProperty("path", "");
-                    juce::String name = slot.getProperty("displayName", "");
-
-                    DBG("  Restoring slot " + juce::String(index) + ": " + path);
-
-                    if (index < 0 || index >= NUM_SAMPLE_SLOTS)
-                        continue;
-
-                    juce::File file(path);
-                    if (file.existsAsFile())
-                    {
-                        sampleLoader.loadSample(index, file);
-                    }
-                    else
-                    {
-                        DBG("  FILE NOT FOUND: " + path);
-                        missingSamples.add("Slot " + juce::String(index + 1) + ": " + name);
-                    }
-                }
-
-                rebuildLoadedIndices();
-                DBG("  Loaded slots after restore: " + juce::String((int)loadedSlotIndices.size()));
-                sampleLoader.updateSynthesiserSounds();
-                DBG("  Synth sounds after restore: " + juce::String(synthesiser.getNumSounds()));
-
-                if (!missingSamples.isEmpty())
-                {
-                    juce::String msg = "The following samples could not be found:\n\n";
-                    msg += missingSamples.joinIntoString("\n");
-                    msg += "\n\nPlease reload them manually.";
-
-                    juce::MessageManager::callAsync([msg]()
-                        {
-                            juce::AlertWindow::showMessageBoxAsync(
-                                juce::AlertWindow::WarningIcon,
-                                "Missing Samples", msg);
-                        });
-                }
+                sampleLoader.loadSample(index, file);
+            }
+            else
+            {
+                DBG("  FILE NOT FOUND: " + path);
+                missingSamples.add("Slot " + juce::String(index + 1) + ": " + name);
             }
         }
 
+        rebuildLoadedIndices();
+        DBG("  Loaded slots after restore: " + juce::String((int)loadedSlotIndices.size()));
+        sampleLoader.updateSynthesiserSounds();
+        DBG("  Synth sounds after restore: " + juce::String(synthesiser.getNumSounds()));
+
+        if (!missingSamples.isEmpty())
+        {
+            juce::String msg = "The following samples could not be found:\n\n";
+            msg += missingSamples.joinIntoString("\n");
+            msg += "\n\nPlease reload them manually.";
+
+            juce::MessageManager::callAsync([msg]()
+                {
+                    juce::AlertWindow::showMessageBoxAsync(
+                        juce::AlertWindow::WarningIcon,
+                        "Missing Samples", msg);
+                });
+        }
     }
     DBG("State loaded successfully");
     DBG("  Parameters restored: " + juce::String(apvts.state.getNumChildren()));
@@ -857,6 +865,8 @@ void NewProjectAudioProcessor::advanceRoundRobin()
 // User Presets
 void NewProjectAudioProcessor::savePreset(const juce::File& file)
 {
+    DBG("--- savePreset() called: " + file.getFullPathName());
+
     juce::MemoryBlock data;
     getStateInformation(data);
 

@@ -297,16 +297,21 @@ void NewProjectAudioProcessorEditor::updateSamplesInfo()
 void NewProjectAudioProcessorEditor::savePreset()
 {
     fileChooser = std::make_unique<juce::FileChooser>(
-        "Save Preset", juce::File{}, "*.rrpreset");
+        "Save Preset",
+        juce::File::getSpecialLocation(juce::File::userDocumentsDirectory),
+        "*.rrpreset");
 
     fileChooser->launchAsync(
         juce::FileBrowserComponent::saveMode |
-        juce::FileBrowserComponent::canSelectFiles,
+        juce::FileBrowserComponent::warnAboutOverwriting,
         [this](const juce::FileChooser& fc)
         {
             auto file = fc.getResult();
-            if (file != juce::File{})
+            DBG("Save dialog result: '" + file.getFullPathName() + "'");
+            if (file.getFullPathName().isNotEmpty())
                 audioProcessor.savePreset(file.withFileExtension(".rrpreset"));
+            else
+                DBG("Save dialog: cancelled or returned empty path");
         });
 }
 
