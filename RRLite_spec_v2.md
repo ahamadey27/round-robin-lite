@@ -86,7 +86,7 @@ The following systems are fully implemented and working:
 - [x] Leave placeholder space for Sample Start/End section (Phase 2)
 
 **Test:**
-- [ ] Build compiles with 0 errors and 0 warnings related to removed code
+- [x] Build compiles with 0 errors and 0 warnings related to removed code
 - [ ] Plugin loads in AudioPluginHost / DAW
 - [ ] Volume, Pan, Semitone, Fine Tune knobs all function with randomization
 - [ ] Samples load and play back correctly
