@@ -272,7 +272,7 @@ void NewProjectAudioProcessorEditor::updateSamplesInfo()
 {
     int count = (int)audioProcessor.loadedSlotIndices.size();
     if (count == 0)
-        samplesInfoLabel.setText("No samples loaded", juce::dontSendNotification);
+        samplesInfoLabel.setText("No Samples Loaded", juce::dontSendNotification);
     else
         samplesInfoLabel.setText(juce::String(count) + " sample(s) loaded",
             juce::dontSendNotification);

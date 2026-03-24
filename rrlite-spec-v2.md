@@ -906,6 +906,7 @@ if (!loadedSampleIndices.empty())
 - True round-robin implementation provides natural variation
 - Consider adding sample selection UI in Pro version (choose which sample plays)
 - Stay focused on core value proposition: easy sample triggering with variation
+- CMake build: cd /Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX && cmake ../..
 
 ---
 

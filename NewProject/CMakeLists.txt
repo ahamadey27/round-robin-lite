@@ -28,40 +28,77 @@ juce_add_plugin(RoundRobinLite
     FORMATS                         VST3 AU Standalone
 )
 
+set(VST3_COPY_DIR "/Library/Audio/Plug-Ins/VST3")
+add_custom_command(TARGET RoundRobinLite_VST3 POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "$<TARGET_FILE_DIR:RoundRobinLite_VST3>/../round-robin-lite.vst3"
+    "${VST3_COPY_DIR}/round-robin-lite.vst3")
+    
+# Generate JuceHeader.h (required because source files use #include <JuceHeader.h>)
+juce_generate_juce_header(RoundRobinLite)
+
 # ============================================================
-# Source files
-# NOTE: RRvoice uses lowercase 'v' to match filenames on disk
+# Source files — grouped to mirror the on-disk folder structure
+# NOTE: RRvoice uses lowercase 'v' to match the actual filename
 # ============================================================
+
+set(SOURCE_ROOT
+    Source/PluginProcessor.cpp
+    Source/PluginProcessor.h
+    Source/PluginEditor.cpp
+    Source/PluginEditor.h
+)
+
+set(SOURCE_AUDIO
+    Source/Audio/RRvoice.cpp
+    Source/Audio/RRvoice.h
+    Source/Audio/RRSound.cpp
+    Source/Audio/RRSound.h
+    Source/Audio/MidiMapper.h
+)
+
+set(SOURCE_DATA
+    Source/Data/SampleLoader.cpp
+    Source/Data/SampleLoader.h
+    Source/Data/SampleSlot.h
+)
+
+set(SOURCE_DSP
+    Source/DSP/RandomizationEngine.cpp
+    Source/DSP/RandomizationEngine.h
+    Source/DSP/ThreeBandEQ.cpp
+    Source/DSP/ThreeBandEQ.h
+    Source/DSP/TransientShaper.cpp
+    Source/DSP/TransientShaper.h
+)
+
+set(SOURCE_PARAMETERS
+    Source/Parameters/ParametersIDs.h
+    Source/Parameters/RandomizationParams.h
+)
+
+set(SOURCE_UI
+    Source/UI/RRLookAndFeel.cpp
+    Source/UI/RRLookAndFeel.h
+)
+
 target_sources(RoundRobinLite
     PRIVATE
-        Source/PluginProcessor.cpp
-        Source/PluginProcessor.h
-        Source/PluginEditor.cpp
-        Source/PluginEditor.h
-
-        Source/Audio/RRvoice.cpp
-        Source/Audio/RRvoice.h
-        Source/Audio/RRSound.cpp
-        Source/Audio/RRSound.h
-        Source/Audio/MidiMapper.h
-
-        Source/Data/SampleLoader.cpp
-        Source/Data/SampleLoader.h
-        Source/Data/SampleSlot.h
-
-        Source/DSP/RandomizationEngine.cpp
-        Source/DSP/RandomizationEngine.h
-        Source/DSP/ThreeBandEQ.cpp
-        Source/DSP/ThreeBandEQ.h
-        Source/DSP/TransientShaper.cpp
-        Source/DSP/TransientShaper.h
-
-        Source/Parameters/ParametersIDs.h
-        Source/Parameters/RandomizationParams.h
-
-        Source/UI/RRLookAndFeel.cpp
-        Source/UI/RRLookAndFeel.h
+        ${SOURCE_ROOT}
+        ${SOURCE_AUDIO}
+        ${SOURCE_DATA}
+        ${SOURCE_DSP}
+        ${SOURCE_PARAMETERS}
+        ${SOURCE_UI}
 )
+
+# Mirrors the folder structure in Xcode's project navigator
+source_group("Source"            FILES ${SOURCE_ROOT})
+source_group("Source\\Audio"     FILES ${SOURCE_AUDIO})
+source_group("Source\\Data"      FILES ${SOURCE_DATA})
+source_group("Source\\DSP"       FILES ${SOURCE_DSP})
+source_group("Source\\Parameters" FILES ${SOURCE_PARAMETERS})
+source_group("Source\\UI"        FILES ${SOURCE_UI})
 
 # ============================================================
 # Include directories
