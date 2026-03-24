@@ -36,37 +36,37 @@ The following systems are fully implemented and working:
 
 ### Step 1.1: Comment Out APVTS Parameter Registration
 
-- [ ] In PluginProcessor.cpp `createParameterLayout()`, comment out (do NOT delete) all parameter registrations for:
+- [x] In PluginProcessor.cpp `createParameterLayout()`, comment out (do NOT delete) all parameter registrations for:
   - EQ: lowGain, lowFreq, midGain, midFreq, highGain, highFreq and all 12 associated RndNeg/RndPos parameters
   - Transient: transientAttack, transientDecay and their 4 RndNeg/RndPos parameters
   - Envelope: envAttack, envDecay and their 4 RndNeg/RndPos parameters
-- [ ] Add a comment block above each group: `// COMMENTED FOR LITE — ACTIVE IN PREMIUM`
-- [ ] Keep the parameter ID constants in ParametersIDs.h untouched (no changes needed there)
+- [x] Add a comment block above each group: `// COMMENTED FOR LITE — ACTIVE IN PREMIUM`
+- [x] Keep the parameter ID constants in ParametersIDs.h untouched (no changes needed there)
 
 ### Step 1.2: Comment Out DSP Processing Calls
 
-- [ ] In PluginProcessor.cpp `processBlock()`, comment out the ThreeBandEQ processing call and filter update call
-- [ ] Comment out the TransientShaper processing call
-- [ ] Comment out the code that reads EQ/transient/envelope randomized values from the active voice
-- [ ] Comment out the smoothed parameter reads for EQ, transient, and envelope values
-- [ ] Keep the ThreeBandEQ and TransientShaper member variables in PluginProcessor.h (just unused)
-- [ ] Keep `prepareToPlay()` calls for ThreeBandEQ and TransientShaper commented out as well
+- [x] In PluginProcessor.cpp `processBlock()`, comment out the ThreeBandEQ processing call and filter update call
+- [x] Comment out the TransientShaper processing call
+- [x] Comment out the code that reads EQ/transient/envelope randomized values from the active voice
+- [x] Comment out the smoothed parameter reads for EQ, transient, and envelope values
+- [x] Keep the ThreeBandEQ and TransientShaper member variables in PluginProcessor.h (just unused)
+- [x] Keep `prepareToPlay()` calls for ThreeBandEQ and TransientShaper commented out as well
 
 ### Step 1.3: Comment Out Voice Randomization for Removed Parameters
 
-- [ ] In RRVoice.cpp `startNote()`, comment out the randomization generation for: EQ bands (low/mid/high gain and freq), transient attack/decay, envelope attack/decay
-- [ ] In RRVoice.cpp `setRandomizationReferences()`, comment out the pointer caching for all removed parameter IDs
-- [ ] Keep the member variables (randomizedLowGain, etc.) declared but unused
-- [ ] In RRVoice.h, comment out the getter functions for removed randomized values (getRandomizedLowGain, etc.)
+- [x] In RRVoice.cpp `startNote()`, comment out the randomization generation for: EQ bands (low/mid/high gain and freq), transient attack/decay, envelope attack/decay
+- [x] In RRVoice.cpp `setRandomizationReferences()`, comment out the pointer caching for all removed parameter IDs
+- [x] Keep the member variables (randomizedLowGain, etc.) declared but unused
+- [x] In RRVoice.h, comment out the getter functions for removed randomized values (getRandomizedLowGain, etc.)
 
 ### Step 1.4: Remove UI Elements for Hidden Parameters
 
-- [ ] In PluginEditor.h, comment out all slider/attachment member declarations for: EQ (6 knobs + 12 rnd sliders + 18 attachments), Transient (2 knobs + 4 rnd sliders + 6 attachments), Envelope (2 knobs + 4 rnd sliders + 6 attachments)
-- [ ] In PluginEditor.cpp constructor, comment out all `addAndMakeVisible()` and slider configuration for the above
-- [ ] In `resized()`, comment out all `setBounds()` calls for the above components
-- [ ] In `paint()`, comment out the section headers, borders, and knob labels for EQ, Transient, and Envelope sections
-- [ ] In `paintOverChildren()`, comment out the `drawRndArcs()` calls for all removed knobs
-- [ ] Remove the `samplesInfoLabel` member and all references to it (the "No Samples Loaded" / "Samples Loaded: x" text)
+- [x] In PluginEditor.h, comment out all slider/attachment member declarations for: EQ (6 knobs + 12 rnd sliders + 18 attachments), Transient (2 knobs + 4 rnd sliders + 6 attachments), Envelope (2 knobs + 4 rnd sliders + 6 attachments)
+- [x] In PluginEditor.cpp constructor, comment out all `addAndMakeVisible()` and slider configuration for the above
+- [x] In `resized()`, comment out all `setBounds()` calls for the above components
+- [x] In `paint()`, comment out the section headers, borders, and knob labels for EQ, Transient, and Envelope sections
+- [x] In `paintOverChildren()`, comment out the `drawRndArcs()` calls for all removed knobs
+- [x] Remove the `samplesInfoLabel` member and all references to it (the "No Samples Loaded" / "Samples Loaded: x" text)
 
 ### Step 1.5: Restructure Header Layout
 
@@ -516,3 +516,6 @@ So at tick 9, the additional randomization per parameter would be:
 - Source/Audio/RRSound.h/.cpp
 - Source/Audio/MidiMapper.h
 - Source/Data/SampleSlot.h
+
+**CMake build command:**
+- cd /Users/alex/Documents/Github/round-robin-lite/NewProject/Builds/MacOSX && cmake ../..
