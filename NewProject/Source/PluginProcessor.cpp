@@ -364,6 +364,12 @@ void NewProjectAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
 
     auto state = apvts.copyState();
 
+    // Remove any stale CustomData left from a previous setStateInformation call,
+    // otherwise getChildWithName() on load will find the old (empty) node first.
+    auto existingCustomData = state.getChildWithName("CustomData");
+    if (existingCustomData.isValid())
+        state.removeChild(existingCustomData, nullptr);
+
     juce::ValueTree customData("CustomData");
     customData.setProperty("version", 1, nullptr);
     
@@ -430,9 +436,12 @@ void NewProjectAudioProcessor::setStateInformation(const void* data, int sizeInB
     // Restore sample file paths
     {
         juce::ValueTree customData = state.getChildWithName("CustomData");
+        DBG("  CustomData found: " + juce::String(customData.isValid() ? "yes" : "no"));
         if (customData.isValid())
         {
             juce::ValueTree sampleData = customData.getChildWithName("SampleData");
+            DBG("  SampleData found: " + juce::String(sampleData.isValid() ? "yes" : "no")
+                + "  children: " + juce::String(sampleData.getNumChildren()));
             if (sampleData.isValid())
             {
                 for (int i = 0; i < NUM_SAMPLE_SLOTS; ++i)
@@ -446,6 +455,8 @@ void NewProjectAudioProcessor::setStateInformation(const void* data, int sizeInB
                     juce::String path = slot.getProperty("path", "");
                     juce::String name = slot.getProperty("displayName", "");
 
+                    DBG("  Restoring slot " + juce::String(index) + ": " + path);
+
                     if (index < 0 || index >= NUM_SAMPLE_SLOTS)
                         continue;
 
@@ -456,12 +467,15 @@ void NewProjectAudioProcessor::setStateInformation(const void* data, int sizeInB
                     }
                     else
                     {
+                        DBG("  FILE NOT FOUND: " + path);
                         missingSamples.add("Slot " + juce::String(index + 1) + ": " + name);
                     }
                 }
 
                 rebuildLoadedIndices();
+                DBG("  Loaded slots after restore: " + juce::String((int)loadedSlotIndices.size()));
                 sampleLoader.updateSynthesiserSounds();
+                DBG("  Synth sounds after restore: " + juce::String(synthesiser.getNumSounds()));
 
                 if (!missingSamples.isEmpty())
                 {
