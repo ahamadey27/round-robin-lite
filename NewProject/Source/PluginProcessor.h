@@ -1,6 +1,6 @@
 #pragma once
 #include <JuceHeader.h>
-#include "Audio/RRVoice.h"
+#include "Audio/RRvoice.h"
 #include "Audio/RRSound.h"
 #include "Data/SampleSlot.h"
 #include "Data/SampleLoader.h"
