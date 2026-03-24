@@ -1,1 +1,518 @@
-# Project Specification: Round Robin Lite - v2
+# Round Robin Lite - Redesign Specification
+
+## Tech Stack: JUCE Framework & C++ | Projucer + Visual Studio 2022 (Windows)
+
+This spec covers the redesign of Round Robin Lite from its current completed state (Phases 1-6 of original rrline-spec.md) into the new streamlined product. The plugin retains all existing DSP code internally for future porting to Round Robin Premium, but the UI and exposed parameters are simplified.
+
+**Canvas:** 700x450px (top border may shift up slightly to accommodate header changes)
+**Format:** VST3 (Standalone for testing)
+**Monophonic:** Single voice, one-shot playback
+
+---
+
+## Current State Summary
+
+The following systems are fully implemented and working:
+- 20-slot sample pool with round-robin (Series) and Fisher-Yates shuffle (Random)
+- Paired-key MIDI mapping (C0-A2, 10 pairs)
+- Global pitch (Semitone + Fine Tune) with per-note asymmetric randomization
+- Volume and Pan with per-note asymmetric randomization
+- 3-band EQ (low shelf, mid peak, high shelf) with gain/freq randomization
+- Transient shaper (attack/decay) with randomization
+- ADSR envelope with randomization
+- Single "Load Samples" multi-file button
+- Series/Random playback toggle
+- User preset save/load (.rrpreset)
+- Sample persistence via getStateInformation/setStateInformation
+- Custom LookAndFeel system (RRKnobLAF, RRNegSliderLAF, RRPosSliderLAF, RRToggleLAF)
+- Randomization arc overlay (RndArcOverlay) with blue neg / red pos arcs
+- About popup ("?" button)
+
+---
+
+## Phase 1: UI Simplification and Parameter Cleanup
+
+**Goal:** Remove EQ, Transient Shaper, and Envelope sections from the UI and APVTS registration. Keep all DSP code intact in the source files for Premium porting. Rearrange the header and remove the samples-info label.
+
+### Step 1.1: Comment Out APVTS Parameter Registration
+
+- [ ] In PluginProcessor.cpp `createParameterLayout()`, comment out (do NOT delete) all parameter registrations for:
+  - EQ: lowGain, lowFreq, midGain, midFreq, highGain, highFreq and all 12 associated RndNeg/RndPos parameters
+  - Transient: transientAttack, transientDecay and their 4 RndNeg/RndPos parameters
+  - Envelope: envAttack, envDecay and their 4 RndNeg/RndPos parameters
+- [ ] Add a comment block above each group: `// COMMENTED FOR LITE — ACTIVE IN PREMIUM`
+- [ ] Keep the parameter ID constants in ParametersIDs.h untouched (no changes needed there)
+
+### Step 1.2: Comment Out DSP Processing Calls
+
+- [ ] In PluginProcessor.cpp `processBlock()`, comment out the ThreeBandEQ processing call and filter update call
+- [ ] Comment out the TransientShaper processing call
+- [ ] Comment out the code that reads EQ/transient/envelope randomized values from the active voice
+- [ ] Comment out the smoothed parameter reads for EQ, transient, and envelope values
+- [ ] Keep the ThreeBandEQ and TransientShaper member variables in PluginProcessor.h (just unused)
+- [ ] Keep `prepareToPlay()` calls for ThreeBandEQ and TransientShaper commented out as well
+
+### Step 1.3: Comment Out Voice Randomization for Removed Parameters
+
+- [ ] In RRVoice.cpp `startNote()`, comment out the randomization generation for: EQ bands (low/mid/high gain and freq), transient attack/decay, envelope attack/decay
+- [ ] In RRVoice.cpp `setRandomizationReferences()`, comment out the pointer caching for all removed parameter IDs
+- [ ] Keep the member variables (randomizedLowGain, etc.) declared but unused
+- [ ] In RRVoice.h, comment out the getter functions for removed randomized values (getRandomizedLowGain, etc.)
+
+### Step 1.4: Remove UI Elements for Hidden Parameters
+
+- [ ] In PluginEditor.h, comment out all slider/attachment member declarations for: EQ (6 knobs + 12 rnd sliders + 18 attachments), Transient (2 knobs + 4 rnd sliders + 6 attachments), Envelope (2 knobs + 4 rnd sliders + 6 attachments)
+- [ ] In PluginEditor.cpp constructor, comment out all `addAndMakeVisible()` and slider configuration for the above
+- [ ] In `resized()`, comment out all `setBounds()` calls for the above components
+- [ ] In `paint()`, comment out the section headers, borders, and knob labels for EQ, Transient, and Envelope sections
+- [ ] In `paintOverChildren()`, comment out the `drawRndArcs()` calls for all removed knobs
+- [ ] Remove the `samplesInfoLabel` member and all references to it (the "No Samples Loaded" / "Samples Loaded: x" text)
+
+### Step 1.5: Restructure Header Layout
+
+- [ ] Move "Load Preset" and "Save Preset" buttons to the top-right header bar area (inside the header, not below it)
+- [ ] Position the "?" (About) button to the right of Save Preset
+- [ ] Remove the old sub-header row that held Load Samples, samples info, and preset buttons
+- [ ] The "Load Samples" button moves into the Sample Manager panel (Phase 3)
+- [ ] The playback mode toggle (Series/Random) moves into the Sample Manager panel (Phase 3)
+
+### Step 1.6: Adjust Remaining Layout
+
+- [ ] With only Amplitude (Volume + Pan) and Pitch (Semitone + Fine Tune) remaining as knob sections, reposition them to the right side of the plugin
+- [ ] Amplitude section: top-right area with Volume and Pan knobs plus their randomization arcs
+- [ ] Pitch section: below Amplitude or center-right, with Semitone and Fine Tune knobs plus randomization arcs
+- [ ] The left half of the plugin is reserved for the Sample Manager (Phase 3)
+- [ ] The center area above Pitch is reserved for the Random Algorithm knob (Phase 5)
+- [ ] Leave placeholder space for Sample Start/End section (Phase 2)
+
+**Test:**
+- [ ] Build compiles with 0 errors and 0 warnings related to removed code
+- [ ] Plugin loads in AudioPluginHost / DAW
+- [ ] Volume, Pan, Semitone, Fine Tune knobs all function with randomization
+- [ ] Samples load and play back correctly
+- [ ] No EQ/Transient/Envelope UI visible
+- [ ] Header shows plugin name on left, Load Preset / Save Preset / ? on right
+- [ ] Preset save/load still works (missing parameters gracefully default)
+
+---
+
+## Phase 2: Sample Start/End Parameters
+
+**Goal:** Add Start and End percentage-based parameters that trim sample playback boundaries. Include per-note randomization and a fixed micro-fade to prevent clicks when trimming.
+
+### Step 2.1: Register Sample Start/End Parameters
+
+- [ ] Add parameter IDs to ParametersIDs.h:
+  - `sampleStart` (float, 0.0 to 100.0, default 0.0, displayed as "%" )
+  - `sampleEnd` (float, 0.0 to 100.0, default 100.0, displayed as "%")
+  - `sampleStartRndNeg`, `sampleStartRndPos` (float, 0.0 to 1.0, default 0.0)
+  - `sampleEndRndNeg`, `sampleEndRndPos` (float, 0.0 to 1.0, default 0.0)
+- [ ] Register all 6 parameters in `createParameterLayout()`
+- [ ] Update `totalParameters` count in ParametersIDs.h
+
+### Step 2.2: Implement Start/End in Voice Playback
+
+- [ ] In RRVoice.h, add member variables:
+  - `float randomizedSampleStart = 0.0f;` (percentage)
+  - `float randomizedSampleEnd = 100.0f;` (percentage)
+  - `int playbackStartSample = 0;` (computed sample index)
+  - `int playbackEndSample = 0;` (computed sample index)
+- [ ] In RRVoice.cpp `setRandomizationReferences()`, cache pointers for all 6 sample start/end parameters
+- [ ] In RRVoice.cpp `startNote()`:
+  - Generate randomized sampleStart and sampleEnd values using RandomizationEngine
+  - Scale randomization range: neg/pos values of 0-1 map to 0-50 percentage points offset
+  - Clamp: randomized start must be >= 0%, randomized end must be <= 100%
+  - Enforce: randomized start must be < randomized end (if they cross, snap start to end - 1%)
+  - Convert percentages to sample indices: `playbackStartSample = (int)(randomizedSampleStart / 100.0f * cachedSampleLength)`
+  - Same for playbackEndSample
+  - Set `sourceSamplePosition = playbackStartSample` instead of 0.0
+
+### Step 2.3: Apply Start/End Boundaries in renderNextBlock
+
+- [ ] In RRVoice.cpp `renderNextBlock()`, replace the end-of-sample check:
+  - Currently checks: `if (sourceSamplePosition >= cachedSampleLength)`
+  - Change to: `if (sourceSamplePosition >= playbackEndSample)`
+- [ ] Ensure playback begins from `playbackStartSample` (set in startNote)
+
+### Step 2.4: Micro-Fade at Trim Points
+
+- [ ] Only apply fade when the user has adjusted start above 0% or end below 100%
+- [ ] Fade length: fixed at approximately 2-3 ms worth of samples (calculate from sample rate: `fadeSamples = (int)(0.003 * sampleRate)`)
+- [ ] Fade curve: exponential/logarithmic with a sharp negative shape (approximately -90% curvature) — this means the fade rises very quickly then levels off, avoiding audible clicks while keeping the transient largely intact
+- [ ] Implementation approach: in `renderNextBlock()`, after reading each sample value, multiply by a fade gain:
+  - Fade-in: for samples from `playbackStartSample` to `playbackStartSample + fadeSamples`, apply gain ramp from 0.0 to 1.0 using the curve `gain = pow(linearPosition, 0.1)` (sharp rise)
+  - Fade-out: for samples from `playbackEndSample - fadeSamples` to `playbackEndSample`, apply gain ramp from 1.0 to 0.0 using the curve `gain = pow(1.0 - linearPosition, 0.1)` (sharp drop)
+- [ ] If the trimmed region is shorter than 2x fadeSamples, reduce fade length to half the trimmed region to avoid overlap
+
+### Step 2.5: Add Start/End UI Section
+
+- [ ] Add "SAMPLE START/END" section label to the layout (bottom-right area, per mockup)
+- [ ] Add Start knob and End knob using existing RRKnobLAF style
+- [ ] Add Start and End randomization arc overlays (RndArcOverlay) — same blue/red arc system
+- [ ] Add hidden randomization sliders for neg/pos and their APVTS attachments
+- [ ] Display values as percentages with one decimal: "0.0 %" and "100.0 %"
+- [ ] Wire knobs to APVTS via SliderParameterAttachment
+
+### Step 2.6: State Persistence
+
+- [ ] Ensure sampleStart, sampleEnd, and their randomization values are included in `getStateInformation()` / `setStateInformation()` — this should happen automatically if they are registered in APVTS
+- [ ] Verify .rrpreset save/load includes the new parameters (existing preset format stores all APVTS values)
+
+**Test:**
+- [ ] Default state: Start=0%, End=100% — sample plays fully, no fade applied
+- [ ] Set Start=25% — playback begins at quarter point, no click
+- [ ] Set End=50% — playback stops at halfway, no click
+- [ ] Set Start=25%, End=75% — middle 50% plays with micro-fades at both boundaries
+- [ ] Randomize Start with pos=0.3 — verify per-note variation in start point
+- [ ] Randomize End with neg=0.2 — verify per-note variation in end point
+- [ ] Extreme: Start=49%, End=51% — very short playback, no crash, fades overlap gracefully
+- [ ] Save/reload project — verify start/end values persist
+- [ ] Save/load .rrpreset — verify start/end values transfer
+
+---
+
+## Phase 3: Sample Manager Panel
+
+**Goal:** Build a comprehensive sample management UI in the left half of the plugin. Includes a scrollable sample list with per-sample actions (reorder, audition, replace, delete), an "add more" clickable area, and the relocated Load Samples button and playback toggle.
+
+### Step 3.1: Create SampleManagerPanel Component
+
+- [ ] Create new files: `Source/UI/SampleManagerPanel.h` and `Source/UI/SampleManagerPanel.cpp`
+- [ ] Add to Projucer project file and regenerate
+- [ ] SampleManagerPanel inherits from `juce::Component`
+- [ ] Takes a reference to the processor (for accessing sample slots, sample loader, and synthesiser)
+- [ ] Occupies roughly the left 45-50% of the plugin canvas (below the header)
+
+### Step 3.2: Panel Header Area
+
+- [ ] "Sample Pool" section title label at top of panel
+- [ ] "Load Samples" button — relocated from the old header area. Opens multi-file picker (same behavior as current implementation)
+- [ ] "playback type" label with Series/Random toggle — relocated from old header. Same APVTS attachment to `playbackMode`
+- [ ] Layout: Load Samples button on the left, playback toggle on the right of the panel header
+
+### Step 3.3: Sample List Display
+
+- [ ] Create a scrollable list area below the panel header
+- [ ] Display loaded samples in a two-column layout (01-10 on left, 11-20 on right) to match the mockup
+- [ ] Each row shows: `XX. samplename.ext` where XX is the slot number (01-20)
+- [ ] Sample name truncation: if the filename exceeds maximum display width, truncate to show the first ~6 characters + "..." + the file extension. Example: `sampl0...wav`
+- [ ] Maximum character length for display: determine based on column width, approximately 14-16 characters total including the number prefix
+- [ ] Empty slots are not displayed — the list only shows loaded samples
+- [ ] If fewer than 20 samples loaded, show `--- click to add XX samples ---` text below the last sample in the list, where XX is the number of empty slots remaining
+- [ ] Clicking the "add more" text opens the file picker (same as Load Samples but appends to existing pool)
+
+### Step 3.4: Per-Sample Action Buttons
+
+Each loaded sample row has 4 small icon buttons to the right of the sample name:
+
+- [ ] **Arrow Cross (Reorder):** Initiates drag-and-drop reordering. User clicks and holds, then drags to a new position in the list
+  - Swap mode: dropping directly on another sample swaps the two samples
+  - Insert mode: dropping between two samples inserts the dragged sample at that position, shifting all samples below down by one index
+  - After reorder, update the round-robin index and reshuffle the Fisher-Yates array if in Random mode
+  - Visual feedback: highlight drop target (swap) or show insertion line between rows (insert)
+
+- [ ] **Play Button (Audition):** Clicking plays that specific sample through the full DSP chain (Volume, Pan, Pitch, Sample Start/End — same processing as a normal trigger)
+  - Implementation: temporarily override the round-robin selection to force-play the clicked sample's slot index, then send a synthetic note-on to the synthesiser
+  - After playback, the round-robin index should NOT advance (audition is non-destructive to the sequence)
+  - The audition should respect the current parameter settings (volume, pitch, start/end, randomization)
+
+- [ ] **Replace Button (Swap File):** Opens a single-file picker dialog. The selected file replaces the audio data in that slot
+  - The slot index and position in the pool remain the same
+  - The display name updates to reflect the new file
+  - The round-robin index is unaffected
+
+- [ ] **Trash Can (Delete):** Removes the sample from the pool
+  - All samples below the deleted slot shift up to fill the gap (auto-reshuffle)
+  - Round-robin index resets to 0 to avoid out-of-bounds
+  - Fisher-Yates shuffle array rebuilds
+  - The "add more" counter updates accordingly
+  - No confirmation dialog (simple one-click delete — the file is not deleted from disk, just removed from the pool)
+
+### Step 3.5: Implement Drag-and-Drop Reorder Logic
+
+- [ ] In the processor (or a new helper class), implement `swapSamples(int indexA, int indexB)` — swaps audio buffers, display names, and file paths between two SampleSlot entries, then calls `updateSynthesiserSounds()`
+- [ ] Implement `insertSample(int fromIndex, int toIndex)` — removes sample from `fromIndex`, inserts at `toIndex`, shifts all intermediate samples accordingly, then calls `updateSynthesiserSounds()`
+- [ ] Both operations must be thread-safe: the audio thread must not be reading sample data while the UI thread modifies the slots. Use the same locking pattern already in place for sample loading
+- [ ] After any reorder, reset the round-robin counter and rebuild the shuffle array
+
+### Step 3.6: Wire File Operations
+
+- [ ] "Load Samples" button: opens multi-file picker, loads files sequentially into empty slots starting from the first available index
+- [ ] "Add more" text click: same behavior as Load Samples
+- [ ] Replace button: opens single-file picker, replaces audio data in that specific slot via `SampleLoader::loadSample(slotIndex, file)`
+- [ ] Delete button: calls `SampleLoader::clearSlot(slotIndex)`, then shifts remaining samples up and calls `updateSynthesiserSounds()`
+- [ ] All file operations trigger a repaint of the SampleManagerPanel to reflect the updated list
+
+### Step 3.7: State Persistence for Sample Order
+
+- [ ] Sample order is already persisted through `getStateInformation()` which saves file paths per slot index — the order of slots IS the order
+- [ ] After drag-and-drop reorder, the new slot arrangement persists automatically on next save
+- [ ] Verify: preset save/load preserves the reordered sample arrangement
+
+**Test:**
+- [ ] Load 5 samples — verify they appear as 01-05 in list with correct names
+- [ ] Verify "--- click to add 15 samples ---" appears below sample 05
+- [ ] Click "add more" — verify file picker opens, new samples append after 05
+- [ ] Long filename (e.g., "my_very_long_sample_name_footstep_wood.wav") — verify truncation
+- [ ] Click Play on sample 03 — verify it plays through DSP chain
+- [ ] Click Replace on sample 02 — verify file picker opens, sample updates
+- [ ] Click Trash on sample 03 — verify deletion, samples 04/05 shift to 03/04
+- [ ] Drag sample 01 onto sample 04 (swap) — verify they trade places
+- [ ] Drag sample 05 between 01 and 02 (insert) — verify proper reindexing
+- [ ] After reorder, play via MIDI — verify round-robin uses new order
+- [ ] Save/reload project — verify sample order persists
+
+---
+
+## Phase 4: Trigger Button
+
+**Goal:** Add a "Trigger" button to the header that fires a synthetic MIDI note-on, advancing the round-robin sequence exactly as if the user played a note on a MIDI keyboard.
+
+### Step 4.1: Add Trigger Button to Header
+
+- [ ] Add a `juce::TextButton` labeled "Trigger" in the top-right area of the header bar (to the left of Load Preset / Save Preset / ?)
+- [ ] Style it with a distinct color (red background per mockup) so it stands out as a play action
+- [ ] Position: right-aligned in header, before the preset buttons
+
+### Step 4.2: Implement Trigger Logic
+
+- [ ] On click, the Trigger button must inject a synthetic MIDI note-on message into the processor's MIDI pipeline
+- [ ] Use one of the existing trigger notes from MidiMapper (e.g., C1 / MIDI 36) with a fixed velocity (e.g., 0.8)
+- [ ] The note-on must go through the same `processBlock()` path as real MIDI input so that:
+  - The round-robin index advances normally
+  - Randomization generates fresh per-note values
+  - All DSP processing applies (Volume, Pan, Pitch, Sample Start/End)
+- [ ] Implementation approach: store a flag or a small MIDI buffer in the processor. When the editor's Trigger button is clicked, set the flag. In the next `processBlock()` call, if the flag is set, inject the note-on into the MIDI buffer before processing, then clear the flag
+- [ ] Follow immediately with a note-off after a short delay (or rely on one-shot behavior where note-off is ignored)
+
+### Step 4.3: Trigger and Round-Robin Continuity
+
+- [ ] The Trigger button shares the same round-robin sequence as MIDI keyboard input
+- [ ] If the user plays sample 01 via MIDI keyboard (Series mode), then clicks Trigger, sample 02 plays. If they then hit the MIDI keyboard again, sample 03 plays
+- [ ] This is automatic as long as both paths go through the same synthesiser noteOn mechanism
+
+**Test:**
+- [ ] Click Trigger with samples loaded — verify audio plays
+- [ ] Click Trigger 5 times in Series mode — verify samples cycle 01, 02, 03, 04, 05
+- [ ] Play MIDI note, then Trigger, then MIDI note — verify continuous sequence (no repeats, no skips)
+- [ ] Click Trigger with no samples loaded — verify no crash, silent
+- [ ] Click Trigger in Random mode — verify random selection (no immediate repeat per Fisher-Yates rules)
+- [ ] Trigger respects current Volume/Pan/Pitch/Start-End settings and randomization
+
+---
+
+## Phase 5: Random Algorithm Knob
+
+**Goal:** Add a large "Random Algorithm" knob in the center of the plugin that provides a quick way to add progressive randomization across all active parameters. The knob has 18 discrete tick positions, from zero additional randomization to moderate-heavy randomization.
+
+### Step 5.1: Define the Random Algorithm Parameter
+
+- [ ] Add parameter ID to ParametersIDs.h: `randomAlgorithm` (int, 0 to 17, default 0)
+- [ ] Register in `createParameterLayout()` as an integer parameter with 18 steps
+- [ ] Position 0 = no additional randomization (knob adds nothing)
+- [ ] Positions 1-17 = progressively increasing randomization amounts
+
+### Step 5.2: Design the Randomization Scaling Table
+
+Each tick position defines an additive offset applied to each parameter's randomization range. These offsets are ADDED to whatever the user has manually set on the individual neg/pos randomization sliders. The values below represent the additional randomization offset at each parameter for each tick:
+
+**Scaling philosophy:** Start barely perceptible (tick 1), reach "obvious but musical" by tick 9, and "heavy but not chaotic" by tick 17. The curve is roughly exponential — more change between ticks 10-17 than between 1-9.
+
+**Parameter groups and their max additional offset at tick 17:**
+- Semitone: max +/- 0.5 semitones (very subtle pitch humanization even at max)
+- Fine Tune: max +/- 25 cents
+- Volume: max +/- 4 dB
+- Pan: max +/- 0.15 (subtle stereo width variation)
+- Sample Start: max +/- 2% (very light even at tick 17, prevents chopping off transients)
+- Sample End: not affected (to preserve intentional tail cuts)
+
+**Tick-to-multiplier mapping (as fraction of max):**
+- Tick 0: 0.00 (off)
+- Tick 1: 0.02
+- Tick 2: 0.04
+- Tick 3: 0.07
+- Tick 4: 0.11
+- Tick 5: 0.16
+- Tick 6: 0.22
+- Tick 7: 0.29
+- Tick 8: 0.37
+- Tick 9: 0.45 (mid-point: about half of max)
+- Tick 10: 0.53
+- Tick 11: 0.61
+- Tick 12: 0.69
+- Tick 13: 0.76
+- Tick 14: 0.82
+- Tick 15: 0.88
+- Tick 16: 0.94
+- Tick 17: 1.00 (full max)
+
+So at tick 9, the additional randomization per parameter would be:
+- Semitone: +/- 0.225 semitones
+- Fine Tune: +/- 11.25 cents
+- Volume: +/- 1.8 dB
+- Pan: +/- 0.0675
+- Sample Start: +/- 0.9%
+
+### Step 5.3: Implement Algorithm Offset Application
+
+- [ ] In RRVoice.cpp `startNote()`, after generating all randomized values from the user's manual randomization ranges, apply the Random Algorithm offset as an additional layer
+- [ ] Read the `randomAlgorithm` parameter value (0-17)
+- [ ] Look up the tick multiplier from the table
+- [ ] For each affected parameter, generate a second random offset within the algorithm's range and add it to the already-randomized value
+- [ ] The algorithm offset uses the same RandomizationEngine (uniform random within +/- range)
+- [ ] The algorithm always applies symmetrically (equal neg and pos range) — it does not respect the user's asymmetric neg/pos settings for its own contribution
+- [ ] Clamp final values to valid parameter ranges after applying both user randomization and algorithm offset
+
+### Step 5.4: Add Random Algorithm Knob to UI
+
+- [ ] Create a larger knob component for the Random Algorithm (approximately 1.5-2x the size of standard parameter knobs per the mockup)
+- [ ] Position: center of the plugin, to the right of the Sample Manager panel, above the Pitch section
+- [ ] Label: "Random Algorithm" section title above the knob
+- [ ] The knob should snap to 18 discrete positions (use `setNumDecimalPlacesToDisplay(0)` and integer slider range)
+- [ ] Visual: 18 tick marks around the knob to indicate discrete positions
+- [ ] Use existing RRKnobLAF but scaled up, or create a variant for the larger knob
+- [ ] No randomization arc on this knob (it IS the randomization control)
+
+### Step 5.5: State Persistence
+
+- [ ] The `randomAlgorithm` parameter is in APVTS, so it persists in DAW projects automatically
+- [ ] Verify it saves/loads with .rrpreset files
+
+**Test:**
+- [ ] Set Random Algorithm to tick 0 — verify no additional randomization beyond user's manual settings
+- [ ] Set to tick 1 — verify barely perceptible variation (A/B against tick 0 to hear difference)
+- [ ] Set to tick 9 — verify moderate, musical randomization across all parameters
+- [ ] Set to tick 17 — verify heavy but not chaotic randomization
+- [ ] Set user's manual Volume randomization to +3dB pos, then set Algorithm to tick 9 — verify the algorithm adds on top (total randomization exceeds +3dB)
+- [ ] Verify Sample Start randomization is very light even at tick 17 (transients not destroyed)
+- [ ] Save/reload — verify tick position persists
+
+---
+
+## Phase 6: UI Layout, Polish, and Integration
+
+**Goal:** Final layout pass to integrate all new components into the 700x450 canvas. Wire everything together, ensure visual consistency, and perform integration testing.
+
+### Step 6.1: Final Layout Planning
+
+- [ ] Update Figma mockup (or sketch) to reflect all changes:
+  - Header bar: Plugin name (left), Trigger button, Load Preset, Save Preset, ? (right)
+  - Left half (~45-50%): Sample Manager panel (Load Samples, playback toggle, sample list with actions, "add more" text)
+  - Center: Random Algorithm knob (large)
+  - Top-right: Amplitude section (Volume + Pan knobs with randomization arcs)
+  - Center-right: Pitch section (Semitone + Fine Tune knobs with randomization arcs)
+  - Bottom-right: Sample Start/End section (Start + End knobs with randomization arcs)
+  - Footer: company name
+
+### Step 6.2: Implement Final resized() Layout
+
+- [ ] Update PluginEditor.cpp `resized()` with new layout constants
+- [ ] Position SampleManagerPanel in the left portion of the canvas
+- [ ] Position Random Algorithm knob centered between the Sample Manager and the parameter sections
+- [ ] Position Amplitude, Pitch, and Sample Start/End sections stacked vertically on the right
+- [ ] Ensure all randomization arc overlays are properly positioned over their respective knobs
+- [ ] Verify no component overlaps
+
+### Step 6.3: Update paint() for New Sections
+
+- [ ] Update `paint()` to draw section backgrounds and borders for: Sample Pool panel area, Random Algorithm area, Amplitude, Pitch, Sample Start/End
+- [ ] Draw section title labels: "Sample Pool", "Random Algorithm", "AMPLITUDE", "PITCH", "SAMPLE START/END"
+- [ ] Draw the yellow divider line between sections (per existing style)
+- [ ] Update knob labels: "Volume", "Pan", "Semitone", "Fine Tune", "Start", "End"
+- [ ] Update footer
+
+### Step 6.4: Verify State Persistence End-to-End
+
+- [ ] Load samples, set all parameters (Volume, Pan, Pitch, Start/End with randomization, Random Algorithm position, playback mode)
+- [ ] Save DAW project, close, reopen — verify full state restoration
+- [ ] Save .rrpreset — verify all new parameters included
+- [ ] Load .rrpreset on a fresh instance — verify complete state (including sample order)
+- [ ] Load an OLD .rrpreset (pre-redesign) — verify graceful handling: new parameters get defaults, old EQ/transient/envelope values ignored without error
+
+### Step 6.5: Edge Cases and Robustness
+
+- [ ] Empty pool: Trigger button, Play button, MIDI input — all silent, no crash
+- [ ] Single sample loaded: Series cycles through just that one sample repeatedly
+- [ ] All 20 samples loaded: list displays correctly in two columns, "add more" text hidden
+- [ ] Rapid trigger clicking: no audio glitches, voice cuts off previous and restarts
+- [ ] Sample Start near Sample End with randomization: verify clamp logic prevents crossover
+- [ ] Random Algorithm at max + user randomization at max: verify values stay within valid parameter ranges
+- [ ] Delete all samples one by one via trash button: verify clean state, no dangling references
+- [ ] Drag reorder with only 2 samples loaded: verify swap works
+
+### Step 6.6: Performance Validation
+
+- [ ] CPU usage remains reasonable (should be lower than before since EQ and transient are commented out)
+- [ ] No audio dropouts at 128-sample buffer size
+- [ ] UI remains responsive during sample loading and drag operations
+- [ ] Memory usage stable after repeated load/delete cycles
+
+**Test (Integration):**
+- [ ] Full workflow: Load 10 samples → set Series → adjust Volume/Pan/Pitch → set Start to 10%, End to 90% → set Random Algorithm to tick 5 → click Trigger 10 times → verify each trigger sounds slightly different with consistent quality
+- [ ] Reorder samples via drag → verify Trigger plays in new order
+- [ ] Delete sample 03 → verify list updates, Trigger continues working
+- [ ] Replace sample 05 → verify new audio plays at that position
+- [ ] Audition sample 07 via Play button → verify it plays but does not advance round-robin
+- [ ] Switch to Random mode → Trigger 20 times → verify no immediate repeats (Fisher-Yates)
+- [ ] Save preset → close plugin → load preset → verify identical state
+
+---
+
+## Parameter Summary (Lite Redesign)
+
+| Category | Parameter | Range | Default | Randomized | In UI |
+|---|---|---|---|---|---|
+| Pitch | semitone | -12 to +12 | 0 | Yes | Yes |
+| Pitch | fineTune | -100 to +100 cents | 0 | Yes | Yes |
+| Amplitude | volume | 0.0 to 1.0 (gain) | ~0.75 (-2.5dB) | Yes | Yes |
+| Amplitude | pan | -1.0 to +1.0 | 0 | No | Yes |
+| Sample | sampleStart | 0 to 100 (%) | 0 | Yes | Yes |
+| Sample | sampleEnd | 0 to 100 (%) | 100 | Yes | Yes |
+| Algorithm | randomAlgorithm | 0-17 (int) | 0 | No | Yes |
+| Playback | playbackMode | 0/1 (Series/Random) | 0 | No | Yes |
+
+**Commented-out parameters (kept in code for Premium):**
+- EQ: lowGain, lowFreq, midGain, midFreq, highGain, highFreq (+ 12 rnd params)
+- Transient: transientAttack, transientDecay (+ 4 rnd params)
+- Envelope: envAttack, envDecay (+ 4 rnd params)
+
+**Active APVTS parameters:** 8 base + 8 randomization (4 pairs for semitone, fineTune, sampleStart, sampleEnd) + volume rnd pair + pan rnd pair (if keeping pan rnd) = ~18 parameters
+
+---
+
+## Estimated Development Effort
+
+| Phase | Description | Estimate |
+|---|---|---|
+| 1 | UI Simplification & Parameter Cleanup | 1-2 sessions |
+| 2 | Sample Start/End Parameters | 2-3 sessions |
+| 3 | Sample Manager Panel | 3-5 sessions |
+| 4 | Trigger Button | 1 session |
+| 5 | Random Algorithm Knob | 2-3 sessions |
+| 6 | UI Layout, Polish & Integration | 2-3 sessions |
+| **Total** | | **~11-17 sessions** |
+
+---
+
+## File Changes Summary
+
+**New files:**
+- Source/UI/SampleManagerPanel.h
+- Source/UI/SampleManagerPanel.cpp
+
+**Heavily modified:**
+- Source/PluginEditor.h (remove commented components, add new ones)
+- Source/PluginEditor.cpp (new layout, new sections, Sample Manager integration)
+- Source/PluginProcessor.cpp (comment out DSP calls, add trigger flag, add new parameters)
+- Source/PluginProcessor.h (add trigger flag, Sample Manager accessors)
+- Source/Audio/RRVoice.h (add start/end members, comment out removed getters)
+- Source/Audio/RRVoice.cpp (add start/end logic, micro-fade, algorithm offset, comment out removed randomization)
+- Source/Parameters/ParametersIDs.h (add new IDs, keep old ones)
+
+**Unchanged (code stays, just unused in Lite):**
+- Source/DSP/ThreeBandEQ.h/.cpp
+- Source/DSP/TransientShaper.h/.cpp
+- Source/DSP/RandomizationEngine.h/.cpp
+- Source/Audio/RRSound.h/.cpp
+- Source/Audio/MidiMapper.h
+- Source/Data/SampleSlot.h
