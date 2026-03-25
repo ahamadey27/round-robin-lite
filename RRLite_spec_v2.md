@@ -104,14 +104,14 @@ The following systems are fully implemented and working:
 
 ### Step 2.1: Register Tone Parameters
 
-- [ ] Add parameter IDs to ParametersIDs.h:
+- [x] Add parameter IDs to ParametersIDs.h:
   - `toneLow` (float, -12.0 to +12.0 dB, default 0.0)
   - `toneHigh` (float, -12.0 to +12.0 dB, default 0.0)
   - `toneLowRndNeg`, `toneLowRndPos` (float, 0.0 to 1.0, default 0.0)
   - `toneHighRndNeg`, `toneHighRndPos` (float, 0.0 to 1.0, default 0.0)
-- [ ] Register all 6 parameters in `createParameterLayout()`
-- [ ] Update `totalParameters` count in ParametersIDs.h
-- [ ] Display values with one decimal place and "dB" suffix
+- [x] Register all 6 parameters in `createParameterLayout()`
+- [x] Update `totalParameters` count in ParametersIDs.h
+- [x] Display values with one decimal place and "dB" suffix
 
 ### Step 2.2: Create ToneControl DSP Class
 
