@@ -260,6 +260,14 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     }
 
     //==============================================================================
+    // INJECT TRIGGER NOTE-ON (from UI button)
+
+    if (triggerPending.exchange(false))
+    {
+        midiMessages.addEvent(juce::MidiMessage::noteOn(1, 36, 0.8f), 0);
+    }
+
+    //==============================================================================
     // ROUND ROBIN: advance sample on each note-on before rendering
 
     for (const auto metadata : midiMessages)

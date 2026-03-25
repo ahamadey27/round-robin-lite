@@ -360,34 +360,34 @@ Each loaded sample row has 4 small icon buttons to the right of the sample name:
 
 ### Step 5.1: Add Trigger Button to Header
 
-- [ ] Add a `juce::TextButton` labeled "Trigger" in the top-right area of the header bar (to the left of Load Preset / Save Preset / ?)
-- [ ] Style it with a distinct color (red background per mockup) so it stands out as a play action
-- [ ] Position: right-aligned in header, before the preset buttons
+- [x] Add a `juce::TextButton` labeled "Trigger" in the top-right area of the header bar (to the left of Load Preset / Save Preset / ?)
+- [x] Style it with a distinct color (red background per mockup) so it stands out as a play action
+- [x] Position: right-aligned in header, before the preset buttons
 
 ### Step 5.2: Implement Trigger Logic
 
-- [ ] On click, the Trigger button must inject a synthetic MIDI note-on message into the processor's MIDI pipeline
-- [ ] Use one of the existing trigger notes from MidiMapper (e.g., C1 / MIDI 36) with a fixed velocity (e.g., 0.8)
-- [ ] The note-on must go through the same `processBlock()` path as real MIDI input so that:
+- [x] On click, the Trigger button must inject a synthetic MIDI note-on message into the processor's MIDI pipeline
+- [x] Use one of the existing trigger notes from MidiMapper (e.g., C1 / MIDI 36) with a fixed velocity (e.g., 0.8)
+- [x] The note-on must go through the same `processBlock()` path as real MIDI input so that:
   - The round-robin index advances normally
   - Randomization generates fresh per-note values
   - All DSP processing applies (Volume, Pan, Pitch, Tone, Sample Start/End)
-- [ ] Implementation approach: store a flag or a small MIDI buffer in the processor. When the editor's Trigger button is clicked, set the flag. In the next `processBlock()` call, if the flag is set, inject the note-on into the MIDI buffer before processing, then clear the flag
-- [ ] Follow immediately with a note-off after a short delay (or rely on one-shot behavior where note-off is ignored)
+- [x] Implementation approach: store a flag or a small MIDI buffer in the processor. When the editor's Trigger button is clicked, set the flag. In the next `processBlock()` call, if the flag is set, inject the note-on into the MIDI buffer before processing, then clear the flag
+- [x] Follow immediately with a note-off after a short delay (or rely on one-shot behavior where note-off is ignored)
 
 ### Step 5.3: Trigger and Round-Robin Continuity
 
-- [ ] The Trigger button shares the same round-robin sequence as MIDI keyboard input
-- [ ] If the user plays sample 01 via MIDI keyboard (Series mode), then clicks Trigger, sample 02 plays. If they then hit the MIDI keyboard again, sample 03 plays
-- [ ] This is automatic as long as both paths go through the same synthesiser noteOn mechanism
+- [x] The Trigger button shares the same round-robin sequence as MIDI keyboard input
+- [x] If the user plays sample 01 via MIDI keyboard (Series mode), then clicks Trigger, sample 02 plays. If they then hit the MIDI keyboard again, sample 03 plays
+- [x] This is automatic as long as both paths go through the same synthesiser noteOn mechanism
 
 **Test:**
-- [ ] Click Trigger with samples loaded — verify audio plays
-- [ ] Click Trigger 5 times in Series mode — verify samples cycle 01, 02, 03, 04, 05
-- [ ] Play MIDI note, then Trigger, then MIDI note — verify continuous sequence (no repeats, no skips)
-- [ ] Click Trigger with no samples loaded — verify no crash, silent
-- [ ] Click Trigger in Random mode — verify random selection (no immediate repeat per Fisher-Yates rules)
-- [ ] Trigger respects current Volume/Pan/Pitch/Tone/Start-End settings and randomization
+- [x] Click Trigger with samples loaded — verify audio plays
+- [x] Click Trigger 5 times in Series mode — verify samples cycle 01, 02, 03, 04, 05
+- [x] Play MIDI note, then Trigger, then MIDI note — verify continuous sequence (no repeats, no skips)
+- [x] Click Trigger with no samples loaded — verify no crash, silent
+- [x] Click Trigger in Random mode — verify random selection (no immediate repeat per Fisher-Yates rules)
+- [x] Trigger respects current Volume/Pan/Pitch/Tone/Start-End settings and randomization
 
 ---
 

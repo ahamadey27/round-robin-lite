@@ -90,6 +90,7 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
     triggerButton.setButtonText("Trigger");
     triggerButton.setColour(juce::TextButton::buttonColourId, juce::Colour(0xffa03030));
     triggerButton.setColour(juce::TextButton::textColourOffId, juce::Colours::white);
+    triggerButton.onClick = [this]() { audioProcessor.requestTrigger(); };
     addAndMakeVisible(triggerButton);
 
     // About button

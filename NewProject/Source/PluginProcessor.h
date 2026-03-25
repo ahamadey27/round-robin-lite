@@ -71,6 +71,7 @@ public:
     void auditionSample(int slotIndex);
     void swapSamples(int indexA, int indexB);
     void insertSample(int fromIndex, int toIndex);
+    void requestTrigger() { triggerPending.store(true); }
 
 private:
     //==============================================================================
@@ -91,6 +92,9 @@ private:
     ThreeBandEQ threeBandEQ;
     TransientShaper transientShaper;
     ToneControl toneControl;
+
+    // Trigger flag (set by UI, consumed by processBlock)
+    std::atomic<bool> triggerPending{ false };
 
     // Current global pitch values
     std::atomic<float> globalSemitones{ 0.0f };
