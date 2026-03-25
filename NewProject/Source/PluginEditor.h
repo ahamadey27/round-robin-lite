@@ -20,7 +20,7 @@ private:
     using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
     using ButtonAttachment = juce::AudioProcessorValueTreeState::ButtonAttachment;
 
-    // LAFs first — destroyed last
+    // LAFs first ï¿½ destroyed last
     RRKnobLAF      knobLAF;
     RRNegSliderLAF negSliderLAF;
     RRPosSliderLAF posSliderLAF;
@@ -38,9 +38,10 @@ private:
     std::unique_ptr<juce::FileChooser> fileChooser;
     ButtonAttachment playbackModeAttachment;
 
-    // Main sliders — before attachments
+    // Main sliders ï¿½ before attachments
     juce::Slider semitoneSlider, fineTuneSlider;
     juce::Slider volumeSlider, panSlider;
+    juce::Slider toneLowSlider, toneHighSlider;
     // COMMENTED FOR LITE â€” ACTIVE IN PREMIUM
     //juce::Slider lowGainSlider, lowFreqSlider;
     //juce::Slider midGainSlider, midFreqSlider;
@@ -50,6 +51,7 @@ private:
 
     SliderAttachment semitoneAttachment, fineTuneAttachment;
     SliderAttachment volumeAttachment, panAttachment;
+    SliderAttachment toneLowAttachment, toneHighAttachment;
     // COMMENTED FOR LITE â€” ACTIVE IN PREMIUM
     //SliderAttachment lowGainAttachment, lowFreqAttachment;
     //SliderAttachment midGainAttachment, midFreqAttachment;
@@ -57,11 +59,13 @@ private:
     //SliderAttachment transientAttackAttachment, transientDecayAttachment;
     //SliderAttachment envAttackAttachment, envDecayAttachment;
 
-    // Rnd sliders — before attachments
+    // Rnd sliders ï¿½ before attachments
     juce::Slider semitoneRndNegSlider, semitoneRndPosSlider;
     juce::Slider fineTuneRndNegSlider, fineTuneRndPosSlider;
     juce::Slider volumeRndNegSlider, volumeRndPosSlider;
     juce::Slider panRndNegSlider, panRndPosSlider;
+    juce::Slider toneLowRndNegSlider, toneLowRndPosSlider;
+    juce::Slider toneHighRndNegSlider, toneHighRndPosSlider;
     // COMMENTED FOR LITE â€” ACTIVE IN PREMIUM
     //juce::Slider lowGainRndNegSlider, lowGainRndPosSlider;
     //juce::Slider lowFreqRndNegSlider, lowFreqRndPosSlider;
@@ -78,6 +82,8 @@ private:
     SliderAttachment fineTuneRndNegAttachment, fineTuneRndPosAttachment;
     SliderAttachment volumeRndNegAttachment, volumeRndPosAttachment;
     SliderAttachment panRndNegAttachment, panRndPosAttachment;
+    SliderAttachment toneLowRndNegAttachment, toneLowRndPosAttachment;
+    SliderAttachment toneHighRndNegAttachment, toneHighRndPosAttachment;
     // COMMENTED FOR LITE â€” ACTIVE IN PREMIUM
     //SliderAttachment lowGainRndNegAttachment, lowGainRndPosAttachment;
     //SliderAttachment lowFreqRndNegAttachment, lowFreqRndPosAttachment;
@@ -90,7 +96,7 @@ private:
     //SliderAttachment envAtkRndNegAttachment, envAtkRndPosAttachment;
     //SliderAttachment envDecRndNegAttachment, envDecRndPosAttachment;
 
-    // AboutWindow — inline popup component
+    // AboutWindow ï¿½ inline popup component
     class AboutWindow : public juce::Component
     {
     public:
@@ -135,7 +141,7 @@ private:
     juce::TextButton aboutButton;
 
 
-    // Overlay AFTER all sliders — accesses slider members via editor reference
+    // Overlay AFTER all sliders ï¿½ accesses slider members via editor reference
     struct RndArcOverlay : public juce::Component
     {
         NewProjectAudioProcessorEditor& editor;

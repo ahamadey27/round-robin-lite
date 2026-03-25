@@ -7,6 +7,8 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
     fineTuneAttachment(p.apvts, ParameterIDs::fineTune, fineTuneSlider),
     volumeAttachment(p.apvts, ParameterIDs::volume, volumeSlider),
     panAttachment(p.apvts, ParameterIDs::pan, panSlider),
+    toneLowAttachment(p.apvts, ParameterIDs::toneLow, toneLowSlider),
+    toneHighAttachment(p.apvts, ParameterIDs::toneHigh, toneHighSlider),
     // COMMENTED FOR LITE — ACTIVE IN PREMIUM
     //lowGainAttachment(p.apvts, ParameterIDs::lowGain, lowGainSlider),
     //lowFreqAttachment(p.apvts, ParameterIDs::lowFreq, lowFreqSlider),
@@ -26,6 +28,10 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
     volumeRndPosAttachment(p.apvts, ParameterIDs::volumeRndPos, volumeRndPosSlider),
     panRndNegAttachment(p.apvts, ParameterIDs::panRndNeg, panRndNegSlider),
     panRndPosAttachment(p.apvts, ParameterIDs::panRndPos, panRndPosSlider),
+    toneLowRndNegAttachment(p.apvts, ParameterIDs::toneLowRndNeg, toneLowRndNegSlider),
+    toneLowRndPosAttachment(p.apvts, ParameterIDs::toneLowRndPos, toneLowRndPosSlider),
+    toneHighRndNegAttachment(p.apvts, ParameterIDs::toneHighRndNeg, toneHighRndNegSlider),
+    toneHighRndPosAttachment(p.apvts, ParameterIDs::toneHighRndPos, toneHighRndPosSlider),
     // COMMENTED FOR LITE — ACTIVE IN PREMIUM
     //lowGainRndNegAttachment(p.apvts, ParameterIDs::lowGainRndNeg, lowGainRndNegSlider),
     //lowGainRndPosAttachment(p.apvts, ParameterIDs::lowGainRndPos, lowGainRndPosSlider),
@@ -100,7 +106,8 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
     //addAndMakeVisible(playbackTypeLabel);
 
     // Main parameter knobs — visible, on the editor
-    for (auto* s : { &semitoneSlider, &fineTuneSlider, &volumeSlider, &panSlider
+    for (auto* s : { &semitoneSlider, &fineTuneSlider, &volumeSlider, &panSlider,
+                     &toneLowSlider, &toneHighSlider
                      // COMMENTED FOR LITE — ACTIVE IN PREMIUM
                      //,&lowGainSlider,  &lowFreqSlider,
                      //,&midGainSlider,  &midFreqSlider,
@@ -114,7 +121,9 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
     for (auto* s : { &semitoneRndNegSlider,  &semitoneRndPosSlider,
                      &fineTuneRndNegSlider,  &fineTuneRndPosSlider,
                      &volumeRndNegSlider,    &volumeRndPosSlider,
-                     &panRndNegSlider,       &panRndPosSlider
+                     &panRndNegSlider,       &panRndPosSlider,
+                     &toneLowRndNegSlider,   &toneLowRndPosSlider,
+                     &toneHighRndNegSlider,  &toneHighRndPosSlider
                      // COMMENTED FOR LITE — ACTIVE IN PREMIUM
                      //,&lowGainRndNegSlider,   &lowGainRndPosSlider,
                      //,&lowFreqRndNegSlider,   &lowFreqRndPosSlider,
@@ -130,7 +139,8 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
         setupSlider(*s);
 
     // Apply knob LAF to main parameter sliders
-    for (auto* s : { &semitoneSlider, &fineTuneSlider, &volumeSlider, &panSlider
+    for (auto* s : { &semitoneSlider, &fineTuneSlider, &volumeSlider, &panSlider,
+                     &toneLowSlider, &toneHighSlider
                      // COMMENTED FOR LITE — ACTIVE IN PREMIUM
                      //,&lowGainSlider, &lowFreqSlider, &midGainSlider, &midFreqSlider,
                      //,&highGainSlider, &highFreqSlider,
@@ -145,6 +155,9 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
 
         for (auto* s : { &volumeSlider, &panSlider })
             s->setColour(juce::Slider::rotarySliderFillColourId, RRColors::ampCol);
+
+        for (auto* s : { &toneLowSlider, &toneHighSlider })
+            s->setColour(juce::Slider::rotarySliderFillColourId, RRColors::toneCol);
 
         // COMMENTED FOR LITE — ACTIVE IN PREMIUM
         //for (auto* s : { &envAttackSlider, &envDecaySlider })
@@ -174,6 +187,8 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
         setValueBoxColors(fineTuneSlider,        RRColors::pitchCol);
         setValueBoxColors(volumeSlider,          RRColors::ampCol);
         setValueBoxColors(panSlider,             RRColors::ampCol);
+        setValueBoxColors(toneLowSlider,         RRColors::toneCol);
+        setValueBoxColors(toneHighSlider,        RRColors::toneCol);
         // COMMENTED FOR LITE — ACTIVE IN PREMIUM
         //setValueBoxColors(envAttackSlider,       RRColors::envCol);
         //setValueBoxColors(envDecaySlider,        RRColors::envCol);
@@ -187,7 +202,7 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
         //setValueBoxColors(highFreqSlider,        RRColors::eqHighCol);
 
 
-    setSize(700, 420);
+    setSize(700, 566);
     // Overlay must be added AFTER all knobs so it sits on top
     addAndMakeVisible(arcOverlay);
     resized();
@@ -198,7 +213,8 @@ static constexpr float kRndDotOffset = 0.18f;   // ~15 degrees
 //==============================================================================
 NewProjectAudioProcessorEditor::~NewProjectAudioProcessorEditor()
 {
-    for (auto* s : { &semitoneSlider, &fineTuneSlider, &volumeSlider, &panSlider
+    for (auto* s : { &semitoneSlider, &fineTuneSlider, &volumeSlider, &panSlider,
+                     &toneLowSlider, &toneHighSlider
                      // COMMENTED FOR LITE — ACTIVE IN PREMIUM
                      //,&lowGainSlider, &lowFreqSlider, &midGainSlider, &midFreqSlider,
                      //,&highGainSlider, &highFreqSlider,
@@ -209,6 +225,7 @@ NewProjectAudioProcessorEditor::~NewProjectAudioProcessorEditor()
 
     for (auto* s : { &semitoneRndNegSlider, &fineTuneRndNegSlider,
                      &volumeRndNegSlider,   &panRndNegSlider,
+                     &toneLowRndNegSlider,  &toneHighRndNegSlider,
                      // COMMENTED FOR LITE — ACTIVE IN PREMIUM
                      //&lowGainRndNegSlider,  &lowFreqRndNegSlider,
                      //&midGainRndNegSlider,  &midFreqRndNegSlider,
@@ -216,7 +233,8 @@ NewProjectAudioProcessorEditor::~NewProjectAudioProcessorEditor()
                      //&transAtkRndNegSlider, &transDecRndNegSlider,
                      //&envAtkRndNegSlider,   &envDecRndNegSlider,
                      &semitoneRndPosSlider, &fineTuneRndPosSlider,
-                     &volumeRndPosSlider,   &panRndPosSlider
+                     &volumeRndPosSlider,   &panRndPosSlider,
+                     &toneLowRndPosSlider,  &toneHighRndPosSlider
                      // COMMENTED FOR LITE — ACTIVE IN PREMIUM
                      //,&lowGainRndPosSlider,  &lowFreqRndPosSlider,
                      //,&midGainRndPosSlider,  &midFreqRndPosSlider,
@@ -366,12 +384,15 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
     constexpr int rpW     = 332;
     constexpr int ampY    = 60;
     constexpr int ampH    = 140;
-    constexpr int pitchY  = ampY + ampH + 50;   // 250
+    constexpr int toneY   = ampY + ampH + 8;
+    constexpr int toneH   = 140;
+    constexpr int pitchY  = toneY + toneH + 8;
     constexpr int pitchH  = 140;
     constexpr int kxOff0  = (rpW - 2 * knobW - knobGap) / 2;  // 86
     constexpr int kxOff1  = kxOff0 + knobW + knobGap;          // 178
 
     const int secLabelBottomAmp   = ampY   + 7 + 9;
+    const int secLabelBottomTone  = toneY  + 7 + 9;
     const int secLabelBottomPitch = pitchY + 7 + 9;
 
     // ── Background ────────────────────────────────────────────────────────────
@@ -405,7 +426,7 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
 
     // ── Left panel: Sample Manager placeholder (Phase 3) ─────────────────────
     const int lpW = rpX - margin - 8;  // 336
-    const int lpH = pitchY + pitchH - ampY;  // total height of both right sections
+    const int lpH = pitchY + pitchH - ampY;  // total height of all right sections
     drawSectionBox({ margin, ampY, lpW, lpH });
     g.setColour(juce::Colour(0xff3a3a4a));
     g.setFont(juce::Font(juce::FontOptions(9.0f)).boldened());
@@ -418,11 +439,11 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
     g.setFont(juce::Font(juce::FontOptions(9.0f)).boldened());
     g.drawText("AMPLITUDE", rpX + 8, ampY + 7, rpW - 16, 10, juce::Justification::left);
 
-    // ── Right panel: Algorithm placeholder (Phase 5) ─────────────────────────
-    g.setColour(juce::Colour(0xff2e2e3e));
-    g.setFont(juce::Font(juce::FontOptions(8.0f)));
-    g.drawText("[ ALGORITHM ]", rpX, ampY + ampH + 16, rpW, 12,
-               juce::Justification::centred);
+    // ── Right panel: Tone section ────────────────────────────────────────────
+    drawSectionBox({ rpX, toneY, rpW, toneH });
+    g.setColour(RRColors::toneCol);
+    g.setFont(juce::Font(juce::FontOptions(9.0f)).boldened());
+    g.drawText("TONE", rpX + 8, toneY + 7, rpW - 16, 10, juce::Justification::left);
 
     // ── Right panel: Pitch section ────────────────────────────────────────────
     drawSectionBox({ rpX, pitchY, rpW, pitchH });
@@ -442,6 +463,8 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
     };
     drawKnobLabel("VOLUME",    volumeSlider,   secLabelBottomAmp);
     drawKnobLabel("PAN",       panSlider,       secLabelBottomAmp);
+    drawKnobLabel("LOW",       toneLowSlider,   secLabelBottomTone);
+    drawKnobLabel("HIGH",      toneHighSlider,  secLabelBottomTone);
     drawKnobLabel("SEMITONE",  semitoneSlider,  secLabelBottomPitch);
     drawKnobLabel("FINE TUNE", fineTuneSlider,  secLabelBottomPitch);
 
@@ -561,6 +584,9 @@ void NewProjectAudioProcessorEditor::paintOverChildren(juce::Graphics& g)
     // AMPLITUDE
     drawRndArcs(volumeSlider,          volumeRndNegSlider,    volumeRndPosSlider,    RRColors::ampNeg,    RRColors::ampCol);
     drawRndArcs(panSlider,             panRndNegSlider,       panRndPosSlider,       RRColors::ampNeg,    RRColors::ampCol);
+    // TONE
+    drawRndArcs(toneLowSlider,         toneLowRndNegSlider,   toneLowRndPosSlider,   RRColors::toneNeg,   RRColors::toneCol);
+    drawRndArcs(toneHighSlider,        toneHighRndNegSlider,  toneHighRndPosSlider,  RRColors::toneNeg,   RRColors::toneCol);
     // COMMENTED FOR LITE — ACTIVE IN PREMIUM
     // ENVELOPE
     //drawRndArcs(envAttackSlider,       envAtkRndNegSlider,    envAtkRndPosSlider,    RRColors::envNeg,    RRColors::envCol);
@@ -595,12 +621,14 @@ void NewProjectAudioProcessorEditor::resized()
     constexpr int tbH     = 16;
     constexpr int knobGap = 24;   // horizontal gap between knob pair
 
-    // Right panel — Pitch + Amplitude sections
+    // Right panel — Amplitude + Tone + Pitch sections
     constexpr int rpX    = 356;
     constexpr int rpW    = 332;   // 700 - 356 - 12
     constexpr int ampY   = 60;
     constexpr int ampH   = 140;
-    constexpr int pitchY = ampY + ampH + 50;   // 250 — 50px gap reserved for Algorithm knob (Phase 5)
+    constexpr int toneY  = ampY + ampH + 8;
+    constexpr int toneH  = 140;
+    constexpr int pitchY = toneY + toneH + 8;
     constexpr int pitchH = 140;
 
     // Knob X offsets within right panel (two knobs centered)
@@ -624,6 +652,15 @@ void NewProjectAudioProcessorEditor::resized()
         const int extraPad    = ((ampY + ampH) - knobDrawBot - tbH) / 2;
         volumeSlider.setBounds(rpX + kxOff0, ky, knobW, knobH + extraPad);
         panSlider   .setBounds(rpX + kxOff1, ky, knobW, knobH + extraPad);
+    }
+
+    // ── Tone knobs (Low, High) ───────────────────────────────────────────────
+    {
+        const int ky          = toneY + (toneH - knobH - 12) / 2 + 16;
+        const int knobDrawBot = ky + knobH - tbH;
+        const int extraPad    = ((toneY + toneH) - knobDrawBot - tbH) / 2;
+        toneLowSlider .setBounds(rpX + kxOff0, ky, knobW, knobH + extraPad);
+        toneHighSlider.setBounds(rpX + kxOff1, ky, knobW, knobH + extraPad);
     }
 
     // ── Pitch knobs (Semitone, Fine Tune) ─────────────────────────────────────
@@ -695,6 +732,8 @@ bool NewProjectAudioProcessorEditor::RndArcOverlay::hitTest(int x, int y)
         { &editor.fineTuneSlider,        &editor.fineTuneRndNegSlider,  &editor.fineTuneRndPosSlider  },
         { &editor.volumeSlider,          &editor.volumeRndNegSlider,    &editor.volumeRndPosSlider    },
         { &editor.panSlider,             &editor.panRndNegSlider,       &editor.panRndPosSlider       },
+        { &editor.toneLowSlider,         &editor.toneLowRndNegSlider,   &editor.toneLowRndPosSlider   },
+        { &editor.toneHighSlider,        &editor.toneHighRndNegSlider,  &editor.toneHighRndPosSlider  },
         // COMMENTED FOR LITE — ACTIVE IN PREMIUM
         //{ &editor.lowGainSlider,         &editor.lowGainRndNegSlider,   &editor.lowGainRndPosSlider   },
         //{ &editor.lowFreqSlider,         &editor.lowFreqRndNegSlider,   &editor.lowFreqRndPosSlider   },
@@ -729,6 +768,8 @@ void NewProjectAudioProcessorEditor::RndArcOverlay::mouseDown(const juce::MouseE
         { &editor.fineTuneSlider,        &editor.fineTuneRndNegSlider,  &editor.fineTuneRndPosSlider  },
         { &editor.volumeSlider,          &editor.volumeRndNegSlider,    &editor.volumeRndPosSlider    },
         { &editor.panSlider,             &editor.panRndNegSlider,       &editor.panRndPosSlider       },
+        { &editor.toneLowSlider,         &editor.toneLowRndNegSlider,   &editor.toneLowRndPosSlider   },
+        { &editor.toneHighSlider,        &editor.toneHighRndNegSlider,  &editor.toneHighRndPosSlider  },
         // COMMENTED FOR LITE — ACTIVE IN PREMIUM
         //{ &editor.lowGainSlider,         &editor.lowGainRndNegSlider,   &editor.lowGainRndPosSlider   },
         //{ &editor.lowFreqSlider,         &editor.lowFreqRndNegSlider,   &editor.lowFreqRndPosSlider   },

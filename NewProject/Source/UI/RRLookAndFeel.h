@@ -20,6 +20,7 @@ namespace RRColors
     inline const juce::Colour eqLowCol  { 0xff6a9a5a };
     inline const juce::Colour eqMidCol  { 0xff4a90c8 };
     inline const juce::Colour eqHighCol { 0xffc89040 };
+    inline const juce::Colour toneCol   { 0xff50a0c8 };
 
     // Rand arc neg colors (lighter version of each section)
     inline const juce::Colour pitchNeg  { 0xffe8b898 };
@@ -29,6 +30,7 @@ namespace RRColors
     inline const juce::Colour eqLowNeg  { 0xffa8c890 };
     inline const juce::Colour eqMidNeg  { 0xffa0cce8 };
     inline const juce::Colour eqHighNeg { 0xffe8cc90 };
+    inline const juce::Colour toneNeg   { 0xff98d0e8 };
 }
 
 // Main parameter knobs

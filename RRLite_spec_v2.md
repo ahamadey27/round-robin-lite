@@ -151,13 +151,13 @@ The following systems are fully implemented and working:
 
 ### Step 2.5: Add Tone UI Section
 
-- [ ] Add "TONE" section label to the layout
-- [ ] Position: this will be finalized in Phase 7 (UI Layout), but provisionally place it near the Amplitude section or between Pitch and Sample Start/End
-- [ ] Add "Low" and "High" knobs using existing RRKnobLAF style
-- [ ] Add randomization arc overlays for both knobs (blue neg / red pos arcs)
-- [ ] Add hidden randomization sliders for neg/pos and their APVTS attachments
-- [ ] Display values as dB with one decimal: "-3.0 dB", "+1.5 dB"
-- [ ] Wire knobs to APVTS via SliderParameterAttachment
+- [x] Add "TONE" section label to the layout
+- [x] Position: this will be finalized in Phase 7 (UI Layout), but provisionally place it near the Amplitude section or between Pitch and Sample Start/End
+- [x] Add "Low" and "High" knobs using existing RRKnobLAF style
+- [x] Add randomization arc overlays for both knobs (blue neg / red pos arcs)
+- [x] Add hidden randomization sliders for neg/pos and their APVTS attachments
+- [x] Display values as dB with one decimal: "-3.0 dB", "+1.5 dB"
+- [x] Wire knobs to APVTS via SliderParameterAttachment
 
 ### Step 2.6: State Persistence
 
@@ -611,3 +611,7 @@ So at tick 9, the additional randomization per parameter would be:
 - Source/Audio/RRSound.h/.cpp
 - Source/Audio/MidiMapper.h
 - Source/Data/SampleSlot.h
+
+**CMake Build Command:**
+- cd /Users/alex/Documents/Github/round-robin-lite/NewProject
+cmake -B Builds/MacOSX -G Xcode -S .
