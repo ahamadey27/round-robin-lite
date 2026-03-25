@@ -69,6 +69,8 @@ public:
     void savePreset(const juce::File& file);
     void loadPreset(const juce::File& file);
     void auditionSample(int slotIndex);
+    void swapSamples(int indexA, int indexB);
+    void insertSample(int fromIndex, int toIndex);
 
 private:
     //==============================================================================

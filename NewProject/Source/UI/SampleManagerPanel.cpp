@@ -53,7 +53,7 @@ void SampleManagerPanel::paint(juce::Graphics& g)
     constexpr int maxChars  = 12;
     constexpr int btnSize   = 14;
     constexpr int btnGap    = 2;
-    constexpr int btnsW     = btnSize * 4 + btnGap * 3; // 4 buttons
+    constexpr int btnsW     = btnSize * 4 + btnGap * 3;
 
     const int colW = (getWidth() - 16 - colGap) / 2;
     const int col0X = 8;
@@ -75,45 +75,58 @@ void SampleManagerPanel::paint(juce::Graphics& g)
         int x   = (col == 0) ? col0X : col1X;
         int y   = listY + row * rowH;
 
+        // Highlight drop target
+        bool isSwapTarget = isDragging && !dragIsInsert && dragTargetSlot == i;
+        if (isSwapTarget)
+        {
+            g.setColour(juce::Colour(0xff3a4a3a));
+            g.fillRect(x, y, colW, rowH);
+        }
+
         // Sample name
         juce::String slotNum = juce::String(i + 1).paddedLeft('0', 2);
         juce::String fileName = processor.sampleSlots[i].sourceFile.getFileName();
         juce::String display = slotNum + ". " + truncateName(fileName, maxChars);
 
-        g.setColour(juce::Colour(0xffb0b0b0));
+        g.setColour(isDragging && dragSourceSlot == i ? juce::Colour(0xff606060) : juce::Colour(0xffb0b0b0));
         g.setFont(juce::Font(juce::FontOptions(11.0f)));
         g.drawText(display, x, y, nameW, rowH, juce::Justification::centredLeft);
 
-        // Action buttons: reorder, play, replace, delete
+        // Action buttons
         int bx = x + nameW + 4;
         RowHitAreas hit;
         hit.slotIndex = i;
+        hit.rowArea = { x, y, colW, rowH };
 
-        // Reorder (arrow cross)
         hit.reorderBtn = { bx, y, btnSize, btnSize };
         g.setColour(juce::Colour(0xff707070));
         g.setFont(juce::Font(juce::FontOptions(11.0f)));
-        g.drawText(juce::String::charToString(0x2725), hit.reorderBtn, juce::Justification::centred); // +
+        g.drawText(juce::String::charToString(0x2725), hit.reorderBtn, juce::Justification::centred);
         bx += btnSize + btnGap;
 
-        // Play (audition)
         hit.playBtn = { bx, y, btnSize, btnSize };
         g.setColour(juce::Colour(0xff80b080));
-        g.drawText(juce::String::charToString(0x25B6), hit.playBtn, juce::Justification::centred); // play triangle
+        g.drawText(juce::String::charToString(0x25B6), hit.playBtn, juce::Justification::centred);
         bx += btnSize + btnGap;
 
-        // Replace
         hit.replaceBtn = { bx, y, btnSize, btnSize };
         g.setColour(juce::Colour(0xff8080b0));
-        g.drawText(juce::String::charToString(0x21C4), hit.replaceBtn, juce::Justification::centred); // swap arrows
+        g.drawText(juce::String::charToString(0x21C4), hit.replaceBtn, juce::Justification::centred);
         bx += btnSize + btnGap;
 
-        // Delete
         hit.deleteBtn = { bx, y, btnSize, btnSize };
         g.setColour(juce::Colour(0xffb07070));
-        g.drawText(juce::String::charToString(0x2715), hit.deleteBtn, juce::Justification::centred); // X
+        g.drawText(juce::String::charToString(0x2715), hit.deleteBtn, juce::Justification::centred);
 
         rowHitAreas.push_back(hit);
+
+        // Draw insertion line if dragging between rows
+        if (isDragging && dragIsInsert && dragTargetSlot == i)
+        {
+            g.setColour(juce::Colour(0xff70c870));
+            g.fillRect(x, y - 1, colW, 2);
+        }
+
         ++loadedCount;
     }
 
@@ -149,6 +162,25 @@ void SampleManagerPanel::resized()
     playbackModeButton.setBounds(getWidth() - 98, headerY, 90, 26);
 }
 
+int SampleManagerPanel::getSlotAtPosition(juce::Point<int> pos, bool& isInsertGap) const
+{
+    constexpr int rowH = 18;
+    isInsertGap = false;
+
+    for (auto& hit : rowHitAreas)
+    {
+        if (hit.rowArea.contains(pos))
+        {
+            // Top 4px of row = insert above, rest = swap onto
+            int relY = pos.y - hit.rowArea.getY();
+            if (relY < 4)
+                isInsertGap = true;
+            return hit.slotIndex;
+        }
+    }
+    return -1;
+}
+
 void SampleManagerPanel::mouseDown(const juce::MouseEvent& e)
 {
     auto pos = e.getPosition();
@@ -156,6 +188,16 @@ void SampleManagerPanel::mouseDown(const juce::MouseEvent& e)
     // Check action buttons
     for (auto& hit : rowHitAreas)
     {
+        if (hit.reorderBtn.contains(pos))
+        {
+            // Start drag
+            isDragging = true;
+            dragSourceSlot = hit.slotIndex;
+            dragTargetSlot = -1;
+            dragIsInsert = false;
+            dragPos = pos;
+            return;
+        }
         if (hit.playBtn.contains(pos))
         {
             if (onAuditionSample)
@@ -173,7 +215,6 @@ void SampleManagerPanel::mouseDown(const juce::MouseEvent& e)
             deleteSample(hit.slotIndex);
             return;
         }
-        // Reorder button — handled in Step 4.5 (drag-and-drop)
     }
 
     // Check "add more" area
@@ -181,11 +222,45 @@ void SampleManagerPanel::mouseDown(const juce::MouseEvent& e)
         onAddMoreClicked();
 }
 
+void SampleManagerPanel::mouseDrag(const juce::MouseEvent& e)
+{
+    if (!isDragging) return;
+
+    dragPos = e.getPosition();
+    bool isInsert = false;
+    int target = getSlotAtPosition(dragPos, isInsert);
+
+    if (target == dragSourceSlot)
+        target = -1; // can't drop on self
+
+    dragTargetSlot = target;
+    dragIsInsert = isInsert;
+    repaint();
+}
+
+void SampleManagerPanel::mouseUp(const juce::MouseEvent& e)
+{
+    if (!isDragging)
+        return;
+
+    if (dragTargetSlot >= 0 && dragSourceSlot >= 0 && dragTargetSlot != dragSourceSlot)
+    {
+        if (dragIsInsert)
+            processor.insertSample(dragSourceSlot, dragTargetSlot);
+        else
+            processor.swapSamples(dragSourceSlot, dragTargetSlot);
+    }
+
+    isDragging = false;
+    dragSourceSlot = -1;
+    dragTargetSlot = -1;
+    repaint();
+}
+
 void SampleManagerPanel::deleteSample(int slotIndex)
 {
     processor.sampleLoader.clearSlot(slotIndex);
 
-    // Shift samples above the deleted slot down to fill the gap
     for (int i = slotIndex; i < NewProjectAudioProcessor::NUM_SAMPLE_SLOTS - 1; ++i)
     {
         if (processor.sampleSlots[i + 1].isLoaded)

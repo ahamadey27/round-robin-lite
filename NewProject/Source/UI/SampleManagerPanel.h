@@ -13,6 +13,8 @@ public:
     void paint(juce::Graphics& g) override;
     void resized() override;
     void mouseDown(const juce::MouseEvent& e) override;
+    void mouseDrag(const juce::MouseEvent& e) override;
+    void mouseUp(const juce::MouseEvent& e) override;
 
     // Callbacks wired by the editor
     std::function<void()> onLoadSamplesClicked;
@@ -37,6 +39,7 @@ private:
     struct RowHitAreas
     {
         int slotIndex = -1;
+        juce::Rectangle<int> rowArea;     // full row for drop target
         juce::Rectangle<int> reorderBtn;
         juce::Rectangle<int> playBtn;
         juce::Rectangle<int> replaceBtn;
@@ -44,8 +47,16 @@ private:
     };
     std::vector<RowHitAreas> rowHitAreas;
 
-    void deleteSample(int slotIndex);
+    // Drag state
+    bool isDragging = false;
+    int dragSourceSlot = -1;
+    int dragTargetSlot = -1;
+    bool dragIsInsert = false;  // true = insert between, false = swap onto
+    juce::Point<int> dragPos;
 
+    int getSlotAtPosition(juce::Point<int> pos, bool& isInsertGap) const;
+
+    void deleteSample(int slotIndex);
     static juce::String truncateName(const juce::String& name, int maxChars);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SampleManagerPanel)

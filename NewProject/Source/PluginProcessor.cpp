@@ -969,6 +969,43 @@ void NewProjectAudioProcessor::auditionSample(int slotIndex)
     synthesiser.noteOn(1, 60, 1.0f);
 }
 
+void NewProjectAudioProcessor::swapSamples(int indexA, int indexB)
+{
+    if (indexA < 0 || indexA >= NUM_SAMPLE_SLOTS ||
+        indexB < 0 || indexB >= NUM_SAMPLE_SLOTS || indexA == indexB)
+        return;
+
+    std::swap(sampleSlots[indexA], sampleSlots[indexB]);
+    sampleLoader.updateSynthesiserSounds();
+    rebuildLoadedIndices();
+    reshuffleIndices();
+}
+
+void NewProjectAudioProcessor::insertSample(int fromIndex, int toIndex)
+{
+    if (fromIndex < 0 || fromIndex >= NUM_SAMPLE_SLOTS ||
+        toIndex < 0 || toIndex >= NUM_SAMPLE_SLOTS || fromIndex == toIndex)
+        return;
+
+    SampleSlot temp = sampleSlots[fromIndex];
+
+    if (fromIndex < toIndex)
+    {
+        for (int i = fromIndex; i < toIndex; ++i)
+            sampleSlots[i] = sampleSlots[i + 1];
+    }
+    else
+    {
+        for (int i = fromIndex; i > toIndex; --i)
+            sampleSlots[i] = sampleSlots[i - 1];
+    }
+
+    sampleSlots[toIndex] = temp;
+    sampleLoader.updateSynthesiserSounds();
+    rebuildLoadedIndices();
+    reshuffleIndices();
+}
+
 //==============================================================================
 // User Presets
 void NewProjectAudioProcessor::savePreset(const juce::File& file)

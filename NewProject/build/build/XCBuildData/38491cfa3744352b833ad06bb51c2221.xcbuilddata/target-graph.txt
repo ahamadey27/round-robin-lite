@@ -1,4 +1,11 @@
-Target dependency graph (7 targets)
+Target dependency graph (9 targets)
+Target 'install' in project 'RoundRobinLite'
+➜ Explicit dependency on target 'ALL_BUILD' in project 'RoundRobinLite'
+Target 'RoundRobinLite_All' in project 'RoundRobinLite'
+➜ Explicit dependency on target 'RoundRobinLite_Standalone' in project 'RoundRobinLite'
+➜ Explicit dependency on target 'RoundRobinLite_AU' in project 'RoundRobinLite'
+➜ Explicit dependency on target 'RoundRobinLite_VST3' in project 'RoundRobinLite'
+➜ Explicit dependency on target 'ZERO_CHECK' in project 'RoundRobinLite'
 Target 'ALL_BUILD' in project 'RoundRobinLite'
 ➜ Explicit dependency on target 'RoundRobinLite' in project 'RoundRobinLite'
 ➜ Explicit dependency on target 'RoundRobinLite_Standalone' in project 'RoundRobinLite'

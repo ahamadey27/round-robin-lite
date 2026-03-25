@@ -314,10 +314,10 @@ Each loaded sample row has 4 small icon buttons to the right of the sample name:
 
 ### Step 4.5: Implement Drag-and-Drop Reorder Logic
 
-- [ ] In the processor (or a new helper class), implement `swapSamples(int indexA, int indexB)` — swaps audio buffers, display names, and file paths between two SampleSlot entries, then calls `updateSynthesiserSounds()`
-- [ ] Implement `insertSample(int fromIndex, int toIndex)` — removes sample from `fromIndex`, inserts at `toIndex`, shifts all intermediate samples accordingly, then calls `updateSynthesiserSounds()`
-- [ ] Both operations must be thread-safe: the audio thread must not be reading sample data while the UI thread modifies the slots. Use the same locking pattern already in place for sample loading
-- [ ] After any reorder, reset the round-robin counter and rebuild the shuffle array
+- [x] In the processor (or a new helper class), implement `swapSamples(int indexA, int indexB)` — swaps audio buffers, display names, and file paths between two SampleSlot entries, then calls `updateSynthesiserSounds()`
+- [x] Implement `insertSample(int fromIndex, int toIndex)` — removes sample from `fromIndex`, inserts at `toIndex`, shifts all intermediate samples accordingly, then calls `updateSynthesiserSounds()`
+- [x] Both operations must be thread-safe: the audio thread must not be reading sample data while the UI thread modifies the slots. Use the same locking pattern already in place for sample loading
+- [x] After any reorder, reset the round-robin counter and rebuild the shuffle array
 
 ### Step 4.6: Wire File Operations
 
