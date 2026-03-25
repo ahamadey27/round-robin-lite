@@ -118,13 +118,13 @@ The following systems are fully implemented and working:
 - [x] Create new files: `Source/DSP/ToneControl.h` and `Source/DSP/ToneControl.cpp`
 - [x] Add both files to the `target_sources()` list in `CMakeLists.txt` and re-run CMake to regenerate the VS project
 - [ ] ToneControl uses two `juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>` — one for low shelf, one for high shelf (same pattern as ThreeBandEQ but with only two filters)
-- [ ] Fixed frequencies: low shelf at 250 Hz, high shelf at 4000 Hz
-- [ ] Q value: 0.707 (Butterworth — standard for shelf filters, gives a smooth flat shelf response without resonant bump)
-- [ ] `prepareToPlay(double sampleRate, int samplesPerBlock)` — initialize both filters with the processing spec
-- [ ] `updateFilters(float lowGain_dB, float highGain_dB)` — recalculate coefficients using `juce::dsp::IIR::Coefficients::makeLowShelf()` and `makeHighShelf()` with fixed freq and Q, variable gain
-- [ ] `processBlock(juce::AudioBuffer<float>& buffer)` — apply low shelf then high shelf in series
-- [ ] `reset()` — reset both filter states
-- [ ] Clamp gains to -12.0 to +12.0 dB range inside `updateFilters()` for safety
+- [x] Fixed frequencies: low shelf at 250 Hz, high shelf at 4000 Hz
+- [x] Q value: 0.707 (Butterworth — standard for shelf filters, gives a smooth flat shelf response without resonant bump)
+- [x] `prepareToPlay(double sampleRate, int samplesPerBlock)` — initialize both filters with the processing spec
+- [x] `updateFilters(float lowGain_dB, float highGain_dB)` — recalculate coefficients using `juce::dsp::IIR::Coefficients::makeLowShelf()` and `makeHighShelf()` with fixed freq and Q, variable gain
+- [x] `processBlock(juce::AudioBuffer<float>& buffer)` — apply low shelf then high shelf in series
+- [x] `reset()` — reset both filter states
+- [x] Clamp gains to -12.0 to +12.0 dB range inside `updateFilters()` for safety
 
 ### Step 2.3: Integrate ToneControl into Processor
 

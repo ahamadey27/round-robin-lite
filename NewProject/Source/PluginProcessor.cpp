@@ -147,6 +147,11 @@ void NewProjectAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBl
     //transientShaper.prepareToPlay(sampleRate, samplesPerBlock);
 
     //==============================================================================
+    // INITIALIZE TONE CONTROL
+
+    toneControl.prepareToPlay(sampleRate, samplesPerBlock);
+
+    //==============================================================================
     // INITIALIZE PARAMETER SMOOTHING
 
     const double rampTimeSeconds = 0.05; // 50 milliseconds
@@ -181,6 +186,7 @@ void NewProjectAudioProcessor::releaseResources()
 
     threeBandEQ.reset();
     transientShaper.reset();
+    toneControl.reset();
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -326,6 +332,25 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
         for (int channel = 0; channel < totalNumOutputChannels; ++channel)
             buffer.getWritePointer(channel)[sample] *= volumeGain;
     }
+
+    //==============================================================================
+    // APPLY TONE CONTROL (AFTER VOLUME/PAN, BEFORE OUTPUT)
+
+    float toneLowGain  = apvts.getRawParameterValue(ParameterIDs::toneLow)->load();
+    float toneHighGain = apvts.getRawParameterValue(ParameterIDs::toneHigh)->load();
+
+    // Override with randomized values when a voice is actively playing
+    if (auto* voice = dynamic_cast<RRVoice*>(synthesiser.getVoice(0)))
+    {
+        if (voice->isVoiceActive())
+        {
+            toneLowGain  = voice->getRandomizedToneLow();
+            toneHighGain = voice->getRandomizedToneHigh();
+        }
+    }
+
+    toneControl.updateFilters(toneLowGain, toneHighGain);
+    toneControl.processBlock(buffer);
 
 }
 

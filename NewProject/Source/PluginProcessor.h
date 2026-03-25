@@ -5,8 +5,9 @@
 #include "Data/SampleSlot.h"
 #include "Data/SampleLoader.h"
 #include "Parameters/ParametersIDs.h"
-#include "DSP/ThreeBandEQ.h" 
-#include "DSP/TransientShaper.h"  
+#include "DSP/ThreeBandEQ.h"
+#include "DSP/TransientShaper.h"
+#include "DSP/ToneControl.h"
 #include "DSP/RandomizationEngine.h"
 
 //==============================================================================
@@ -86,6 +87,7 @@ private:
     // DSP Processors
     ThreeBandEQ threeBandEQ;
     TransientShaper transientShaper;
+    ToneControl toneControl;
 
     // Current global pitch values
     std::atomic<float> globalSemitones{ 0.0f };
