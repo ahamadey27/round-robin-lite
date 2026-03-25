@@ -560,6 +560,45 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
         juce::ParameterID(ParameterIDs::panRndPos, 1),
         "Pan Rnd Pos", 0.0f, 1.0f, 0.0f));
 
+    //==============================================================================
+    // TONE CONTROL
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::toneLow, 1),
+        "Tone Low",
+        juce::NormalisableRange<float>(-12.0f, 12.0f, 0.1f),
+        0.0f,
+        juce::String(),
+        juce::AudioProcessorParameter::genericParameter,
+        [](float value, int) { return juce::String(value, 1) + " dB"; },
+        [](const juce::String& text) { return text.dropLastCharacters(3).getFloatValue(); }
+    ));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::toneHigh, 1),
+        "Tone High",
+        juce::NormalisableRange<float>(-12.0f, 12.0f, 0.1f),
+        0.0f,
+        juce::String(),
+        juce::AudioProcessorParameter::genericParameter,
+        [](float value, int) { return juce::String(value, 1) + " dB"; },
+        [](const juce::String& text) { return text.dropLastCharacters(3).getFloatValue(); }
+    ));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::toneLowRndNeg, 1),
+        "Tone Low Rnd Neg", 0.0f, 1.0f, 0.0f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::toneLowRndPos, 1),
+        "Tone Low Rnd Pos", 0.0f, 1.0f, 0.0f));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::toneHighRndNeg, 1),
+        "Tone High Rnd Neg", 0.0f, 1.0f, 0.0f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID(ParameterIDs::toneHighRndPos, 1),
+        "Tone High Rnd Pos", 0.0f, 1.0f, 0.0f));
+
     // COMMENTED FOR LITE — ACTIVE IN PREMIUM
     //==============================================================================
     // AMPLITUDE ENVELOPE

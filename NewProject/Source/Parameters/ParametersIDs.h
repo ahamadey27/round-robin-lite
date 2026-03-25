@@ -224,12 +224,23 @@ namespace ParameterIDs
     const juce::String envDecayRndPos = "envDecayRndPos";
 
     //==============================================================================
+    // TONE CONTROL (Lite replacement for 3-Band EQ)
+
+    inline constexpr auto toneLow  = "toneLow";
+    inline constexpr auto toneHigh = "toneHigh";
+
+    const juce::String toneLowRndNeg  = "toneLowRndNeg";
+    const juce::String toneLowRndPos  = "toneLowRndPos";
+    const juce::String toneHighRndNeg = "toneHighRndNeg";
+    const juce::String toneHighRndPos = "toneHighRndPos";
+
+    //==============================================================================
     // PARAMETER COUNT (useful for validation)
 
     /**
      * Total number of parameters in the plugin.
      * Update this if you add/remove parameters!
      */
-    inline constexpr int totalParameters = 35;
+    inline constexpr int totalParameters = 41;
 
 } 

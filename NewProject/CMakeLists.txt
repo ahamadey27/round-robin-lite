@@ -65,6 +65,8 @@ set(SOURCE_DSP
     Source/DSP/ThreeBandEQ.h
     Source/DSP/TransientShaper.cpp
     Source/DSP/TransientShaper.h
+    Source/DSP/ToneControl.cpp
+    Source/DSP/ToneControl.h
 )
 
 set(SOURCE_PARAMETERS
