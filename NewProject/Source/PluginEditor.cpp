@@ -86,6 +86,12 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
             audioProcessor.auditionSample(slotIndex);
         };
 
+    // Trigger button
+    triggerButton.setButtonText("Trigger");
+    triggerButton.setColour(juce::TextButton::buttonColourId, juce::Colour(0xffa03030));
+    triggerButton.setColour(juce::TextButton::textColourOffId, juce::Colours::white);
+    addAndMakeVisible(triggerButton);
+
     // About button
     aboutButton.setButtonText("?");
     aboutButton.onClick = [this]
@@ -719,9 +725,10 @@ void NewProjectAudioProcessorEditor::resized()
     constexpr int kxOff1 = kxOff0 + knobW + knobGap;          // 178
 
     // ── Header: preset buttons + about — all inside header bar ───────────────
-    savePresetButton.setBounds(getWidth() - 226, 13, 80, 26);
-    loadPresetButton.setBounds(getWidth() - 138, 13, 80, 26);
-    aboutButton.setBounds    (getWidth() -  50, 13, 26, 26);
+    triggerButton.setBounds   (getWidth() - 310, 13, 70, 26);
+    savePresetButton.setBounds(getWidth() - 232, 13, 80, 26);
+    loadPresetButton.setBounds(getWidth() - 144, 13, 80, 26);
+    aboutButton.setBounds    (getWidth() -  56, 13, 26, 26);
 
     // ── Left panel: Sample Manager ──────────────────────────────────────────
     {

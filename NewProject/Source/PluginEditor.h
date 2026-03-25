@@ -28,6 +28,7 @@ private:
 
 
     // Buttons & labels
+    juce::TextButton triggerButton;
     juce::TextButton savePresetButton;
     juce::TextButton loadPresetButton;
     std::unique_ptr<juce::FileChooser> fileChooser;

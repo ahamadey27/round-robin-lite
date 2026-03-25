@@ -348,9 +348,9 @@ Each loaded sample row has 4 small icon buttons to the right of the sample name:
 
 ### Step 4.8: Post-test Edits and Revision
 
-- [ ] Enable feature so when user's pointer hovers over truncated name for a couple seconds (or whatever is the standard amount of time is) a popup window appears with the full file name
-- [ ] Make the sample pool window's audio files be arranged in a single row of 20 samples instead of two rows of 10 samples to makre more room for the sample's text. Include the same four features to the right of the text and continue to truncate if text length exceeds space alloted space. 
-- [ ] When deleting a sample for the pool the "click here to add more sample" text button is moving up with each deleted sample and is under the text (and moved to the left column even when there are still samples in the right column). This may resolve itself after task two is completed but check logic anyways to ensure a smooth conistent movement with each sample.
+- [x] Enable feature so when user's pointer hovers over truncated name for a couple seconds (or whatever is the standard amount of time is) a popup window appears with the full file name
+- [x] Make the sample pool window's audio files be arranged in a single row of 20 samples instead of two rows of 10 samples to makre more room for the sample's text. Include the same four features to the right of the text and continue to truncate if text length exceeds space alloted space. 
+- [x] When deleting a sample for the pool the "click here to add more sample" text button is moving up with each deleted sample and is under the text (and moved to the left column even when there are still samples in the right column). This may resolve itself after task two is completed but check logic anyways to ensure a smooth conistent movement with each sample.
 
 ---
 
