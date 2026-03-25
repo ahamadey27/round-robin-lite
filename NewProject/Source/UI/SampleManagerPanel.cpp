@@ -285,5 +285,6 @@ void SampleManagerPanel::deleteSample(int slotIndex)
 
     processor.rebuildLoadedIndices();
     processor.reshuffleIndices();
+    processor.sampleLoader.updateSynthesiserSounds();
     repaint();
 }

@@ -181,6 +181,10 @@ void SampleLoader::updateSynthesiserSounds()
                     return;
                 }
             }
+
+            // No loaded slots — clear the sound so nothing plays
+            sound->clearSample();
+            DBG("All slots empty — sound cleared");
         }
     }
 }
