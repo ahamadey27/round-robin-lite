@@ -948,6 +948,28 @@ void NewProjectAudioProcessor::advanceRoundRobin()
 }
 
 //==============================================================================
+void NewProjectAudioProcessor::auditionSample(int slotIndex)
+{
+    if (slotIndex < 0 || slotIndex >= NUM_SAMPLE_SLOTS || !sampleSlots[slotIndex].isLoaded)
+        return;
+
+    // Force the synth to play this specific slot without advancing round-robin
+    if (synthesiser.getNumSounds() == 0)
+    {
+        auto* newSound = new RRSound();
+        newSound->setFromSlot(sampleSlots[slotIndex]);
+        synthesiser.addSound(newSound);
+    }
+    else
+    {
+        if (auto* sound = dynamic_cast<RRSound*>(synthesiser.getSound(0).get()))
+            sound->setFromSlot(sampleSlots[slotIndex]);
+    }
+
+    synthesiser.noteOn(1, 60, 1.0f);
+}
+
+//==============================================================================
 // User Presets
 void NewProjectAudioProcessor::savePreset(const juce::File& file)
 {

@@ -66,8 +66,9 @@ public:
     void advanceRoundRobin();
     void rebuildLoadedIndices();
 
-    void savePreset(const juce::File& file);  
-    void loadPreset(const juce::File& file);  
+    void savePreset(const juce::File& file);
+    void loadPreset(const juce::File& file);
+    void auditionSample(int slotIndex);
 
 private:
     //==============================================================================

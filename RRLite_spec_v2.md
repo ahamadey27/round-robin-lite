@@ -276,36 +276,36 @@ The following systems are fully implemented and working:
 
 ### Step 4.3: Sample List Display
 
-- [ ] Create a scrollable list area below the panel header
-- [ ] Display loaded samples in a two-column layout (01-10 on left, 11-20 on right) to match the mockup
-- [ ] Each row shows: `XX. samplename.ext` where XX is the slot number (01-20)
-- [ ] Sample name truncation: if the filename exceeds maximum display width, truncate to show the first ~6 characters + "..." + the file extension. Example: `sampl0...wav`
-- [ ] Maximum character length for display: determine based on column width, approximately 14-16 characters total including the number prefix
-- [ ] Empty slots are not displayed — the list only shows loaded samples
-- [ ] If fewer than 20 samples loaded, show `--- click to add XX samples ---` text below the last sample in the list, where XX is the number of empty slots remaining
-- [ ] Clicking the "add more" text opens the file picker (same as Load Samples but appends to existing pool)
+- [x] Create a scrollable list area below the panel header
+- [x] Display loaded samples in a two-column layout (01-10 on left, 11-20 on right) to match the mockup
+- [x] Each row shows: `XX. samplename.ext` where XX is the slot number (01-20)
+- [x] Sample name truncation: if the filename exceeds maximum display width, truncate to show the first ~6 characters + "..." + the file extension. Example: `sampl0...wav`
+- [x] Maximum character length for display: determine based on column width, approximately 14-16 characters total including the number prefix
+- [x] Empty slots are not displayed — the list only shows loaded samples
+- [x] If fewer than 20 samples loaded, show `--- click to add XX samples ---` text below the last sample in the list, where XX is the number of empty slots remaining
+- [x] Clicking the "add more" text opens the file picker (same as Load Samples but appends to existing pool)
 
 ### Step 4.4: Per-Sample Action Buttons
 
 Each loaded sample row has 4 small icon buttons to the right of the sample name:
 
-- [ ] **Arrow Cross (Reorder):** Initiates drag-and-drop reordering. User clicks and holds, then drags to a new position in the list
+- [x] **Arrow Cross (Reorder):** Initiates drag-and-drop reordering. User clicks and holds, then drags to a new position in the list
   - Swap mode: dropping directly on another sample swaps the two samples
   - Insert mode: dropping between two samples inserts the dragged sample at that position, shifting all samples below down by one index
   - After reorder, update the round-robin index and reshuffle the Fisher-Yates array if in Random mode
   - Visual feedback: highlight drop target (swap) or show insertion line between rows (insert)
 
-- [ ] **Play Button (Audition):** Clicking plays that specific sample through the full DSP chain (Volume, Pan, Pitch, Tone, Sample Start/End — same processing as a normal trigger)
+- [x] **Play Button (Audition):** Clicking plays that specific sample through the full DSP chain (Volume, Pan, Pitch, Tone, Sample Start/End — same processing as a normal trigger)
   - Implementation: temporarily override the round-robin selection to force-play the clicked sample's slot index, then send a synthetic note-on to the synthesiser
   - After playback, the round-robin index should NOT advance (audition is non-destructive to the sequence)
   - The audition should respect the current parameter settings (volume, pitch, tone, start/end, randomization)
 
-- [ ] **Replace Button (Swap File):** Opens a single-file picker dialog. The selected file replaces the audio data in that slot
+- [x] **Replace Button (Swap File):** Opens a single-file picker dialog. The selected file replaces the audio data in that slot
   - The slot index and position in the pool remain the same
   - The display name updates to reflect the new file
   - The round-robin index is unaffected
 
-- [ ] **Trash Can (Delete):** Removes the sample from the pool
+- [x] **Trash Can (Delete):** Removes the sample from the pool
   - All samples below the deleted slot shift up to fill the gap (auto-reshuffle)
   - Round-robin index resets to 0 to avoid out-of-bounds
   - Fisher-Yates shuffle array rebuilds

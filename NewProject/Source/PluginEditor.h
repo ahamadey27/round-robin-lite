@@ -165,6 +165,7 @@ private:
     void setupSlider(juce::Slider& s);
     void setupKnob(juce::Slider& s);
     void loadSamplesFromFiles();
+    void addMoreSamples();
     void updateSamplesInfo();
     void savePreset();
     void loadPreset();

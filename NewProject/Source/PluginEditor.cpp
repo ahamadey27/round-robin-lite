@@ -61,8 +61,30 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
     //envDecRndPosAttachment(p.apvts, ParameterIDs::envDecayRndPos, envDecRndPosSlider),
     sampleManagerPanel(p)
 {
-    // Wire sample manager panel's load callback
+    // Wire sample manager panel callbacks
     sampleManagerPanel.onLoadSamplesClicked = [this]() { loadSamplesFromFiles(); };
+    sampleManagerPanel.onAddMoreClicked = [this]() { addMoreSamples(); };
+    sampleManagerPanel.onReplaceSample = [this](int slotIndex)
+        {
+            fileChooser = std::make_unique<juce::FileChooser>(
+                "Replace Sample", juce::File{}, "*.wav;*.aif;*.aiff;*.flac;*.ogg");
+            fileChooser->launchAsync(
+                juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles,
+                [this, slotIndex](const juce::FileChooser& fc)
+                {
+                    auto file = fc.getResult();
+                    if (file.existsAsFile())
+                    {
+                        audioProcessor.sampleLoader.loadSample(slotIndex, file);
+                        audioProcessor.rebuildLoadedIndices();
+                        sampleManagerPanel.repaint();
+                    }
+                });
+        };
+    sampleManagerPanel.onAuditionSample = [this](int slotIndex)
+        {
+            audioProcessor.auditionSample(slotIndex);
+        };
 
     // About button
     aboutButton.setButtonText("?");
@@ -303,7 +325,49 @@ void NewProjectAudioProcessorEditor::loadSamplesFromFiles()
             }
 
             audioProcessor.rebuildLoadedIndices();
-            updateSamplesInfo();
+            sampleManagerPanel.repaint();
+        }
+    );
+}
+
+void NewProjectAudioProcessorEditor::addMoreSamples()
+{
+    fileChooser = std::make_unique<juce::FileChooser>(
+        "Add Samples",
+        juce::File{},
+        "*.wav;*.aif;*.aiff;*.flac;*.ogg"
+    );
+
+    fileChooser->launchAsync(
+        juce::FileBrowserComponent::openMode |
+        juce::FileBrowserComponent::canSelectFiles |
+        juce::FileBrowserComponent::canSelectMultipleItems,
+        [this](const juce::FileChooser& fc)
+        {
+            auto results = fc.getResults();
+
+            // Find first empty slot
+            int slot = 0;
+            for (; slot < NewProjectAudioProcessor::NUM_SAMPLE_SLOTS; ++slot)
+                if (!audioProcessor.sampleSlots[slot].isLoaded)
+                    break;
+
+            for (const auto& file : results)
+            {
+                if (slot >= NewProjectAudioProcessor::NUM_SAMPLE_SLOTS) break;
+                if (file.existsAsFile())
+                {
+                    audioProcessor.sampleLoader.loadSample(slot, file);
+                    ++slot;
+                    // Skip to next empty slot
+                    while (slot < NewProjectAudioProcessor::NUM_SAMPLE_SLOTS &&
+                           audioProcessor.sampleSlots[slot].isLoaded)
+                        ++slot;
+                }
+            }
+
+            audioProcessor.rebuildLoadedIndices();
+            sampleManagerPanel.repaint();
         }
     );
 }
