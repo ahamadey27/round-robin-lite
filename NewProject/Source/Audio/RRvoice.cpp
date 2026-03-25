@@ -295,6 +295,13 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
     voiceBuffer.makeCopyOf(buf);           // deep copy — safe from buffer swaps
     cachedSampleLength = voiceBuffer.getNumSamples();
 
+    if (cachedSampleLength == 0)
+    {
+        isPlaying = false;
+        clearCurrentNote();
+        return;
+    }
+
     // Convert start/end percentages to sample indices
     playbackStartSample = (int)(randomizedSampleStart / 100.0f * cachedSampleLength);
     playbackEndSample   = (int)(randomizedSampleEnd   / 100.0f * cachedSampleLength);

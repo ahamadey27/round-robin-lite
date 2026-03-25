@@ -391,6 +391,21 @@ Each loaded sample row has 4 small icon buttons to the right of the sample name:
 
 ---
 
+## Phase 5.1: Alter Random Paramater Arc UI
+
+**Goal:** The current UI of the neagtive/positive paramater arcs with the white dots are becoming a UX issue. The fluuidt of changing these paramaters in a circular motion is getting frusterating so would like to redesign the UI and keep all logic the same
+
+### Step 5.1.1: Create and Place New Randomize UI Slider 
+- [ ] Following a similar aestetic to the current desgign, create a new horizontel slider where in the center two parameter markers will be joined. When user moves the left one to the left, the negative randomization of the parameter's value will increase and when user moves the right paramater marker to the right, the positive randomization will increase. Image refernces for slider configuration are located at /ImageReferences/RanomSlider 0%.png and /ImageReferences/RanomSlider 100%.png. 
+- [ ] Color of dual slider markers will be consistent with that parameter's color scheme 
+- [ ] New random slider knobs will be located between the bottom of the parameter knob and the top of the parameter value window. Image reference for slider position is located at /ImageReferences/RandomSliderPostion.png
+- [ ] Get rid of the current random parameter arc UI around applicable paramater knobs
+
+### Step 5.1.2: Create Corresponding Random Parameter Amount at Location of Former Parameter Arc (IF this is possible using JUCE)
+- [ ] When user moves new parameter negative slider to the left, there will be colored outline that starts to appear on the outer parameter the paramter knob (where the arc used to be) that will represent the percentage of randomization for that particualr parameter that moves counter clockwise. Same will be the case when user moves positive randomize slider to the right but clockwise. Color of these parameter amounts will align with parameter's color scheme 
+
+---
+
 ## Phase 6: Random Algorithm Knob
 
 **Goal:** Add a large "Random Algorithm" knob in the center of the plugin that provides a quick way to add progressive randomization across all active parameters. The knob has 18 discrete tick positions, from zero additional randomization to moderate-heavy randomization.
