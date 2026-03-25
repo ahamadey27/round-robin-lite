@@ -356,7 +356,7 @@ void RRVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer,
 
         float outputSample = 0.0f;
 
-        if (sourceSamplePosition < sampleLength - 1)
+        if (sourceSamplePosition < playbackEndSample - 1)
         {
             const int index0 = static_cast<int>(sourceSamplePosition);
             const int index1 = index0 + 1;

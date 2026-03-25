@@ -213,10 +213,10 @@ The following systems are fully implemented and working:
 
 ### Step 3.3: Apply Start/End Boundaries in renderNextBlock
 
-- [ ] In RRVoice.cpp `renderNextBlock()`, replace the end-of-sample check:
+- [x] In RRVoice.cpp `renderNextBlock()`, replace the end-of-sample check:
   - Currently checks: `if (sourceSamplePosition >= cachedSampleLength)`
   - Change to: `if (sourceSamplePosition >= playbackEndSample)`
-- [ ] Ensure playback begins from `playbackStartSample` (set in startNote)
+- [x] Ensure playback begins from `playbackStartSample` (set in startNote)
 
 ### Step 3.4: Micro-Fade at Trim Points
 
