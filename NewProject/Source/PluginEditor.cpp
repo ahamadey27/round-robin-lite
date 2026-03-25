@@ -59,12 +59,10 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
     //envAtkRndPosAttachment(p.apvts, ParameterIDs::envAttackRndPos, envAtkRndPosSlider),
     //envDecRndNegAttachment(p.apvts, ParameterIDs::envDecayRndNeg, envDecRndNegSlider),
     //envDecRndPosAttachment(p.apvts, ParameterIDs::envDecayRndPos, envDecRndPosSlider),
-    playbackModeAttachment(p.apvts, ParameterIDs::playbackMode, playbackModeButton)
+    sampleManagerPanel(p)
 {
-    // Sample Load Button
-    loadSamplesButton.setButtonText("Load Samples");
-    loadSamplesButton.onClick = [this]() { loadSamplesFromFiles(); };
-    addAndMakeVisible(loadSamplesButton);
+    // Wire sample manager panel's load callback
+    sampleManagerPanel.onLoadSamplesClicked = [this]() { loadSamplesFromFiles(); };
 
     // About button
     aboutButton.setButtonText("?");
@@ -93,16 +91,7 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
     //samplesInfoLabel.setColour(juce::Label::textColourId, juce::Colours::white);
     //addAndMakeVisible(samplesInfoLabel);
 
-    // Playback mode button
-    playbackModeButton.setButtonText("Series");
-    playbackModeButton.setClickingTogglesState(true);
-    playbackModeButton.onClick = [this]()
-        {
-            bool isRandom = playbackModeButton.getToggleState();
-            playbackModeButton.setButtonText(isRandom ? "Random" : "Series");
-        };
-    addAndMakeVisible(playbackModeButton);
-    playbackModeButton.setLookAndFeel(&toggleLAF);
+    addAndMakeVisible(sampleManagerPanel);
 
     // Label setup:
     //playbackTypeLabel.setText("Playback Type", juce::dontSendNotification);
@@ -262,7 +251,7 @@ NewProjectAudioProcessorEditor::~NewProjectAudioProcessorEditor()
                      })
         s->setLookAndFeel(nullptr);
 
-        playbackModeButton.setLookAndFeel(nullptr);
+        // playbackModeButton now owned by SampleManagerPanel
 }
 
 //==============================================================================
@@ -449,10 +438,6 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
     const int lpW = rpX - margin - 8;  // 336
     const int lpH = pitchY + pitchH - ampY;  // total height of all right sections
     drawSectionBox({ margin, ampY, lpW, lpH });
-    g.setColour(juce::Colour(0xff3a3a4a));
-    g.setFont(juce::Font(juce::FontOptions(9.0f)).boldened());
-    g.drawText("SAMPLE MANAGER", margin + 8, ampY + 7, lpW - 16, 10,
-               juce::Justification::left);
 
     // ── Right panel: Amplitude section ───────────────────────────────────────
     drawSectionBox({ rpX, ampY, rpW, ampH });
@@ -674,10 +659,13 @@ void NewProjectAudioProcessorEditor::resized()
     loadPresetButton.setBounds(getWidth() - 138, 13, 80, 26);
     aboutButton.setBounds    (getWidth() -  50, 13, 26, 26);
 
-    // ── Left panel: Sample Manager placeholder ────────────────────────────────
-    // Load Samples + Playback Mode temporarily parked here until Phase 3
-    loadSamplesButton .setBounds(margin + 8, ampY + 8,  120, 26);
-    playbackModeButton.setBounds(margin + 8, ampY + 42,  90, 26);
+    // ── Left panel: Sample Manager ──────────────────────────────────────────
+    {
+        const int lpW = rpX - margin - 8;
+        const int lpH = trimY + trimH - ampY;
+        sampleManagerPanel.setBounds(margin, ampY, lpW, lpH);
+    }
+    // Load Samples + Playback Mode now inside SampleManagerPanel
 
     // ── Amplitude knobs (Volume, Pan) ─────────────────────────────────────────
     {

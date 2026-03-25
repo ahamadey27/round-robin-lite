@@ -78,6 +78,8 @@ set(SOURCE_PARAMETERS
 set(SOURCE_UI
     Source/UI/RRLookAndFeel.cpp
     Source/UI/RRLookAndFeel.h
+    Source/UI/SampleManagerPanel.cpp
+    Source/UI/SampleManagerPanel.h
 )
 
 target_sources(RoundRobinLite

@@ -261,18 +261,18 @@ The following systems are fully implemented and working:
 
 ### Step 4.1: Create SampleManagerPanel Component
 
-- [ ] Create new files: `Source/UI/SampleManagerPanel.h` and `Source/UI/SampleManagerPanel.cpp`
-- [ ] Add both files to the `target_sources()` list in `CMakeLists.txt` and re-run CMake to regenerate the VS project
-- [ ] SampleManagerPanel inherits from `juce::Component`
-- [ ] Takes a reference to the processor (for accessing sample slots, sample loader, and synthesiser)
-- [ ] Occupies roughly the left 45-50% of the plugin canvas (below the header)
+- [x] Create new files: `Source/UI/SampleManagerPanel.h` and `Source/UI/SampleManagerPanel.cpp`
+- [x] Add both files to the `target_sources()` list in `CMakeLists.txt` and re-run CMake to regenerate the VS project
+- [x] SampleManagerPanel inherits from `juce::Component`
+- [x] Takes a reference to the processor (for accessing sample slots, sample loader, and synthesiser)
+- [x] Occupies roughly the left 45-50% of the plugin canvas (below the header)
 
 ### Step 4.2: Panel Header Area
 
-- [ ] "Sample Pool" section title label at top of panel
-- [ ] "Load Samples" button — relocated from the old header area. Opens multi-file picker (same behavior as current implementation)
-- [ ] "playback type" label with Series/Random toggle — relocated from old header. Same APVTS attachment to `playbackMode`
-- [ ] Layout: Load Samples button on the left, playback toggle on the right of the panel header
+- [x] "Sample Pool" section title label at top of panel
+- [x] "Load Samples" button — relocated from the old header area. Opens multi-file picker (same behavior as current implementation)
+- [x] "playback type" label with Series/Random toggle — relocated from old header. Same APVTS attachment to `playbackMode`
+- [x] Layout: Load Samples button on the left, playback toggle on the right of the panel header
 
 ### Step 4.3: Sample List Display
 

@@ -2,7 +2,8 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "Parameters/ParametersIDs.h"
-#include "UI/RRLookAndFeel.h"  
+#include "UI/RRLookAndFeel.h"
+#include "UI/SampleManagerPanel.h"
 
 class NewProjectAudioProcessorEditor : public juce::AudioProcessorEditor, public juce::ComponentListener
 {
@@ -24,19 +25,12 @@ private:
     RRKnobLAF      knobLAF;
     RRNegSliderLAF negSliderLAF;
     RRPosSliderLAF posSliderLAF;
-    RRToggleLAF    toggleLAF;
 
 
     // Buttons & labels
-    juce::TextButton loadSamplesButton;
     juce::TextButton savePresetButton;
     juce::TextButton loadPresetButton;
-    juce::TextButton playbackModeButton;
-    // REMOVED FOR LITE: samplesInfoLabel
-    //juce::Label      samplesInfoLabel;
-    juce::Label      playbackTypeLabel;
     std::unique_ptr<juce::FileChooser> fileChooser;
-    ButtonAttachment playbackModeAttachment;
 
     // Main sliders � before attachments
     juce::Slider semitoneSlider, fineTuneSlider;
@@ -145,6 +139,7 @@ private:
 
     AboutWindow      aboutWindow;
     juce::TextButton aboutButton;
+    SampleManagerPanel sampleManagerPanel;
 
 
     // Overlay AFTER all sliders � accesses slider members via editor reference
