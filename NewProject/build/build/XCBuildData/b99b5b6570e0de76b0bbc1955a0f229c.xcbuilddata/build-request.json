@@ -1,16 +1,16 @@
 {
   "buildCommand" : {
-    "command" : "prepareForIndexing",
-    "enableIndexBuildArena" : false,
-    "targets" : null
+    "command" : "build",
+    "skipDependencies" : false,
+    "style" : "buildOnly"
   },
   "configuredTargets" : [
     {
-      "guid" : "1dfdb4234da7b3ab1f06c53dec5997f5782c8af6e152f14821b11c71ba51baff"
+      "guid" : "1dfdb4234da7b3ab1f06c53dec5997f5bf30b9238c09ccf61f6e1a5fffdaf361"
     }
   ],
   "containerPath" : "/Users/alex/Documents/Github/round-robin-lite/NewProject/build/RoundRobinLite.xcodeproj",
-  "continueBuildingAfterErrors" : true,
+  "continueBuildingAfterErrors" : false,
   "dependencyScope" : "workspace",
   "enableIndexBuildArena" : false,
   "hideShellScriptEnvironment" : false,

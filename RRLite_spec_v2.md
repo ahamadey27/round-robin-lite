@@ -321,30 +321,36 @@ Each loaded sample row has 4 small icon buttons to the right of the sample name:
 
 ### Step 4.6: Wire File Operations
 
-- [ ] "Load Samples" button: opens multi-file picker, loads files sequentially into empty slots starting from the first available index
-- [ ] "Add more" text click: same behavior as Load Samples
-- [ ] Replace button: opens single-file picker, replaces audio data in that specific slot via `SampleLoader::loadSample(slotIndex, file)`
-- [ ] Delete button: calls `SampleLoader::clearSlot(slotIndex)`, then shifts remaining samples up and calls `updateSynthesiserSounds()`
-- [ ] All file operations trigger a repaint of the SampleManagerPanel to reflect the updated list
+- [x] "Load Samples" button: opens multi-file picker, loads files sequentially into empty slots starting from the first available index
+- [x] "Add more" text click: same behavior as Load Samples
+- [x] Replace button: opens single-file picker, replaces audio data in that specific slot via `SampleLoader::loadSample(slotIndex, file)`
+- [x] Delete button: calls `SampleLoader::clearSlot(slotIndex)`, then shifts remaining samples up and calls `updateSynthesiserSounds()`
+- [x] All file operations trigger a repaint of the SampleManagerPanel to reflect the updated list
 
 ### Step 4.7: State Persistence for Sample Order
 
-- [ ] Sample order is already persisted through `getStateInformation()` which saves file paths per slot index — the order of slots IS the order
-- [ ] After drag-and-drop reorder, the new slot arrangement persists automatically on next save
-- [ ] Verify: preset save/load preserves the reordered sample arrangement
+- [x] Sample order is already persisted through `getStateInformation()` which saves file paths per slot index — the order of slots IS the order
+- [x] After drag-and-drop reorder, the new slot arrangement persists automatically on next save
+- [x] Verify: preset save/load preserves the reordered sample arrangement
 
 **Test:**
-- [ ] Load 5 samples — verify they appear as 01-05 in list with correct names
-- [ ] Verify "--- click to add 15 samples ---" appears below sample 05
-- [ ] Click "add more" — verify file picker opens, new samples append after 05
-- [ ] Long filename (e.g., "my_very_long_sample_name_footstep_wood.wav") — verify truncation
-- [ ] Click Play on sample 03 — verify it plays through DSP chain
-- [ ] Click Replace on sample 02 — verify file picker opens, sample updates
-- [ ] Click Trash on sample 03 — verify deletion, samples 04/05 shift to 03/04
-- [ ] Drag sample 01 onto sample 04 (swap) — verify they trade places
-- [ ] Drag sample 05 between 01 and 02 (insert) — verify proper reindexing
-- [ ] After reorder, play via MIDI — verify round-robin uses new order
-- [ ] Save/reload project — verify sample order persists
+- [x] Load 5 samples — verify they appear as 01-05 in list with correct names
+- [x] Verify "--- click to add 15 samples ---" appears below sample 05
+- [x] Click "add more" — verify file picker opens, new samples append after 05
+- [x] Long filename (e.g., "my_very_long_sample_name_footstep_wood.wav") — verify truncation
+- [x] Click Play on sample 03 — verify it plays through DSP chain
+- [x] Click Replace on sample 02 — verify file picker opens, sample updates
+- [x] Click Trash on sample 03 — verify deletion, samples 04/05 shift to 03/04
+- [x] Drag sample 01 onto sample 04 (swap) — verify they trade places
+- [x] Drag sample 05 between 01 and 02 (insert) — verify proper reindexing
+- [x] After reorder, play via MIDI — verify round-robin uses new order
+- [x] Save/reload project — verify sample order persists
+
+### Step 4.8: Post-test Edits and Revision
+
+- [ ] Enable feature so when user's pointer hovers over truncated name for a couple seconds (or whatever is the standard amount of time is) a popup window appears with the full file name
+- [ ] Make the sample pool window's audio files be arranged in a single row of 20 samples instead of two rows of 10 samples to makre more room for the sample's text. Include the same four features to the right of the text and continue to truncate if text length exceeds space alloted space. 
+- [ ] When deleting a sample for the pool the "click here to add more sample" text button is moving up with each deleted sample and is under the text (and moved to the left column even when there are still samples in the right column). This may resolve itself after task two is completed but check logic anyways to ensure a smooth conistent movement with each sample.
 
 ---
 

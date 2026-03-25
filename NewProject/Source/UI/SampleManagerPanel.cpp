@@ -46,21 +46,17 @@ void SampleManagerPanel::paint(juce::Graphics& g)
     g.setFont(juce::Font(juce::FontOptions(9.0f)).boldened());
     g.drawText("SAMPLE POOL", 8, 7, getWidth() - 16, 10, juce::Justification::left);
 
-    // ── Sample list ──────────────────────────────────────────────────────────
+    // ── Sample list (single column, 20 rows) ─────────────────────────────────
     constexpr int listY     = 58;
     constexpr int rowH      = 18;
-    constexpr int colGap    = 8;
-    constexpr int maxChars  = 12;
     constexpr int btnSize   = 14;
     constexpr int btnGap    = 2;
     constexpr int btnsW     = btnSize * 4 + btnGap * 3;
+    constexpr int padX      = 8;
 
-    const int colW = (getWidth() - 16 - colGap) / 2;
-    const int col0X = 8;
-    const int col1X = col0X + colW + colGap;
-    const int nameW = colW - btnsW - 4;
-
-    g.setFont(juce::Font(juce::FontOptions(11.0f)));
+    const int listW = getWidth() - padX * 2;
+    const int nameW = listW - btnsW - 4;
+    const int maxChars = juce::jmax(14, nameW / 7); // approximate chars that fit
 
     rowHitAreas.clear();
     int loadedCount = 0;
@@ -70,17 +66,13 @@ void SampleManagerPanel::paint(juce::Graphics& g)
         if (!processor.sampleSlots[i].isLoaded)
             continue;
 
-        int col = (loadedCount < 10) ? 0 : 1;
-        int row = (loadedCount < 10) ? loadedCount : loadedCount - 10;
-        int x   = (col == 0) ? col0X : col1X;
-        int y   = listY + row * rowH;
+        int y = listY + loadedCount * rowH;
 
-        // Highlight drop target
-        bool isSwapTarget = isDragging && !dragIsInsert && dragTargetSlot == i;
-        if (isSwapTarget)
+        // Highlight drop target (swap)
+        if (isDragging && !dragIsInsert && dragTargetSlot == i)
         {
             g.setColour(juce::Colour(0xff3a4a3a));
-            g.fillRect(x, y, colW, rowH);
+            g.fillRect(padX, y, listW, rowH);
         }
 
         // Sample name
@@ -90,13 +82,14 @@ void SampleManagerPanel::paint(juce::Graphics& g)
 
         g.setColour(isDragging && dragSourceSlot == i ? juce::Colour(0xff606060) : juce::Colour(0xffb0b0b0));
         g.setFont(juce::Font(juce::FontOptions(11.0f)));
-        g.drawText(display, x, y, nameW, rowH, juce::Justification::centredLeft);
+        g.drawText(display, padX, y, nameW, rowH, juce::Justification::centredLeft);
 
         // Action buttons
-        int bx = x + nameW + 4;
+        int bx = padX + nameW + 4;
         RowHitAreas hit;
         hit.slotIndex = i;
-        hit.rowArea = { x, y, colW, rowH };
+        hit.nameArea = { padX, y, nameW, rowH };
+        hit.rowArea  = { padX, y, listW, rowH };
 
         hit.reorderBtn = { bx, y, btnSize, btnSize };
         g.setColour(juce::Colour(0xff707070));
@@ -124,30 +117,24 @@ void SampleManagerPanel::paint(juce::Graphics& g)
         if (isDragging && dragIsInsert && dragTargetSlot == i)
         {
             g.setColour(juce::Colour(0xff70c870));
-            g.fillRect(x, y - 1, colW, 2);
+            g.fillRect(padX, y - 1, listW, 2);
         }
 
         ++loadedCount;
     }
 
-    // ── "Add more" text ──────────────────────────────────────────────────────
+    // ── "Add more" text (always directly below last loaded sample) ───────────
     int emptySlots = NewProjectAudioProcessor::NUM_SAMPLE_SLOTS - loadedCount;
     if (emptySlots > 0)
     {
-        int addY;
-        if (loadedCount == 0)
-            addY = listY;
-        else if (loadedCount <= 10)
-            addY = listY + loadedCount * rowH + 4;
-        else
-            addY = listY + (loadedCount - 10) * rowH + 4;
+        int addY = listY + loadedCount * rowH + 4;
 
         juce::String addText = "--- click to add " + juce::String(emptySlots) + " samples ---";
         g.setColour(juce::Colour(0xff606068));
         g.setFont(juce::Font(juce::FontOptions(10.0f)).italicised());
-        g.drawText(addText, col0X, addY, getWidth() - 16, rowH, juce::Justification::centredLeft);
+        g.drawText(addText, padX, addY, listW, rowH, juce::Justification::centredLeft);
 
-        addMoreArea = { col0X, addY, getWidth() - 16, rowH };
+        addMoreArea = { padX, addY, listW, rowH };
     }
     else
     {
@@ -164,14 +151,12 @@ void SampleManagerPanel::resized()
 
 int SampleManagerPanel::getSlotAtPosition(juce::Point<int> pos, bool& isInsertGap) const
 {
-    constexpr int rowH = 18;
     isInsertGap = false;
 
     for (auto& hit : rowHitAreas)
     {
         if (hit.rowArea.contains(pos))
         {
-            // Top 4px of row = insert above, rest = swap onto
             int relY = pos.y - hit.rowArea.getY();
             if (relY < 4)
                 isInsertGap = true;
@@ -185,12 +170,10 @@ void SampleManagerPanel::mouseDown(const juce::MouseEvent& e)
 {
     auto pos = e.getPosition();
 
-    // Check action buttons
     for (auto& hit : rowHitAreas)
     {
         if (hit.reorderBtn.contains(pos))
         {
-            // Start drag
             isDragging = true;
             dragSourceSlot = hit.slotIndex;
             dragTargetSlot = -1;
@@ -200,14 +183,12 @@ void SampleManagerPanel::mouseDown(const juce::MouseEvent& e)
         }
         if (hit.playBtn.contains(pos))
         {
-            if (onAuditionSample)
-                onAuditionSample(hit.slotIndex);
+            if (onAuditionSample) onAuditionSample(hit.slotIndex);
             return;
         }
         if (hit.replaceBtn.contains(pos))
         {
-            if (onReplaceSample)
-                onReplaceSample(hit.slotIndex);
+            if (onReplaceSample) onReplaceSample(hit.slotIndex);
             return;
         }
         if (hit.deleteBtn.contains(pos))
@@ -217,7 +198,6 @@ void SampleManagerPanel::mouseDown(const juce::MouseEvent& e)
         }
     }
 
-    // Check "add more" area
     if (addMoreArea.contains(pos) && onAddMoreClicked)
         onAddMoreClicked();
 }
@@ -231,7 +211,7 @@ void SampleManagerPanel::mouseDrag(const juce::MouseEvent& e)
     int target = getSlotAtPosition(dragPos, isInsert);
 
     if (target == dragSourceSlot)
-        target = -1; // can't drop on self
+        target = -1;
 
     dragTargetSlot = target;
     dragIsInsert = isInsert;
@@ -240,8 +220,7 @@ void SampleManagerPanel::mouseDrag(const juce::MouseEvent& e)
 
 void SampleManagerPanel::mouseUp(const juce::MouseEvent& e)
 {
-    if (!isDragging)
-        return;
+    if (!isDragging) return;
 
     if (dragTargetSlot >= 0 && dragSourceSlot >= 0 && dragTargetSlot != dragSourceSlot)
     {
@@ -255,6 +234,36 @@ void SampleManagerPanel::mouseUp(const juce::MouseEvent& e)
     dragSourceSlot = -1;
     dragTargetSlot = -1;
     repaint();
+}
+
+void SampleManagerPanel::mouseMove(const juce::MouseEvent& e)
+{
+    auto pos = e.getPosition();
+    juce::String newTooltip;
+
+    for (auto& hit : rowHitAreas)
+    {
+        if (hit.nameArea.contains(pos))
+        {
+            // Show full filename as tooltip if it was truncated
+            juce::String fullName = processor.sampleSlots[hit.slotIndex].sourceFile.getFileName();
+            int maxChars = juce::jmax(14, hit.nameArea.getWidth() / 7);
+            if (fullName.length() > maxChars)
+                newTooltip = fullName;
+            break;
+        }
+    }
+
+    if (newTooltip != currentTooltip)
+    {
+        currentTooltip = newTooltip;
+        // TooltipWindow picks up changes via getTooltip() automatically
+    }
+}
+
+void SampleManagerPanel::mouseExit(const juce::MouseEvent&)
+{
+    currentTooltip = {};
 }
 
 void SampleManagerPanel::deleteSample(int slotIndex)

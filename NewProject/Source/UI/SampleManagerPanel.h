@@ -4,7 +4,8 @@
 
 class NewProjectAudioProcessor;
 
-class SampleManagerPanel : public juce::Component
+class SampleManagerPanel : public juce::Component,
+                           public juce::TooltipClient
 {
 public:
     explicit SampleManagerPanel(NewProjectAudioProcessor& processor);
@@ -15,6 +16,10 @@ public:
     void mouseDown(const juce::MouseEvent& e) override;
     void mouseDrag(const juce::MouseEvent& e) override;
     void mouseUp(const juce::MouseEvent& e) override;
+    void mouseMove(const juce::MouseEvent& e) override;
+    void mouseExit(const juce::MouseEvent& e) override;
+
+    juce::String getTooltip() override { return currentTooltip; }
 
     // Callbacks wired by the editor
     std::function<void()> onLoadSamplesClicked;
@@ -29,6 +34,7 @@ private:
     juce::TextButton playbackModeButton;
 
     RRToggleLAF toggleLAF;
+    juce::TooltipWindow tooltipWindow{ this };
 
     using ButtonAttachment = juce::AudioProcessorValueTreeState::ButtonAttachment;
     std::unique_ptr<ButtonAttachment> playbackModeAttachment;
@@ -39,6 +45,7 @@ private:
     struct RowHitAreas
     {
         int slotIndex = -1;
+        juce::Rectangle<int> nameArea;    // text area for tooltip
         juce::Rectangle<int> rowArea;     // full row for drop target
         juce::Rectangle<int> reorderBtn;
         juce::Rectangle<int> playBtn;
@@ -47,11 +54,13 @@ private:
     };
     std::vector<RowHitAreas> rowHitAreas;
 
+    juce::String currentTooltip;
+
     // Drag state
     bool isDragging = false;
     int dragSourceSlot = -1;
     int dragTargetSlot = -1;
-    bool dragIsInsert = false;  // true = insert between, false = swap onto
+    bool dragIsInsert = false;
     juce::Point<int> dragPos;
 
     int getSlotAtPosition(juce::Point<int> pos, bool& isInsertGap) const;
