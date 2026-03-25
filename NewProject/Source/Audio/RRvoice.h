@@ -152,6 +152,7 @@ private:
     float randomizedSampleEnd = 100.0f;
     int playbackStartSample = 0;
     int playbackEndSample = 0;
+    int fadeSamples = 0;
 
     bool releaseTriggered = false;
 

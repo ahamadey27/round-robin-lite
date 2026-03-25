@@ -301,6 +301,12 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
     playbackStartSample = juce::jlimit(0, cachedSampleLength - 1, playbackStartSample);
     playbackEndSample   = juce::jlimit(playbackStartSample + 1, cachedSampleLength, playbackEndSample);
 
+    // Micro-fade length (~3ms), reduced if trimmed region is very short
+    fadeSamples = (int)(0.003 * getSampleRate());
+    int trimmedLength = playbackEndSample - playbackStartSample;
+    if (trimmedLength < fadeSamples * 2)
+        fadeSamples = trimmedLength / 2;
+
     sourceSamplePosition = (double)playbackStartSample;
 
     // AD envelope: attack fade-in, decay fade-out to zero, no sustain
@@ -364,6 +370,27 @@ void RRVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer,
             const float sample0 = sampleData[index0];
             const float sample1 = sampleData[index1];
             outputSample = (sample0 + (sample1 - sample0) * fraction) * envelopeLevel * randomizedVolume;
+
+            // Micro-fade at trim points (only when trimmed away from 0%/100%)
+            if (fadeSamples > 0)
+            {
+                int pos = (int)sourceSamplePosition;
+
+                // Fade-in at start (when start > 0%)
+                if (randomizedSampleStart > 0.0f && pos < playbackStartSample + fadeSamples)
+                {
+                    float linear = (float)(pos - playbackStartSample) / (float)fadeSamples;
+                    outputSample *= std::pow(juce::jlimit(0.0f, 1.0f, linear), 0.1f);
+                }
+
+                // Fade-out at end (when end < 100%)
+                if (randomizedSampleEnd < 100.0f && pos >= playbackEndSample - fadeSamples)
+                {
+                    float linear = (float)(playbackEndSample - pos) / (float)fadeSamples;
+                    outputSample *= std::pow(juce::jlimit(0.0f, 1.0f, linear), 0.1f);
+                }
+            }
+
             sourceSamplePosition += pitchRatio;
         }
         else
