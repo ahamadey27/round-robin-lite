@@ -97,6 +97,9 @@ public:
     //float getRandomizedTransientAttack() const { return randomizedTransientAttack; }
     //float getRandomizedTransientDecay() const { return randomizedTransientDecay; }
 
+    float getRandomizedToneLow()  const { return randomizedToneLow; }
+    float getRandomizedToneHigh() const { return randomizedToneHigh; }
+
 private:
     //==============================================================================
    // Member Variables
@@ -143,6 +146,8 @@ private:
     float randomizedHighFreq = 5000.0f;
     float randomizedTransientAttack = 0.0f;
     float randomizedTransientDecay = 0.0f;
+    float randomizedToneLow = 0.0f;
+    float randomizedToneHigh = 0.0f;
 
     bool releaseTriggered = false;
 
@@ -179,6 +184,11 @@ private:
         std::atomic<float>* highFreqNeg = nullptr;  std::atomic<float>* highFreqPos = nullptr;
         std::atomic<float>* transAtkNeg = nullptr;  std::atomic<float>* transAtkPos = nullptr;
         std::atomic<float>* transDecNeg = nullptr;  std::atomic<float>* transDecPos = nullptr;
+
+        std::atomic<float>* toneLow = nullptr;
+        std::atomic<float>* toneHigh = nullptr;
+        std::atomic<float>* toneLowNeg = nullptr;   std::atomic<float>* toneLowPos = nullptr;
+        std::atomic<float>* toneHighNeg = nullptr;  std::atomic<float>* toneHighPos = nullptr;
     } rndPtrs;
 
     // Reference to randomization engine and parameters

@@ -128,26 +128,26 @@ The following systems are fully implemented and working:
 
 ### Step 2.3: Integrate ToneControl into Processor
 
-- [ ] In PluginProcessor.h, add `ToneControl toneControl;` member variable
-- [ ] In PluginProcessor.cpp `prepareToPlay()`, call `toneControl.prepareToPlay(sampleRate, samplesPerBlock)`
-- [ ] In PluginProcessor.cpp `processBlock()`, after the synthesiser renders audio:
+- [x] In PluginProcessor.h, add `ToneControl toneControl;` member variable
+- [x] In PluginProcessor.cpp `prepareToPlay()`, call `toneControl.prepareToPlay(sampleRate, samplesPerBlock)`
+- [x] In PluginProcessor.cpp `processBlock()`, after the synthesiser renders audio:
   - Read randomized tone values from the active voice (if playing) or base parameter values (if no voice active)
   - Call `toneControl.updateFilters(toneLowGain, toneHighGain)`
   - Call `toneControl.processBlock(buffer)`
-- [ ] Position the tone processing in the signal chain: after Volume/Pan, before output (since EQ and transient are commented out, Tone effectively replaces them)
+- [x] Position the tone processing in the signal chain: after Volume/Pan, before output (since EQ and transient are commented out, Tone effectively replaces them)
 
 ### Step 2.4: Add Tone Randomization to Voice
 
-- [ ] In RRVoice.h, add member variables:
+- [x] In RRVoice.h, add member variables:
   - `float randomizedToneLow = 0.0f;`
   - `float randomizedToneHigh = 0.0f;`
-- [ ] Add getter functions: `getRandomizedToneLow()`, `getRandomizedToneHigh()`
-- [ ] In RRVoice.cpp `setRandomizationReferences()`, cache pointers for all 6 tone parameters
-- [ ] In RRVoice.cpp `startNote()`, generate randomized values:
+- [x] Add getter functions: `getRandomizedToneLow()`, `getRandomizedToneHigh()`
+- [x] In RRVoice.cpp `setRandomizationReferences()`, cache pointers for all 6 tone parameters
+- [x] In RRVoice.cpp `startNote()`, generate randomized values:
   - `randomizedToneLow` via `RandomizationEngine::generateRandomValue()` using toneLow base + neg/pos ranges
   - Clamp to -12.0 to +12.0 dB
   - Same for `randomizedToneHigh`
-- [ ] In PluginProcessor.cpp `processBlock()`, read randomized tone values from voice when active (same pattern as the commented-out EQ value reads)
+- [x] In PluginProcessor.cpp `processBlock()`, read randomized tone values from voice when active (same pattern as the commented-out EQ value reads)
 
 ### Step 2.5: Add Tone UI Section
 

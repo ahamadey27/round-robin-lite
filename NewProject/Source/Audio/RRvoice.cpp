@@ -52,6 +52,14 @@ void RRVoice::setRandomizationReferences(RandomizationEngine* engine,
     rndPtrs.pan = params->getRawParameterValue(ParameterIDs::pan);
     rndPtrs.panNeg = params->getRawParameterValue(ParameterIDs::panRndNeg);
     rndPtrs.panPos = params->getRawParameterValue(ParameterIDs::panRndPos);
+
+    rndPtrs.toneLow     = params->getRawParameterValue(ParameterIDs::toneLow);
+    rndPtrs.toneHigh    = params->getRawParameterValue(ParameterIDs::toneHigh);
+    rndPtrs.toneLowNeg  = params->getRawParameterValue(ParameterIDs::toneLowRndNeg);
+    rndPtrs.toneLowPos  = params->getRawParameterValue(ParameterIDs::toneLowRndPos);
+    rndPtrs.toneHighNeg = params->getRawParameterValue(ParameterIDs::toneHighRndNeg);
+    rndPtrs.toneHighPos = params->getRawParameterValue(ParameterIDs::toneHighRndPos);
+
     // COMMENTED FOR LITE — ACTIVE IN PREMIUM
     //rndPtrs.atkNeg = params->getRawParameterValue(ParameterIDs::envAttackRndNeg);
     //rndPtrs.atkPos = params->getRawParameterValue(ParameterIDs::envAttackRndPos);
@@ -141,6 +149,20 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
             rndPtrs.panPos->load());
         randomizedPan = juce::jlimit(-1.0f, 1.0f, randomizedPan);
 
+        // Tone Low randomization
+        randomizedToneLow = randEngine->generateRandomValue(
+            rndPtrs.toneLow->load(),
+            rndPtrs.toneLowNeg->load() * 12.0f,
+            rndPtrs.toneLowPos->load() * 12.0f);
+        randomizedToneLow = juce::jlimit(-12.0f, 12.0f, randomizedToneLow);
+
+        // Tone High randomization
+        randomizedToneHigh = randEngine->generateRandomValue(
+            rndPtrs.toneHigh->load(),
+            rndPtrs.toneHighNeg->load() * 12.0f,
+            rndPtrs.toneHighPos->load() * 12.0f);
+        randomizedToneHigh = juce::jlimit(-12.0f, 12.0f, randomizedToneHigh);
+
         // COMMENTED FOR LITE — ACTIVE IN PREMIUM
         // Envelope attack randomization
         //randomizedAttackMs = randEngine->generateRandomValue(
@@ -211,6 +233,8 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
     else
     {
         randomizedVolume = 0.75f;
+        randomizedToneLow = 0.0f;
+        randomizedToneHigh = 0.0f;
         // COMMENTED FOR LITE — ACTIVE IN PREMIUM
         //randomizedLowGain = 0.0f;
         //randomizedLowFreq = 100.0f;
