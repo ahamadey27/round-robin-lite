@@ -80,6 +80,7 @@ set(SOURCE_UI
     Source/UI/RRLookAndFeel.h
     Source/UI/SampleManagerPanel.cpp
     Source/UI/SampleManagerPanel.h
+    Source/UI/DualThumbRndSlider.h
 )
 
 target_sources(RoundRobinLite

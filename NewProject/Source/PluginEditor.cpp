@@ -235,52 +235,22 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
         //setValueBoxColors(highFreqSlider,        RRColors::eqHighCol);
 
 
+    // Dual-thumb randomization sliders
+    for (auto* bar : { &semitoneRndBar, &fineTuneRndBar, &volumeRndBar, &panRndBar,
+                       &toneLowRndBar, &toneHighRndBar, &sampleStartRndBar, &sampleEndRndBar })
+        addAndMakeVisible(*bar);
+
     setSize(700, 714);
-    // Overlay must be added AFTER all knobs so it sits on top
-    addAndMakeVisible(arcOverlay);
     resized();
 }
-
-static constexpr float kRndDotOffset = 0.18f;   // ~15 degrees
 
 //==============================================================================
 NewProjectAudioProcessorEditor::~NewProjectAudioProcessorEditor()
 {
     for (auto* s : { &semitoneSlider, &fineTuneSlider, &volumeSlider, &panSlider,
                      &toneLowSlider, &toneHighSlider,
-                     &sampleStartSlider, &sampleEndSlider
-                     // COMMENTED FOR LITE — ACTIVE IN PREMIUM
-                     //,&lowGainSlider, &lowFreqSlider, &midGainSlider, &midFreqSlider,
-                     //,&highGainSlider, &highFreqSlider,
-                     //,&transientAttackSlider, &transientDecaySlider,
-                     //,&envAttackSlider, &envDecaySlider
-                     })
+                     &sampleStartSlider, &sampleEndSlider })
         s->setLookAndFeel(nullptr);
-
-    for (auto* s : { &semitoneRndNegSlider, &fineTuneRndNegSlider,
-                     &volumeRndNegSlider,   &panRndNegSlider,
-                     &toneLowRndNegSlider,  &toneHighRndNegSlider,
-                     &sampleStartRndNegSlider, &sampleEndRndNegSlider,
-                     // COMMENTED FOR LITE — ACTIVE IN PREMIUM
-                     //&lowGainRndNegSlider,  &lowFreqRndNegSlider,
-                     //&midGainRndNegSlider,  &midFreqRndNegSlider,
-                     //&highGainRndNegSlider, &highFreqRndNegSlider,
-                     //&transAtkRndNegSlider, &transDecRndNegSlider,
-                     //&envAtkRndNegSlider,   &envDecRndNegSlider,
-                     &semitoneRndPosSlider, &fineTuneRndPosSlider,
-                     &volumeRndPosSlider,   &panRndPosSlider,
-                     &toneLowRndPosSlider,  &toneHighRndPosSlider,
-                     &sampleStartRndPosSlider, &sampleEndRndPosSlider
-                     // COMMENTED FOR LITE — ACTIVE IN PREMIUM
-                     //,&lowGainRndPosSlider,  &lowFreqRndPosSlider,
-                     //,&midGainRndPosSlider,  &midFreqRndPosSlider,
-                     //,&highGainRndPosSlider, &highFreqRndPosSlider,
-                     //,&transAtkRndPosSlider, &transDecRndPosSlider,
-                     //,&envAtkRndPosSlider,   &envDecRndPosSlider
-                     })
-        s->setLookAndFeel(nullptr);
-
-        // playbackModeButton now owned by SampleManagerPanel
 }
 
 //==============================================================================
@@ -471,10 +441,7 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
     constexpr int kxOff0  = (rpW - 2 * knobW - knobGap) / 2;  // 86
     constexpr int kxOff1  = kxOff0 + knobW + knobGap;          // 178
 
-    const int secLabelBottomAmp   = ampY   + 7 + 9;
-    const int secLabelBottomTone  = toneY  + 7 + 9;
-    const int secLabelBottomPitch = pitchY + 7 + 9;
-    const int secLabelBottomTrim  = trimY  + 7 + 9;
+    // knob label positions computed in drawKnobLabel lambda
 
     // ── Background ────────────────────────────────────────────────────────────
     g.fillAll(RRColors::background);
@@ -536,22 +503,21 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
 
     // ── Knob labels ───────────────────────────────────────────────────────────
     g.setFont(juce::Font(juce::FontOptions(12.0f)));
-    auto drawKnobLabel = [&](const juce::String& text, juce::Slider& s, int secLabelBottom)
+    auto drawKnobLabel = [&](const juce::String& text, int secY, int knobX)
     {
-        auto b = s.getBounds();
-        int centerY = (secLabelBottom + b.getY()) / 2;
+        int labelY = secY + 22;
         g.setColour(juce::Colour(0xff666666));
-        g.drawText(text, b.getX() - 8, centerY - 6, b.getWidth() + 16, 12,
+        g.drawText(text, knobX - 8, labelY, knobW + 16, 12,
                    juce::Justification::centred);
     };
-    drawKnobLabel("VOLUME",    volumeSlider,   secLabelBottomAmp);
-    drawKnobLabel("PAN",       panSlider,       secLabelBottomAmp);
-    drawKnobLabel("LOW",       toneLowSlider,   secLabelBottomTone);
-    drawKnobLabel("HIGH",      toneHighSlider,  secLabelBottomTone);
-    drawKnobLabel("SEMITONE",  semitoneSlider,  secLabelBottomPitch);
-    drawKnobLabel("FINE TUNE", fineTuneSlider,  secLabelBottomPitch);
-    drawKnobLabel("START",     sampleStartSlider, secLabelBottomTrim);
-    drawKnobLabel("END",       sampleEndSlider,   secLabelBottomTrim);
+    drawKnobLabel("VOLUME",    ampY,   rpX + kxOff0);
+    drawKnobLabel("PAN",       ampY,   rpX + kxOff1);
+    drawKnobLabel("LOW",       toneY,  rpX + kxOff0);
+    drawKnobLabel("HIGH",      toneY,  rpX + kxOff1);
+    drawKnobLabel("SEMITONE",  pitchY, rpX + kxOff0);
+    drawKnobLabel("FINE TUNE", pitchY, rpX + kxOff1);
+    drawKnobLabel("START",     trimY,  rpX + kxOff0);
+    drawKnobLabel("END",       trimY,  rpX + kxOff1);
 
     // ── Footer ────────────────────────────────────────────────────────────────
     g.setColour(RRColors::sectionBorder.darker(0.5f));
@@ -567,130 +533,76 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
 
 void NewProjectAudioProcessorEditor::paintOverChildren(juce::Graphics& g)
 {
-    // Skip drawing arc overlay entirely when about window is open
     if (aboutWindow.isVisible())
     {
         juce::RectangleList<int> clip(getLocalBounds());
         clip.subtract(aboutWindow.getBounds());
-        g.reduceClipRegion(clip);   // ← arcs render outside window bounds only
+        g.reduceClipRegion(clip);
     }
-            
-    constexpr float pi     = juce::MathConstants<float>::pi;
+
     constexpr float twoPi  = juce::MathConstants<float>::twoPi;
-    constexpr float maxNeg = pi * 0.8f;
-    constexpr float maxPos = pi * 0.8f;
-    constexpr float trackW = 5.0f;
-    constexpr float arcW   = 6.5f;
-    constexpr float dotR   = 5.0f;
+    constexpr float maxArc = juce::MathConstants<float>::pi * 0.8f;
+    constexpr float arcW   = 2.0f;
     constexpr int   tbH    = 16;
 
-    // Muted gray-green dot color — fits dark forest palette, not harsh white
-    const juce::Colour dotCol { 0xff8a9a8a };
-
-    auto drawRndArcs = [&](juce::Slider& knob,
-                           juce::Slider& negSlider,
-                           juce::Slider& posSlider,
-                           juce::Colour  negCol,
-                           juce::Colour  posCol)
+    auto drawArcOutline = [&](juce::Slider& knob,
+                              juce::Slider& negSlider,
+                              juce::Slider& posSlider,
+                              juce::Colour  col)
     {
-        auto  b  = knob.getBounds();
-        float w  = (float)b.getWidth();
-        float h  = (float)(b.getHeight() - tbH);
-
-        // cy matches new drawRotarySlider: cy = y + (height-tbH)*0.5
-        float cx = b.getX() + w * 0.5f;
-        float cy = b.getY() + h * 0.5f;
-
-        // Arc sits 5px outside the knob rim — same knob radius formula as LAF
-        float knobRadius = juce::jmin(w, h) * 0.5f - 4.0f;
-        float radius     = knobRadius + 5.0f;
-
         auto getNorm = [](juce::Slider& s) -> float {
             double range = s.getMaximum() - s.getMinimum();
             if (range == 0.0) return 0.0f;
             return (float)((s.getValue() - s.getMinimum()) / range);
         };
 
-        float negExtent = getNorm(negSlider) * (maxNeg - kRndDotOffset);
-        float posExtent = getNorm(posSlider) * (maxPos - kRndDotOffset);
+        float negNorm = getNorm(negSlider);
+        float posNorm = getNorm(posSlider);
+        if (negNorm < 0.01f && posNorm < 0.01f) return;
 
-        // Dim background tracks
-        juce::Path negTrack;
-        negTrack.addArc(cx - radius, cy - radius, radius * 2.0f, radius * 2.0f,
-            twoPi - maxNeg, twoPi, true);
-        g.setColour(negCol.withAlpha(0.25f));
-        g.strokePath(negTrack, juce::PathStrokeType(trackW,
-            juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
+        auto  b  = knob.getBounds();
+        float w  = (float)b.getWidth();
+        float h  = (float)(b.getHeight() - tbH);
+        float cx = b.getX() + w * 0.5f;
+        float cy = b.getY() + h * 0.5f;
 
-        juce::Path posTrack;
-        posTrack.addArc(cx - radius, cy - radius, radius * 2.0f, radius * 2.0f,
-            0.0f, maxPos, true);
-        g.setColour(posCol.withAlpha(0.25f));
-        g.strokePath(posTrack, juce::PathStrokeType(trackW,
-            juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
+        float knobRadius = juce::jmin(w, h) * 0.5f - 4.0f;
+        float radius     = knobRadius + 4.0f;
 
-        // Active neg arc
+        float negExtent = negNorm * maxArc;
+        float posExtent = posNorm * maxArc;
+
+        // Neg arc: counter-clockwise from 12 o'clock
         if (negExtent > 0.01f)
         {
             juce::Path negArc;
             negArc.addArc(cx - radius, cy - radius, radius * 2.0f, radius * 2.0f,
                 twoPi - negExtent, twoPi, true);
-            g.setColour(negCol.withAlpha(0.9f));
+            g.setColour(col.withAlpha(0.7f));
             g.strokePath(negArc, juce::PathStrokeType(arcW,
                 juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
         }
 
-        // Active pos arc
+        // Pos arc: clockwise from 12 o'clock
         if (posExtent > 0.01f)
         {
             juce::Path posArc;
             posArc.addArc(cx - radius, cy - radius, radius * 2.0f, radius * 2.0f,
                 0.0f, posExtent, true);
-            g.setColour(posCol.withAlpha(0.9f));
+            g.setColour(col.withAlpha(0.7f));
             g.strokePath(posArc, juce::PathStrokeType(arcW,
                 juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
         }
-
-        // Muted gray-green dots at arc endpoints (grab handles)
-        float negDotX = cx - std::sin(negExtent + kRndDotOffset) * radius;
-        float negDotY = cy - std::cos(negExtent + kRndDotOffset) * radius;
-        g.setColour(dotCol);
-        g.fillEllipse(negDotX - dotR, negDotY - dotR, dotR * 2.0f, dotR * 2.0f);
-
-        float posDotX = cx + std::sin(posExtent + kRndDotOffset) * radius;
-        float posDotY = cy - std::cos(posExtent + kRndDotOffset) * radius;
-        g.setColour(dotCol);
-        g.fillEllipse(posDotX - dotR, posDotY - dotR, dotR * 2.0f, dotR * 2.0f);
     };
 
-    // PITCH
-    drawRndArcs(semitoneSlider,        semitoneRndNegSlider,  semitoneRndPosSlider,  RRColors::pitchNeg,  RRColors::pitchCol);
-    drawRndArcs(fineTuneSlider,        fineTuneRndNegSlider,  fineTuneRndPosSlider,  RRColors::pitchNeg,  RRColors::pitchCol);
-    // AMPLITUDE
-    drawRndArcs(volumeSlider,          volumeRndNegSlider,    volumeRndPosSlider,    RRColors::ampNeg,    RRColors::ampCol);
-    drawRndArcs(panSlider,             panRndNegSlider,       panRndPosSlider,       RRColors::ampNeg,    RRColors::ampCol);
-    // TONE
-    drawRndArcs(toneLowSlider,         toneLowRndNegSlider,   toneLowRndPosSlider,   RRColors::toneNeg,   RRColors::toneCol);
-    drawRndArcs(toneHighSlider,        toneHighRndNegSlider,  toneHighRndPosSlider,  RRColors::toneNeg,   RRColors::toneCol);
-    // SAMPLE START/END
-    drawRndArcs(sampleStartSlider,     sampleStartRndNegSlider, sampleStartRndPosSlider, RRColors::trimNeg, RRColors::trimCol);
-    drawRndArcs(sampleEndSlider,       sampleEndRndNegSlider,   sampleEndRndPosSlider,   RRColors::trimNeg, RRColors::trimCol);
-    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
-    // ENVELOPE
-    //drawRndArcs(envAttackSlider,       envAtkRndNegSlider,    envAtkRndPosSlider,    RRColors::envNeg,    RRColors::envCol);
-    //drawRndArcs(envDecaySlider,        envDecRndNegSlider,    envDecRndPosSlider,    RRColors::envNeg,    RRColors::envCol);
-    // TRANSIENT
-    //drawRndArcs(transientAttackSlider, transAtkRndNegSlider,  transAtkRndPosSlider,  RRColors::transNeg,  RRColors::transCol);
-    //drawRndArcs(transientDecaySlider,  transDecRndNegSlider,  transDecRndPosSlider,  RRColors::transNeg,  RRColors::transCol);
-    // EQ LOW
-    //drawRndArcs(lowGainSlider,         lowGainRndNegSlider,   lowGainRndPosSlider,   RRColors::eqLowNeg,  RRColors::eqLowCol);
-    //drawRndArcs(lowFreqSlider,         lowFreqRndNegSlider,   lowFreqRndPosSlider,   RRColors::eqLowNeg,  RRColors::eqLowCol);
-    // EQ MID
-    //drawRndArcs(midGainSlider,         midGainRndNegSlider,   midGainRndPosSlider,   RRColors::eqMidNeg,  RRColors::eqMidCol);
-    //drawRndArcs(midFreqSlider,         midFreqRndNegSlider,   midFreqRndPosSlider,   RRColors::eqMidNeg,  RRColors::eqMidCol);
-    // EQ HIGH
-    //drawRndArcs(highGainSlider,        highGainRndNegSlider,  highGainRndPosSlider,  RRColors::eqHighNeg, RRColors::eqHighCol);
-    //drawRndArcs(highFreqSlider,        highFreqRndNegSlider,  highFreqRndPosSlider,  RRColors::eqHighNeg, RRColors::eqHighCol);
+    drawArcOutline(semitoneSlider,     semitoneRndNegSlider,     semitoneRndPosSlider,     RRColors::pitchCol);
+    drawArcOutline(fineTuneSlider,     fineTuneRndNegSlider,     fineTuneRndPosSlider,     RRColors::pitchCol);
+    drawArcOutline(volumeSlider,       volumeRndNegSlider,       volumeRndPosSlider,       RRColors::ampCol);
+    drawArcOutline(panSlider,          panRndNegSlider,          panRndPosSlider,          RRColors::ampCol);
+    drawArcOutline(toneLowSlider,      toneLowRndNegSlider,      toneLowRndPosSlider,      RRColors::toneCol);
+    drawArcOutline(toneHighSlider,     toneHighRndNegSlider,     toneHighRndPosSlider,     RRColors::toneCol);
+    drawArcOutline(sampleStartSlider,  sampleStartRndNegSlider,  sampleStartRndPosSlider,  RRColors::trimCol);
+    drawArcOutline(sampleEndSlider,    sampleEndRndNegSlider,    sampleEndRndPosSlider,    RRColors::trimCol);
 }
 
 void NewProjectAudioProcessorEditor::componentVisibilityChanged(juce::Component& component)
@@ -739,213 +651,42 @@ void NewProjectAudioProcessorEditor::resized()
     }
     // Load Samples + Playback Mode now inside SampleManagerPanel
 
-    // ── Amplitude knobs (Volume, Pan) ─────────────────────────────────────────
+    // ── Knob positioning helper ─────────────────────────────────────────────
+    // Layout per section (top to bottom):
+    //   secY+22..34    = knob name label
+    //   centered       = knob (80px: 64px rotary + 16px value text)
+    //   bottom-14      = rnd bar (12px + 2px gap)
+    constexpr int nameBottom = 34;   // name label ends here (within section)
+    constexpr int barSpace   = 14;   // rnd bar (12) + gap (2) at section bottom
+
+    auto placeKnobPair = [&](juce::Slider& knob0, juce::Slider& knob1, int secY, int secH)
     {
-        const int ky          = ampY + (ampH - knobH - 12) / 2 + 16;
-        const int knobDrawBot = ky + knobH - tbH;
-        const int extraPad    = ((ampY + ampH) - knobDrawBot - tbH) / 2;
-        volumeSlider.setBounds(rpX + kxOff0, ky, knobW, knobH + extraPad);
-        panSlider   .setBounds(rpX + kxOff1, ky, knobW, knobH + extraPad);
-    }
-
-    // ── Tone knobs (Low, High) ───────────────────────────────────────────────
-    {
-        const int ky          = toneY + (toneH - knobH - 12) / 2 + 16;
-        const int knobDrawBot = ky + knobH - tbH;
-        const int extraPad    = ((toneY + toneH) - knobDrawBot - tbH) / 2;
-        toneLowSlider .setBounds(rpX + kxOff0, ky, knobW, knobH + extraPad);
-        toneHighSlider.setBounds(rpX + kxOff1, ky, knobW, knobH + extraPad);
-    }
-
-    // ── Pitch knobs (Semitone, Fine Tune) ─────────────────────────────────────
-    {
-        const int ky          = pitchY + (pitchH - knobH - 12) / 2 + 16;
-        const int knobDrawBot = ky + knobH - tbH;
-        const int extraPad    = ((pitchY + pitchH) - knobDrawBot - tbH) / 2;
-        semitoneSlider.setBounds(rpX + kxOff0, ky, knobW, knobH + extraPad);
-        fineTuneSlider.setBounds(rpX + kxOff1, ky, knobW, knobH + extraPad);
-    }
-
-    // ── Sample Start/End knobs (Start, End) ──────────────────────────────────
-    {
-        const int ky          = trimY + (trimH - knobH - 12) / 2 + 16;
-        const int knobDrawBot = ky + knobH - tbH;
-        const int extraPad    = ((trimY + trimH) - knobDrawBot - tbH) / 2;
-        sampleStartSlider.setBounds(rpX + kxOff0, ky, knobW, knobH + extraPad);
-        sampleEndSlider  .setBounds(rpX + kxOff1, ky, knobW, knobH + extraPad);
-    }
-
-    // ── Arc overlay (full canvas) ─────────────────────────────────────────────
-    arcOverlay.setBounds(getLocalBounds());
-}
-
-//==============================================================================
-// RndArcOverlay — transparent component sitting over all knobs.
-// hitTest returns true only near arc dots, so knobs still receive
-// normal mouse events everywhere else.
-
-// PluginEditor.cpp — before RndArcOverlay::hitTest
-
-static void getDotPositions(juce::Slider& knob,
-    juce::Slider& negSlider,
-    juce::Slider& posSlider,
-    juce::Point<float>& negPt,
-    juce::Point<float>& posPt)
-{
-    constexpr float pi     = juce::MathConstants<float>::pi;
-    constexpr float maxNeg = pi * 0.8f;
-    constexpr float maxPos = pi * 0.8f;
-    constexpr int   tbH    = 16;
-
-    auto b  = knob.getBounds();
-    float w = (float)b.getWidth();
-    float h = (float)(b.getHeight() - tbH);    // match new drawRotarySlider
-    float cx = b.getX() + w * 0.5f;
-    float cy = b.getY() + h * 0.5f;            // match new drawRotarySlider
-    float knobRadius = juce::jmin(w, h) * 0.5f - 4.0f;
-    float radius     = knobRadius + 5.0f;       // arc sits 5px outside knob rim
-
-    auto getNorm = [](juce::Slider& s) -> float {
-        double range = s.getMaximum() - s.getMinimum();
-        if (range == 0.0) return 0.0f;
-        return (float)((s.getValue() - s.getMinimum()) / range);
+        int available = secH - nameBottom - barSpace;
+        int ky = secY + nameBottom + (available - knobH) / 2;
+        knob0.setBounds(rpX + kxOff0, ky, knobW, knobH);
+        knob1.setBounds(rpX + kxOff1, ky, knobW, knobH);
     };
 
-    float negExtent = getNorm(negSlider) * (maxNeg - kRndDotOffset);
-    float posExtent = getNorm(posSlider) * (maxPos - kRndDotOffset);
+    placeKnobPair(volumeSlider,       panSlider,          ampY,   ampH);
+    placeKnobPair(toneLowSlider,      toneHighSlider,     toneY,  toneH);
+    placeKnobPair(semitoneSlider,     fineTuneSlider,     pitchY, pitchH);
+    placeKnobPair(sampleStartSlider,  sampleEndSlider,    trimY,  trimH);
 
-    negPt = { cx - std::sin(negExtent + kRndDotOffset) * radius,
-              cy - std::cos(negExtent + kRndDotOffset) * radius };
-    posPt = { cx + std::sin(posExtent + kRndDotOffset) * radius,
-              cy - std::cos(posExtent + kRndDotOffset) * radius };
-}
-
-bool NewProjectAudioProcessorEditor::RndArcOverlay::hitTest(int x, int y)
-{
-    
-    if (editor.aboutWindow.isVisible())   // ← ADD THIS
-            return false;
-    
-    constexpr float hitR = 14.0f;
-    auto pos = juce::Point<float>((float)x, (float)y);
-
-    struct Trio { juce::Slider* k; juce::Slider* n; juce::Slider* p; };
-    Trio trios[] = {
-        { &editor.semitoneSlider,        &editor.semitoneRndNegSlider,  &editor.semitoneRndPosSlider  },
-        { &editor.fineTuneSlider,        &editor.fineTuneRndNegSlider,  &editor.fineTuneRndPosSlider  },
-        { &editor.volumeSlider,          &editor.volumeRndNegSlider,    &editor.volumeRndPosSlider    },
-        { &editor.panSlider,             &editor.panRndNegSlider,       &editor.panRndPosSlider       },
-        { &editor.toneLowSlider,         &editor.toneLowRndNegSlider,   &editor.toneLowRndPosSlider   },
-        { &editor.toneHighSlider,        &editor.toneHighRndNegSlider,  &editor.toneHighRndPosSlider  },
-        { &editor.sampleStartSlider,     &editor.sampleStartRndNegSlider, &editor.sampleStartRndPosSlider },
-        { &editor.sampleEndSlider,       &editor.sampleEndRndNegSlider,   &editor.sampleEndRndPosSlider   },
-        // COMMENTED FOR LITE — ACTIVE IN PREMIUM
-        //{ &editor.lowGainSlider,         &editor.lowGainRndNegSlider,   &editor.lowGainRndPosSlider   },
-        //{ &editor.lowFreqSlider,         &editor.lowFreqRndNegSlider,   &editor.lowFreqRndPosSlider   },
-        //{ &editor.midGainSlider,         &editor.midGainRndNegSlider,   &editor.midGainRndPosSlider   },
-        //{ &editor.midFreqSlider,         &editor.midFreqRndNegSlider,   &editor.midFreqRndPosSlider   },
-        //{ &editor.highGainSlider,        &editor.highGainRndNegSlider,  &editor.highGainRndPosSlider  },
-        //{ &editor.highFreqSlider,        &editor.highFreqRndNegSlider,  &editor.highFreqRndPosSlider  },
-        //{ &editor.transientAttackSlider, &editor.transAtkRndNegSlider,  &editor.transAtkRndPosSlider  },
-        //{ &editor.transientDecaySlider,  &editor.transDecRndNegSlider,  &editor.transDecRndPosSlider  },
-        //{ &editor.envAttackSlider,       &editor.envAtkRndNegSlider,    &editor.envAtkRndPosSlider    },
-        //{ &editor.envDecaySlider,        &editor.envDecRndNegSlider,    &editor.envDecRndPosSlider    },
+    // ── Dual-thumb randomization sliders (below each knob, above text box) ──
+    auto placeRndBar = [&](DualThumbRndSlider& bar, juce::Slider& knob, int secY, int secH)
+    {
+        auto b = knob.getBounds();
+        constexpr int barH = 12;
+        int barY = secY + secH - barH - 2;
+        bar.setBounds(b.getX() + 2, barY, b.getWidth() - 4, barH);
     };
 
-    for (auto& t : trios)
-    {
-        juce::Point<float> negPt, posPt;
-        getDotPositions(*t.k, *t.n, *t.p, negPt, posPt);
-        if (pos.getDistanceFrom(negPt) < hitR) return true;
-        if (pos.getDistanceFrom(posPt) < hitR) return true;
-    }
-    return false; // pass through to knob below
-}
-
-void NewProjectAudioProcessorEditor::RndArcOverlay::mouseDown(const juce::MouseEvent& e)
-{
-    activeSlider = nullptr;
-    auto pos = e.position;
-
-    struct Trio { juce::Slider* k; juce::Slider* n; juce::Slider* p; };
-    Trio trios[] = {
-        { &editor.semitoneSlider,        &editor.semitoneRndNegSlider,  &editor.semitoneRndPosSlider  },
-        { &editor.fineTuneSlider,        &editor.fineTuneRndNegSlider,  &editor.fineTuneRndPosSlider  },
-        { &editor.volumeSlider,          &editor.volumeRndNegSlider,    &editor.volumeRndPosSlider    },
-        { &editor.panSlider,             &editor.panRndNegSlider,       &editor.panRndPosSlider       },
-        { &editor.toneLowSlider,         &editor.toneLowRndNegSlider,   &editor.toneLowRndPosSlider   },
-        { &editor.toneHighSlider,        &editor.toneHighRndNegSlider,  &editor.toneHighRndPosSlider  },
-        { &editor.sampleStartSlider,     &editor.sampleStartRndNegSlider, &editor.sampleStartRndPosSlider },
-        { &editor.sampleEndSlider,       &editor.sampleEndRndNegSlider,   &editor.sampleEndRndPosSlider   },
-        // COMMENTED FOR LITE — ACTIVE IN PREMIUM
-        //{ &editor.lowGainSlider,         &editor.lowGainRndNegSlider,   &editor.lowGainRndPosSlider   },
-        //{ &editor.lowFreqSlider,         &editor.lowFreqRndNegSlider,   &editor.lowFreqRndPosSlider   },
-        //{ &editor.midGainSlider,         &editor.midGainRndNegSlider,   &editor.midGainRndPosSlider   },
-        //{ &editor.midFreqSlider,         &editor.midFreqRndNegSlider,   &editor.midFreqRndPosSlider   },
-        //{ &editor.highGainSlider,        &editor.highGainRndNegSlider,  &editor.highGainRndPosSlider  },
-        //{ &editor.highFreqSlider,        &editor.highFreqRndNegSlider,  &editor.highFreqRndPosSlider  },
-        //{ &editor.transientAttackSlider, &editor.transAtkRndNegSlider,  &editor.transAtkRndPosSlider  },
-        //{ &editor.transientDecaySlider,  &editor.transDecRndNegSlider,  &editor.transDecRndPosSlider  },
-        //{ &editor.envAttackSlider,       &editor.envAtkRndNegSlider,    &editor.envAtkRndPosSlider    },
-        //{ &editor.envDecaySlider,        &editor.envDecRndNegSlider,    &editor.envDecRndPosSlider    },
-    };
-
-    // FIX: use closest-dot selection instead of first-found.
-    // Prevents neg dot being grabbed when clicking the pos dot at 0% (both near top).
-    float        closestDist = 18.0f;   // hit radius
-    juce::Slider* closestSlider = nullptr;
-    bool          closestIsNeg  = false;
-
-    for (auto& t : trios)
-    {
-        juce::Point<float> negPt, posPt;
-        getDotPositions(*t.k, *t.n, *t.p, negPt, posPt);
-
-        float negDist = pos.getDistanceFrom(negPt);
-        float posDist = pos.getDistanceFrom(posPt);
-
-        if (negDist < closestDist)
-        {
-            closestDist   = negDist;
-            closestSlider = t.n;
-            closestIsNeg  = true;
-        }
-        if (posDist < closestDist)
-        {
-            closestDist   = posDist;
-            closestSlider = t.p;
-            closestIsNeg  = false;
-        }
-    }
-
-    activeSlider = closestSlider;
-    activeIsNeg  = closestIsNeg;
-
-    if (activeSlider != nullptr)
-    {
-        dragStartY   = e.position.y;
-        dragStartX   = e.position.x;
-        dragStartVal = (float)activeSlider->getValue();
-    }
-}
-
-void NewProjectAudioProcessorEditor::RndArcOverlay::mouseDrag(const juce::MouseEvent& e)
-{
-    if (activeSlider == nullptr) return;
-
-    float vertDelta = dragStartY - e.position.y;                  // up   = +
-    float horzDelta = activeIsNeg ? (dragStartX - e.position.x)   // left = + for neg
-        : (e.position.x - dragStartX);  // right = + for pos
-    float delta = vertDelta + horzDelta;
-    float range = (float)(activeSlider->getMaximum() - activeSlider->getMinimum());
-    float newVal = dragStartVal + delta * (range / 150.0f);
-    newVal = juce::jlimit((float)activeSlider->getMinimum(),
-        (float)activeSlider->getMaximum(), newVal);
-    activeSlider->setValue(newVal, juce::sendNotificationAsync);
-    editor.repaint();
-}
-
-void NewProjectAudioProcessorEditor::RndArcOverlay::mouseUp(const juce::MouseEvent&)
-{
-    activeSlider = nullptr;
+    placeRndBar(volumeRndBar,       volumeSlider,       ampY,   ampH);
+    placeRndBar(panRndBar,          panSlider,          ampY,   ampH);
+    placeRndBar(toneLowRndBar,      toneLowSlider,      toneY,  toneH);
+    placeRndBar(toneHighRndBar,     toneHighSlider,     toneY,  toneH);
+    placeRndBar(semitoneRndBar,     semitoneSlider,     pitchY, pitchH);
+    placeRndBar(fineTuneRndBar,     fineTuneSlider,     pitchY, pitchH);
+    placeRndBar(sampleStartRndBar,  sampleStartSlider,  trimY,  trimH);
+    placeRndBar(sampleEndRndBar,    sampleEndSlider,    trimY,  trimH);
 }

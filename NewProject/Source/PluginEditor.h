@@ -4,6 +4,7 @@
 #include "Parameters/ParametersIDs.h"
 #include "UI/RRLookAndFeel.h"
 #include "UI/SampleManagerPanel.h"
+#include "UI/DualThumbRndSlider.h"
 
 class NewProjectAudioProcessorEditor : public juce::AudioProcessorEditor, public juce::ComponentListener
 {
@@ -21,11 +22,7 @@ private:
     using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
     using ButtonAttachment = juce::AudioProcessorValueTreeState::ButtonAttachment;
 
-    // LAFs first � destroyed last
-    RRKnobLAF      knobLAF;
-    RRNegSliderLAF negSliderLAF;
-    RRPosSliderLAF posSliderLAF;
-
+    RRKnobLAF knobLAF;
 
     // Buttons & labels
     juce::TextButton triggerButton;
@@ -33,30 +30,18 @@ private:
     juce::TextButton loadPresetButton;
     std::unique_ptr<juce::FileChooser> fileChooser;
 
-    // Main sliders � before attachments
+    // Main sliders
     juce::Slider semitoneSlider, fineTuneSlider;
     juce::Slider volumeSlider, panSlider;
     juce::Slider toneLowSlider, toneHighSlider;
     juce::Slider sampleStartSlider, sampleEndSlider;
-    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
-    //juce::Slider lowGainSlider, lowFreqSlider;
-    //juce::Slider midGainSlider, midFreqSlider;
-    //juce::Slider highGainSlider, highFreqSlider;
-    //juce::Slider transientAttackSlider, transientDecaySlider;
-    //juce::Slider envAttackSlider, envDecaySlider;
 
     SliderAttachment semitoneAttachment, fineTuneAttachment;
     SliderAttachment volumeAttachment, panAttachment;
     SliderAttachment toneLowAttachment, toneHighAttachment;
     SliderAttachment sampleStartAttachment, sampleEndAttachment;
-    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
-    //SliderAttachment lowGainAttachment, lowFreqAttachment;
-    //SliderAttachment midGainAttachment, midFreqAttachment;
-    //SliderAttachment highGainAttachment, highFreqAttachment;
-    //SliderAttachment transientAttackAttachment, transientDecayAttachment;
-    //SliderAttachment envAttackAttachment, envDecayAttachment;
 
-    // Rnd sliders � before attachments
+    // Hidden rnd sliders (APVTS-bound, values read by DualThumbRndSlider and arc outline)
     juce::Slider semitoneRndNegSlider, semitoneRndPosSlider;
     juce::Slider fineTuneRndNegSlider, fineTuneRndPosSlider;
     juce::Slider volumeRndNegSlider, volumeRndPosSlider;
@@ -65,17 +50,6 @@ private:
     juce::Slider toneHighRndNegSlider, toneHighRndPosSlider;
     juce::Slider sampleStartRndNegSlider, sampleStartRndPosSlider;
     juce::Slider sampleEndRndNegSlider, sampleEndRndPosSlider;
-    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
-    //juce::Slider lowGainRndNegSlider, lowGainRndPosSlider;
-    //juce::Slider lowFreqRndNegSlider, lowFreqRndPosSlider;
-    //juce::Slider midGainRndNegSlider, midGainRndPosSlider;
-    //juce::Slider midFreqRndNegSlider, midFreqRndPosSlider;
-    //juce::Slider highGainRndNegSlider, highGainRndPosSlider;
-    //juce::Slider highFreqRndNegSlider, highFreqRndPosSlider;
-    //juce::Slider transAtkRndNegSlider, transAtkRndPosSlider;
-    //juce::Slider transDecRndNegSlider, transDecRndPosSlider;
-    //juce::Slider envAtkRndNegSlider, envAtkRndPosSlider;
-    //juce::Slider envDecRndNegSlider, envDecRndPosSlider;
 
     SliderAttachment semitoneRndNegAttachment, semitoneRndPosAttachment;
     SliderAttachment fineTuneRndNegAttachment, fineTuneRndPosAttachment;
@@ -85,19 +59,18 @@ private:
     SliderAttachment toneHighRndNegAttachment, toneHighRndPosAttachment;
     SliderAttachment sampleStartRndNegAttachment, sampleStartRndPosAttachment;
     SliderAttachment sampleEndRndNegAttachment, sampleEndRndPosAttachment;
-    // COMMENTED FOR LITE — ACTIVE IN PREMIUM
-    //SliderAttachment lowGainRndNegAttachment, lowGainRndPosAttachment;
-    //SliderAttachment lowFreqRndNegAttachment, lowFreqRndPosAttachment;
-    //SliderAttachment midGainRndNegAttachment, midGainRndPosAttachment;
-    //SliderAttachment midFreqRndNegAttachment, midFreqRndPosAttachment;
-    //SliderAttachment highGainRndNegAttachment, highGainRndPosAttachment;
-    //SliderAttachment highFreqRndNegAttachment, highFreqRndPosAttachment;
-    //SliderAttachment transAtkRndNegAttachment, transAtkRndPosAttachment;
-    //SliderAttachment transDecRndNegAttachment, transDecRndPosAttachment;
-    //SliderAttachment envAtkRndNegAttachment, envAtkRndPosAttachment;
-    //SliderAttachment envDecRndNegAttachment, envDecRndPosAttachment;
 
-    // AboutWindow � inline popup component
+    // Dual-thumb randomization sliders (below each knob)
+    DualThumbRndSlider semitoneRndBar   { semitoneRndNegSlider,     semitoneRndPosSlider,     RRColors::pitchCol };
+    DualThumbRndSlider fineTuneRndBar   { fineTuneRndNegSlider,     fineTuneRndPosSlider,     RRColors::pitchCol };
+    DualThumbRndSlider volumeRndBar     { volumeRndNegSlider,       volumeRndPosSlider,       RRColors::ampCol };
+    DualThumbRndSlider panRndBar        { panRndNegSlider,          panRndPosSlider,          RRColors::ampCol };
+    DualThumbRndSlider toneLowRndBar    { toneLowRndNegSlider,      toneLowRndPosSlider,      RRColors::toneCol };
+    DualThumbRndSlider toneHighRndBar   { toneHighRndNegSlider,     toneHighRndPosSlider,     RRColors::toneCol };
+    DualThumbRndSlider sampleStartRndBar{ sampleStartRndNegSlider,  sampleStartRndPosSlider,  RRColors::trimCol };
+    DualThumbRndSlider sampleEndRndBar  { sampleEndRndNegSlider,    sampleEndRndPosSlider,    RRColors::trimCol };
+
+    // About window
     class AboutWindow : public juce::Component
     {
     public:
@@ -123,8 +96,8 @@ private:
                 "mapped to all white keys and played back randomly\n"
                 "based on selected playback algorithm type.\n\n"
                 "Use the knobs to control pitch, volume, etc.\n"
-                "Drag the blue/red arc dots to set negative and positive\n"
-                "(respectively) per-note randomization ranges.";
+                "Use the sliders below each knob to set per-note\n"
+                "randomization ranges.";
             g.drawFittedText(body, 20, 50, getWidth() - 40, 110,
                 juce::Justification::centredTop, 6);
         }
@@ -141,26 +114,6 @@ private:
     AboutWindow      aboutWindow;
     juce::TextButton aboutButton;
     SampleManagerPanel sampleManagerPanel;
-
-
-    // Overlay AFTER all sliders � accesses slider members via editor reference
-    struct RndArcOverlay : public juce::Component
-    {
-        NewProjectAudioProcessorEditor& editor;
-        explicit RndArcOverlay(NewProjectAudioProcessorEditor& e) : editor(e) {}
-
-        bool hitTest(int x, int y) override;
-        void mouseDown(const juce::MouseEvent& e) override;
-        void mouseDrag(const juce::MouseEvent& e) override;
-        void mouseUp(const juce::MouseEvent& e) override;
-
-        juce::Slider* activeSlider = nullptr;
-        float         dragStartY = 0.0f;
-        float         dragStartVal = 0.0f;
-
-        float dragStartX = 0.f;
-        bool  activeIsNeg = false;   // true = neg (blue) dot grabbed
-    } arcOverlay{ *this };
 
     // Helpers
     void setupSlider(juce::Slider& s);

@@ -402,7 +402,7 @@ Each loaded sample row has 4 small icon buttons to the right of the sample name:
 - [ ] Get rid of the current random parameter arc UI around applicable paramater knobs
 
 ### Step 5.1.2: Create Corresponding Random Parameter Amount at Location of Former Parameter Arc (IF this is possible using JUCE)
-- [ ] When user moves new parameter negative slider to the left, there will be colored outline that starts to appear on the outer parameter the paramter knob (where the arc used to be) that will represent the percentage of randomization for that particualr parameter that moves counter clockwise. Same will be the case when user moves positive randomize slider to the right but clockwise. Color of these parameter amounts will align with parameter's color scheme 
+- [ ] When user moves new parameter negative slider to the left, there will be colored outline that starts to appear on the outer parameter the paramter knob (where the arc used to be) that will represent the percentage of randomization for that particualr parameter that moves counter clockwise. Same will be the case when user moves positive randomize slider to the right but clockwise. Color of these parameter amounts will align with parameter's color scheme. Image reference is located at /ImageReferences/RandomSliderArcOutlinePosition.png
 
 ---
 
