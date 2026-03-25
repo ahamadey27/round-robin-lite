@@ -220,38 +220,38 @@ The following systems are fully implemented and working:
 
 ### Step 3.4: Micro-Fade at Trim Points
 
-- [ ] Only apply fade when the user has adjusted start above 0% or end below 100%
-- [ ] Fade length: fixed at approximately 2-3 ms worth of samples (calculate from sample rate: `fadeSamples = (int)(0.003 * sampleRate)`)
-- [ ] Fade curve: exponential/logarithmic with a sharp negative shape (approximately -90% curvature) — this means the fade rises very quickly then levels off, avoiding audible clicks while keeping the transient largely intact
-- [ ] Implementation approach: in `renderNextBlock()`, after reading each sample value, multiply by a fade gain:
+- [x] Only apply fade when the user has adjusted start above 0% or end below 100%
+- [x] Fade length: fixed at approximately 2-3 ms worth of samples (calculate from sample rate: `fadeSamples = (int)(0.003 * sampleRate)`)
+- [x] Fade curve: exponential/logarithmic with a sharp negative shape (approximately -90% curvature) — this means the fade rises very quickly then levels off, avoiding audible clicks while keeping the transient largely intact
+- [x] Implementation approach: in `renderNextBlock()`, after reading each sample value, multiply by a fade gain:
   - Fade-in: for samples from `playbackStartSample` to `playbackStartSample + fadeSamples`, apply gain ramp from 0.0 to 1.0 using the curve `gain = pow(linearPosition, 0.1)` (sharp rise)
   - Fade-out: for samples from `playbackEndSample - fadeSamples` to `playbackEndSample`, apply gain ramp from 1.0 to 0.0 using the curve `gain = pow(1.0 - linearPosition, 0.1)` (sharp drop)
-- [ ] If the trimmed region is shorter than 2x fadeSamples, reduce fade length to half the trimmed region to avoid overlap
+- [x] If the trimmed region is shorter than 2x fadeSamples, reduce fade length to half the trimmed region to avoid overlap
 
 ### Step 3.5: Add Start/End UI Section
 
-- [ ] Add "SAMPLE START/END" section label to the layout (bottom-right area, per mockup)
-- [ ] Add Start knob and End knob using existing RRKnobLAF style
-- [ ] Add Start and End randomization arc overlays (RndArcOverlay) — same blue/red arc system
-- [ ] Add hidden randomization sliders for neg/pos and their APVTS attachments
-- [ ] Display values as percentages with one decimal: "0.0 %" and "100.0 %"
-- [ ] Wire knobs to APVTS via SliderParameterAttachment
+- [x] Add "SAMPLE START/END" section label to the layout (bottom-right area, per mockup)
+- [x] Add Start knob and End knob using existing RRKnobLAF style
+- [x] Add Start and End randomization arc overlays (RndArcOverlay) — same blue/red arc system
+- [x] Add hidden randomization sliders for neg/pos and their APVTS attachments
+- [x] Display values as percentages with one decimal: "0.0 %" and "100.0 %"
+- [x] Wire knobs to APVTS via SliderParameterAttachment
 
 ### Step 3.6: State Persistence
 
-- [ ] Ensure sampleStart, sampleEnd, and their randomization values are included in `getStateInformation()` / `setStateInformation()` — this should happen automatically if they are registered in APVTS
-- [ ] Verify .rrpreset save/load includes the new parameters (existing preset format stores all APVTS values)
+- [x] Ensure sampleStart, sampleEnd, and their randomization values are included in `getStateInformation()` / `setStateInformation()` — this should happen automatically if they are registered in APVTS
+- [x] Verify .rrpreset save/load includes the new parameters (existing preset format stores all APVTS values)
 
 **Test:**
-- [ ] Default state: Start=0%, End=100% — sample plays fully, no fade applied
-- [ ] Set Start=25% — playback begins at quarter point, no click
-- [ ] Set End=50% — playback stops at halfway, no click
-- [ ] Set Start=25%, End=75% — middle 50% plays with micro-fades at both boundaries
-- [ ] Randomize Start with pos=0.3 — verify per-note variation in start point
-- [ ] Randomize End with neg=0.2 — verify per-note variation in end point
-- [ ] Extreme: Start=49%, End=51% — very short playback, no crash, fades overlap gracefully
-- [ ] Save/reload project — verify start/end values persist
-- [ ] Save/load .rrpreset — verify start/end values transfer
+- [x] Default state: Start=0%, End=100% — sample plays fully, no fade applied
+- [x] Set Start=25% — playback begins at quarter point, no click
+- [x] Set End=50% — playback stops at halfway, no click
+- [x] Set Start=25%, End=75% — middle 50% plays with micro-fades at both boundaries
+- [x] Randomize Start with pos=0.3 — verify per-note variation in start point
+- [x] Randomize End with neg=0.2 — verify per-note variation in end point
+- [x] Extreme: Start=49%, End=51% — very short playback, no crash, fades overlap gracefully
+- [x] Save/reload project — verify start/end values persist
+- [x] Save/load .rrpreset — verify start/end values transfer
 
 ---
 

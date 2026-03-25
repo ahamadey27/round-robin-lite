@@ -693,6 +693,7 @@ endif()
 # all_module_files at /Users/alex/Documents/JUCE/extras/Build/CMake/JUCEModuleSupport.cmake:220 (file)
 # all_module_files at /Users/alex/Documents/JUCE/extras/Build/CMake/JUCEModuleSupport.cmake:220 (file)
 # all_module_files at /Users/alex/Documents/JUCE/extras/Build/CMake/JUCEModuleSupport.cmake:220 (file)
+# all_module_files at /Users/alex/Documents/JUCE/extras/Build/CMake/JUCEModuleSupport.cmake:220 (file)
 # all_module_files at /Users/alex/Documents/JUCE/extras/Build/CMake/JUCEModuleSupport.cmake:497 (file)
 file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false RELATIVE "/Users/alex/Documents/JUCE/modules" "/Users/alex/Documents/JUCE/modules/juce_audio_plugin_client/*")
 set(OLD_GLOB

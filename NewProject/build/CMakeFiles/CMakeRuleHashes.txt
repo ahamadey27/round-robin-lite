@@ -1,5 +1,0 @@
-# Hashes of file build rules.
-38d67bd8085a1b80a2c4e5c36934662d RoundRobinLite_artefacts/JuceLibraryCode/JuceHeader.h
-e29d06bd547d5ee72da5a0a346254d3b RoundRobinLite_artefacts/JuceLibraryCode/RoundRobinLite_AU/PkgInfo
-a46824dc11ff0f6eeebf4e159e4d7e59 RoundRobinLite_artefacts/JuceLibraryCode/RoundRobinLite_Standalone/PkgInfo
-5c03bf48cd6e33c301f70a77f3986610 RoundRobinLite_artefacts/JuceLibraryCode/RoundRobinLite_VST3/PkgInfo

@@ -9,6 +9,8 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
     panAttachment(p.apvts, ParameterIDs::pan, panSlider),
     toneLowAttachment(p.apvts, ParameterIDs::toneLow, toneLowSlider),
     toneHighAttachment(p.apvts, ParameterIDs::toneHigh, toneHighSlider),
+    sampleStartAttachment(p.apvts, ParameterIDs::sampleStart, sampleStartSlider),
+    sampleEndAttachment(p.apvts, ParameterIDs::sampleEnd, sampleEndSlider),
     // COMMENTED FOR LITE — ACTIVE IN PREMIUM
     //lowGainAttachment(p.apvts, ParameterIDs::lowGain, lowGainSlider),
     //lowFreqAttachment(p.apvts, ParameterIDs::lowFreq, lowFreqSlider),
@@ -32,6 +34,10 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
     toneLowRndPosAttachment(p.apvts, ParameterIDs::toneLowRndPos, toneLowRndPosSlider),
     toneHighRndNegAttachment(p.apvts, ParameterIDs::toneHighRndNeg, toneHighRndNegSlider),
     toneHighRndPosAttachment(p.apvts, ParameterIDs::toneHighRndPos, toneHighRndPosSlider),
+    sampleStartRndNegAttachment(p.apvts, ParameterIDs::sampleStartRndNeg, sampleStartRndNegSlider),
+    sampleStartRndPosAttachment(p.apvts, ParameterIDs::sampleStartRndPos, sampleStartRndPosSlider),
+    sampleEndRndNegAttachment(p.apvts, ParameterIDs::sampleEndRndNeg, sampleEndRndNegSlider),
+    sampleEndRndPosAttachment(p.apvts, ParameterIDs::sampleEndRndPos, sampleEndRndPosSlider),
     // COMMENTED FOR LITE — ACTIVE IN PREMIUM
     //lowGainRndNegAttachment(p.apvts, ParameterIDs::lowGainRndNeg, lowGainRndNegSlider),
     //lowGainRndPosAttachment(p.apvts, ParameterIDs::lowGainRndPos, lowGainRndPosSlider),
@@ -107,7 +113,8 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
 
     // Main parameter knobs — visible, on the editor
     for (auto* s : { &semitoneSlider, &fineTuneSlider, &volumeSlider, &panSlider,
-                     &toneLowSlider, &toneHighSlider
+                     &toneLowSlider, &toneHighSlider,
+                     &sampleStartSlider, &sampleEndSlider
                      // COMMENTED FOR LITE — ACTIVE IN PREMIUM
                      //,&lowGainSlider,  &lowFreqSlider,
                      //,&midGainSlider,  &midFreqSlider,
@@ -123,7 +130,9 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
                      &volumeRndNegSlider,    &volumeRndPosSlider,
                      &panRndNegSlider,       &panRndPosSlider,
                      &toneLowRndNegSlider,   &toneLowRndPosSlider,
-                     &toneHighRndNegSlider,  &toneHighRndPosSlider
+                     &toneHighRndNegSlider,  &toneHighRndPosSlider,
+                     &sampleStartRndNegSlider, &sampleStartRndPosSlider,
+                     &sampleEndRndNegSlider,   &sampleEndRndPosSlider
                      // COMMENTED FOR LITE — ACTIVE IN PREMIUM
                      //,&lowGainRndNegSlider,   &lowGainRndPosSlider,
                      //,&lowFreqRndNegSlider,   &lowFreqRndPosSlider,
@@ -140,7 +149,8 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
 
     // Apply knob LAF to main parameter sliders
     for (auto* s : { &semitoneSlider, &fineTuneSlider, &volumeSlider, &panSlider,
-                     &toneLowSlider, &toneHighSlider
+                     &toneLowSlider, &toneHighSlider,
+                     &sampleStartSlider, &sampleEndSlider
                      // COMMENTED FOR LITE — ACTIVE IN PREMIUM
                      //,&lowGainSlider, &lowFreqSlider, &midGainSlider, &midFreqSlider,
                      //,&highGainSlider, &highFreqSlider,
@@ -158,6 +168,9 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
 
         for (auto* s : { &toneLowSlider, &toneHighSlider })
             s->setColour(juce::Slider::rotarySliderFillColourId, RRColors::toneCol);
+
+        for (auto* s : { &sampleStartSlider, &sampleEndSlider })
+            s->setColour(juce::Slider::rotarySliderFillColourId, RRColors::trimCol);
 
         // COMMENTED FOR LITE — ACTIVE IN PREMIUM
         //for (auto* s : { &envAttackSlider, &envDecaySlider })
@@ -189,6 +202,8 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
         setValueBoxColors(panSlider,             RRColors::ampCol);
         setValueBoxColors(toneLowSlider,         RRColors::toneCol);
         setValueBoxColors(toneHighSlider,        RRColors::toneCol);
+        setValueBoxColors(sampleStartSlider,     RRColors::trimCol);
+        setValueBoxColors(sampleEndSlider,       RRColors::trimCol);
         // COMMENTED FOR LITE — ACTIVE IN PREMIUM
         //setValueBoxColors(envAttackSlider,       RRColors::envCol);
         //setValueBoxColors(envDecaySlider,        RRColors::envCol);
@@ -202,7 +217,7 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
         //setValueBoxColors(highFreqSlider,        RRColors::eqHighCol);
 
 
-    setSize(700, 566);
+    setSize(700, 714);
     // Overlay must be added AFTER all knobs so it sits on top
     addAndMakeVisible(arcOverlay);
     resized();
@@ -214,7 +229,8 @@ static constexpr float kRndDotOffset = 0.18f;   // ~15 degrees
 NewProjectAudioProcessorEditor::~NewProjectAudioProcessorEditor()
 {
     for (auto* s : { &semitoneSlider, &fineTuneSlider, &volumeSlider, &panSlider,
-                     &toneLowSlider, &toneHighSlider
+                     &toneLowSlider, &toneHighSlider,
+                     &sampleStartSlider, &sampleEndSlider
                      // COMMENTED FOR LITE — ACTIVE IN PREMIUM
                      //,&lowGainSlider, &lowFreqSlider, &midGainSlider, &midFreqSlider,
                      //,&highGainSlider, &highFreqSlider,
@@ -226,6 +242,7 @@ NewProjectAudioProcessorEditor::~NewProjectAudioProcessorEditor()
     for (auto* s : { &semitoneRndNegSlider, &fineTuneRndNegSlider,
                      &volumeRndNegSlider,   &panRndNegSlider,
                      &toneLowRndNegSlider,  &toneHighRndNegSlider,
+                     &sampleStartRndNegSlider, &sampleEndRndNegSlider,
                      // COMMENTED FOR LITE — ACTIVE IN PREMIUM
                      //&lowGainRndNegSlider,  &lowFreqRndNegSlider,
                      //&midGainRndNegSlider,  &midFreqRndNegSlider,
@@ -234,7 +251,8 @@ NewProjectAudioProcessorEditor::~NewProjectAudioProcessorEditor()
                      //&envAtkRndNegSlider,   &envDecRndNegSlider,
                      &semitoneRndPosSlider, &fineTuneRndPosSlider,
                      &volumeRndPosSlider,   &panRndPosSlider,
-                     &toneLowRndPosSlider,  &toneHighRndPosSlider
+                     &toneLowRndPosSlider,  &toneHighRndPosSlider,
+                     &sampleStartRndPosSlider, &sampleEndRndPosSlider
                      // COMMENTED FOR LITE — ACTIVE IN PREMIUM
                      //,&lowGainRndPosSlider,  &lowFreqRndPosSlider,
                      //,&midGainRndPosSlider,  &midFreqRndPosSlider,
@@ -388,12 +406,15 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
     constexpr int toneH   = 140;
     constexpr int pitchY  = toneY + toneH + 8;
     constexpr int pitchH  = 140;
+    constexpr int trimY   = pitchY + pitchH + 8;
+    constexpr int trimH   = 140;
     constexpr int kxOff0  = (rpW - 2 * knobW - knobGap) / 2;  // 86
     constexpr int kxOff1  = kxOff0 + knobW + knobGap;          // 178
 
     const int secLabelBottomAmp   = ampY   + 7 + 9;
     const int secLabelBottomTone  = toneY  + 7 + 9;
     const int secLabelBottomPitch = pitchY + 7 + 9;
+    const int secLabelBottomTrim  = trimY  + 7 + 9;
 
     // ── Background ────────────────────────────────────────────────────────────
     g.fillAll(RRColors::background);
@@ -451,6 +472,12 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
     g.setFont(juce::Font(juce::FontOptions(9.0f)).boldened());
     g.drawText("PITCH", rpX + 8, pitchY + 7, rpW - 16, 10, juce::Justification::left);
 
+    // ── Right panel: Sample Start/End section ────────────────────────────────
+    drawSectionBox({ rpX, trimY, rpW, trimH });
+    g.setColour(RRColors::trimCol);
+    g.setFont(juce::Font(juce::FontOptions(9.0f)).boldened());
+    g.drawText("SAMPLE START/END", rpX + 8, trimY + 7, rpW - 16, 10, juce::Justification::left);
+
     // ── Knob labels ───────────────────────────────────────────────────────────
     g.setFont(juce::Font(juce::FontOptions(12.0f)));
     auto drawKnobLabel = [&](const juce::String& text, juce::Slider& s, int secLabelBottom)
@@ -467,6 +494,8 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
     drawKnobLabel("HIGH",      toneHighSlider,  secLabelBottomTone);
     drawKnobLabel("SEMITONE",  semitoneSlider,  secLabelBottomPitch);
     drawKnobLabel("FINE TUNE", fineTuneSlider,  secLabelBottomPitch);
+    drawKnobLabel("START",     sampleStartSlider, secLabelBottomTrim);
+    drawKnobLabel("END",       sampleEndSlider,   secLabelBottomTrim);
 
     // ── Footer ────────────────────────────────────────────────────────────────
     g.setColour(RRColors::sectionBorder.darker(0.5f));
@@ -587,6 +616,9 @@ void NewProjectAudioProcessorEditor::paintOverChildren(juce::Graphics& g)
     // TONE
     drawRndArcs(toneLowSlider,         toneLowRndNegSlider,   toneLowRndPosSlider,   RRColors::toneNeg,   RRColors::toneCol);
     drawRndArcs(toneHighSlider,        toneHighRndNegSlider,  toneHighRndPosSlider,  RRColors::toneNeg,   RRColors::toneCol);
+    // SAMPLE START/END
+    drawRndArcs(sampleStartSlider,     sampleStartRndNegSlider, sampleStartRndPosSlider, RRColors::trimNeg, RRColors::trimCol);
+    drawRndArcs(sampleEndSlider,       sampleEndRndNegSlider,   sampleEndRndPosSlider,   RRColors::trimNeg, RRColors::trimCol);
     // COMMENTED FOR LITE — ACTIVE IN PREMIUM
     // ENVELOPE
     //drawRndArcs(envAttackSlider,       envAtkRndNegSlider,    envAtkRndPosSlider,    RRColors::envNeg,    RRColors::envCol);
@@ -630,6 +662,8 @@ void NewProjectAudioProcessorEditor::resized()
     constexpr int toneH  = 140;
     constexpr int pitchY = toneY + toneH + 8;
     constexpr int pitchH = 140;
+    constexpr int trimY  = pitchY + pitchH + 8;
+    constexpr int trimH  = 140;
 
     // Knob X offsets within right panel (two knobs centered)
     constexpr int kxOff0 = (rpW - 2 * knobW - knobGap) / 2;  // 86
@@ -670,6 +704,15 @@ void NewProjectAudioProcessorEditor::resized()
         const int extraPad    = ((pitchY + pitchH) - knobDrawBot - tbH) / 2;
         semitoneSlider.setBounds(rpX + kxOff0, ky, knobW, knobH + extraPad);
         fineTuneSlider.setBounds(rpX + kxOff1, ky, knobW, knobH + extraPad);
+    }
+
+    // ── Sample Start/End knobs (Start, End) ──────────────────────────────────
+    {
+        const int ky          = trimY + (trimH - knobH - 12) / 2 + 16;
+        const int knobDrawBot = ky + knobH - tbH;
+        const int extraPad    = ((trimY + trimH) - knobDrawBot - tbH) / 2;
+        sampleStartSlider.setBounds(rpX + kxOff0, ky, knobW, knobH + extraPad);
+        sampleEndSlider  .setBounds(rpX + kxOff1, ky, knobW, knobH + extraPad);
     }
 
     // ── Arc overlay (full canvas) ─────────────────────────────────────────────
@@ -734,6 +777,8 @@ bool NewProjectAudioProcessorEditor::RndArcOverlay::hitTest(int x, int y)
         { &editor.panSlider,             &editor.panRndNegSlider,       &editor.panRndPosSlider       },
         { &editor.toneLowSlider,         &editor.toneLowRndNegSlider,   &editor.toneLowRndPosSlider   },
         { &editor.toneHighSlider,        &editor.toneHighRndNegSlider,  &editor.toneHighRndPosSlider  },
+        { &editor.sampleStartSlider,     &editor.sampleStartRndNegSlider, &editor.sampleStartRndPosSlider },
+        { &editor.sampleEndSlider,       &editor.sampleEndRndNegSlider,   &editor.sampleEndRndPosSlider   },
         // COMMENTED FOR LITE — ACTIVE IN PREMIUM
         //{ &editor.lowGainSlider,         &editor.lowGainRndNegSlider,   &editor.lowGainRndPosSlider   },
         //{ &editor.lowFreqSlider,         &editor.lowFreqRndNegSlider,   &editor.lowFreqRndPosSlider   },
@@ -770,6 +815,8 @@ void NewProjectAudioProcessorEditor::RndArcOverlay::mouseDown(const juce::MouseE
         { &editor.panSlider,             &editor.panRndNegSlider,       &editor.panRndPosSlider       },
         { &editor.toneLowSlider,         &editor.toneLowRndNegSlider,   &editor.toneLowRndPosSlider   },
         { &editor.toneHighSlider,        &editor.toneHighRndNegSlider,  &editor.toneHighRndPosSlider  },
+        { &editor.sampleStartSlider,     &editor.sampleStartRndNegSlider, &editor.sampleStartRndPosSlider },
+        { &editor.sampleEndSlider,       &editor.sampleEndRndNegSlider,   &editor.sampleEndRndPosSlider   },
         // COMMENTED FOR LITE — ACTIVE IN PREMIUM
         //{ &editor.lowGainSlider,         &editor.lowGainRndNegSlider,   &editor.lowGainRndPosSlider   },
         //{ &editor.lowFreqSlider,         &editor.lowFreqRndNegSlider,   &editor.lowFreqRndPosSlider   },

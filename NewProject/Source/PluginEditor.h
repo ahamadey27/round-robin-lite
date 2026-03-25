@@ -42,6 +42,7 @@ private:
     juce::Slider semitoneSlider, fineTuneSlider;
     juce::Slider volumeSlider, panSlider;
     juce::Slider toneLowSlider, toneHighSlider;
+    juce::Slider sampleStartSlider, sampleEndSlider;
     // COMMENTED FOR LITE — ACTIVE IN PREMIUM
     //juce::Slider lowGainSlider, lowFreqSlider;
     //juce::Slider midGainSlider, midFreqSlider;
@@ -52,6 +53,7 @@ private:
     SliderAttachment semitoneAttachment, fineTuneAttachment;
     SliderAttachment volumeAttachment, panAttachment;
     SliderAttachment toneLowAttachment, toneHighAttachment;
+    SliderAttachment sampleStartAttachment, sampleEndAttachment;
     // COMMENTED FOR LITE — ACTIVE IN PREMIUM
     //SliderAttachment lowGainAttachment, lowFreqAttachment;
     //SliderAttachment midGainAttachment, midFreqAttachment;
@@ -66,6 +68,8 @@ private:
     juce::Slider panRndNegSlider, panRndPosSlider;
     juce::Slider toneLowRndNegSlider, toneLowRndPosSlider;
     juce::Slider toneHighRndNegSlider, toneHighRndPosSlider;
+    juce::Slider sampleStartRndNegSlider, sampleStartRndPosSlider;
+    juce::Slider sampleEndRndNegSlider, sampleEndRndPosSlider;
     // COMMENTED FOR LITE — ACTIVE IN PREMIUM
     //juce::Slider lowGainRndNegSlider, lowGainRndPosSlider;
     //juce::Slider lowFreqRndNegSlider, lowFreqRndPosSlider;
@@ -84,6 +88,8 @@ private:
     SliderAttachment panRndNegAttachment, panRndPosAttachment;
     SliderAttachment toneLowRndNegAttachment, toneLowRndPosAttachment;
     SliderAttachment toneHighRndNegAttachment, toneHighRndPosAttachment;
+    SliderAttachment sampleStartRndNegAttachment, sampleStartRndPosAttachment;
+    SliderAttachment sampleEndRndNegAttachment, sampleEndRndPosAttachment;
     // COMMENTED FOR LITE — ACTIVE IN PREMIUM
     //SliderAttachment lowGainRndNegAttachment, lowGainRndPosAttachment;
     //SliderAttachment lowFreqRndNegAttachment, lowFreqRndPosAttachment;
