@@ -148,6 +148,10 @@ private:
     float randomizedTransientDecay = 0.0f;
     float randomizedToneLow = 0.0f;
     float randomizedToneHigh = 0.0f;
+    float randomizedSampleStart = 0.0f;
+    float randomizedSampleEnd = 100.0f;
+    int playbackStartSample = 0;
+    int playbackEndSample = 0;
 
     bool releaseTriggered = false;
 
@@ -189,6 +193,11 @@ private:
         std::atomic<float>* toneHigh = nullptr;
         std::atomic<float>* toneLowNeg = nullptr;   std::atomic<float>* toneLowPos = nullptr;
         std::atomic<float>* toneHighNeg = nullptr;  std::atomic<float>* toneHighPos = nullptr;
+
+        std::atomic<float>* sampleStart = nullptr;
+        std::atomic<float>* sampleEnd = nullptr;
+        std::atomic<float>* sampleStartNeg = nullptr;  std::atomic<float>* sampleStartPos = nullptr;
+        std::atomic<float>* sampleEndNeg = nullptr;    std::atomic<float>* sampleEndPos = nullptr;
     } rndPtrs;
 
     // Reference to randomization engine and parameters

@@ -235,12 +235,23 @@ namespace ParameterIDs
     const juce::String toneHighRndPos = "toneHighRndPos";
 
     //==============================================================================
+    // SAMPLE START/END
+
+    inline constexpr auto sampleStart = "sampleStart";
+    inline constexpr auto sampleEnd   = "sampleEnd";
+
+    const juce::String sampleStartRndNeg = "sampleStartRndNeg";
+    const juce::String sampleStartRndPos = "sampleStartRndPos";
+    const juce::String sampleEndRndNeg   = "sampleEndRndNeg";
+    const juce::String sampleEndRndPos   = "sampleEndRndPos";
+
+    //==============================================================================
     // PARAMETER COUNT (useful for validation)
 
     /**
      * Total number of parameters in the plugin.
      * Update this if you add/remove parameters!
      */
-    inline constexpr int totalParameters = 41;
+    inline constexpr int totalParameters = 47;
 
 } 

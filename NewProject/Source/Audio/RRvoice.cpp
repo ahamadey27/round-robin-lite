@@ -60,6 +60,13 @@ void RRVoice::setRandomizationReferences(RandomizationEngine* engine,
     rndPtrs.toneHighNeg = params->getRawParameterValue(ParameterIDs::toneHighRndNeg);
     rndPtrs.toneHighPos = params->getRawParameterValue(ParameterIDs::toneHighRndPos);
 
+    rndPtrs.sampleStart    = params->getRawParameterValue(ParameterIDs::sampleStart);
+    rndPtrs.sampleEnd      = params->getRawParameterValue(ParameterIDs::sampleEnd);
+    rndPtrs.sampleStartNeg = params->getRawParameterValue(ParameterIDs::sampleStartRndNeg);
+    rndPtrs.sampleStartPos = params->getRawParameterValue(ParameterIDs::sampleStartRndPos);
+    rndPtrs.sampleEndNeg   = params->getRawParameterValue(ParameterIDs::sampleEndRndNeg);
+    rndPtrs.sampleEndPos   = params->getRawParameterValue(ParameterIDs::sampleEndRndPos);
+
     // COMMENTED FOR LITE — ACTIVE IN PREMIUM
     //rndPtrs.atkNeg = params->getRawParameterValue(ParameterIDs::envAttackRndNeg);
     //rndPtrs.atkPos = params->getRawParameterValue(ParameterIDs::envAttackRndPos);
@@ -163,6 +170,24 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
             rndPtrs.toneHighPos->load() * 12.0f);
         randomizedToneHigh = juce::jlimit(-12.0f, 12.0f, randomizedToneHigh);
 
+        // Sample Start randomization
+        randomizedSampleStart = randEngine->generateRandomValue(
+            rndPtrs.sampleStart->load(),
+            rndPtrs.sampleStartNeg->load() * 50.0f,
+            rndPtrs.sampleStartPos->load() * 50.0f);
+        randomizedSampleStart = juce::jlimit(0.0f, 100.0f, randomizedSampleStart);
+
+        // Sample End randomization
+        randomizedSampleEnd = randEngine->generateRandomValue(
+            rndPtrs.sampleEnd->load(),
+            rndPtrs.sampleEndNeg->load() * 50.0f,
+            rndPtrs.sampleEndPos->load() * 50.0f);
+        randomizedSampleEnd = juce::jlimit(0.0f, 100.0f, randomizedSampleEnd);
+
+        // Enforce: start must be < end
+        if (randomizedSampleStart >= randomizedSampleEnd)
+            randomizedSampleStart = randomizedSampleEnd - 1.0f;
+
         // COMMENTED FOR LITE — ACTIVE IN PREMIUM
         // Envelope attack randomization
         //randomizedAttackMs = randEngine->generateRandomValue(
@@ -235,6 +260,8 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
         randomizedVolume = 0.75f;
         randomizedToneLow = 0.0f;
         randomizedToneHigh = 0.0f;
+        randomizedSampleStart = 0.0f;
+        randomizedSampleEnd = 100.0f;
         // COMMENTED FOR LITE — ACTIVE IN PREMIUM
         //randomizedLowGain = 0.0f;
         //randomizedLowFreq = 100.0f;
@@ -263,12 +290,18 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
     //==========================================================================
     // START PLAYBACK
 
-    sourceSamplePosition = 0.0;
-
     // cache audio data so buffer swaps can't corrupt playback
     const auto& buf = currentSound->getAudioBuffer();
     voiceBuffer.makeCopyOf(buf);           // deep copy — safe from buffer swaps
     cachedSampleLength = voiceBuffer.getNumSamples();
+
+    // Convert start/end percentages to sample indices
+    playbackStartSample = (int)(randomizedSampleStart / 100.0f * cachedSampleLength);
+    playbackEndSample   = (int)(randomizedSampleEnd   / 100.0f * cachedSampleLength);
+    playbackStartSample = juce::jlimit(0, cachedSampleLength - 1, playbackStartSample);
+    playbackEndSample   = juce::jlimit(playbackStartSample + 1, cachedSampleLength, playbackEndSample);
+
+    sourceSamplePosition = (double)playbackStartSample;
 
     // AD envelope: attack fade-in, decay fade-out to zero, no sustain
     envelopeParams.attack = juce::jlimit(0.001f, 5.0f, randomizedAttackMs / 1000.0f);

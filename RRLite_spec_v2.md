@@ -161,22 +161,22 @@ The following systems are fully implemented and working:
 
 ### Step 2.6: State Persistence
 
-- [ ] Tone parameters are in APVTS, so DAW project save/load is automatic
-- [ ] Verify .rrpreset save/load includes tone values
-- [ ] Old presets (pre-tone) will load with toneLow=0 and toneHigh=0 (no tonal change), which is correct default behavior
+- [x] Tone parameters are in APVTS, so DAW project save/load is automatic
+- [x] Verify .rrpreset save/load includes tone values
+- [x] Old presets (pre-tone) will load with toneLow=0 and toneHigh=0 (no tonal change), which is correct default behavior
 
 **Test:**
-- [ ] Default state: toneLow=0, toneHigh=0 — audio passes unchanged
-- [ ] Set toneLow=+6 dB — verify audible bass boost
-- [ ] Set toneLow=-6 dB — verify audible bass cut
-- [ ] Set toneHigh=+6 dB — verify audible brightness increase
-- [ ] Set toneHigh=-6 dB — verify audible brightness decrease
-- [ ] Both at +12 dB — verify no clipping artifacts or filter instability
-- [ ] Both at -12 dB — verify signal is very quiet but not silent
-- [ ] Set toneLow randomization: neg=0.5, pos=0.3 — verify per-note tonal variation
-- [ ] Rapid triggering — verify no filter clicks or coefficient glitches
-- [ ] Save/reload project — verify tone values persist
-- [ ] A/B test against the commented-out ThreeBandEQ low shelf at 250 Hz — verify similar character
+- [x] Default state: toneLow=0, toneHigh=0 — audio passes unchanged
+- [x] Set toneLow=+6 dB — verify audible bass boost
+- [x] Set toneLow=-6 dB — verify audible bass cut
+- [x] Set toneHigh=+6 dB — verify audible brightness increase
+- [x] Set toneHigh=-6 dB — verify audible brightness decrease
+- [x] Both at +12 dB — verify no clipping artifacts or filter instability
+- [x] Both at -12 dB — verify signal is very quiet but not silent
+- [x] Set toneLow randomization: neg=0.5, pos=0.3 — verify per-note tonal variation
+- [x] Rapid triggering — verify no filter clicks or coefficient glitches
+- [x] Save/reload project — verify tone values persist
+- [x] A/B test against the commented-out ThreeBandEQ low shelf at 250 Hz — verify similar character
 
 ---
 
@@ -186,23 +186,23 @@ The following systems are fully implemented and working:
 
 ### Step 3.1: Register Sample Start/End Parameters
 
-- [ ] Add parameter IDs to ParametersIDs.h:
+- [x] Add parameter IDs to ParametersIDs.h:
   - `sampleStart` (float, 0.0 to 100.0, default 0.0, displayed as "%" )
   - `sampleEnd` (float, 0.0 to 100.0, default 100.0, displayed as "%")
   - `sampleStartRndNeg`, `sampleStartRndPos` (float, 0.0 to 1.0, default 0.0)
   - `sampleEndRndNeg`, `sampleEndRndPos` (float, 0.0 to 1.0, default 0.0)
-- [ ] Register all 6 parameters in `createParameterLayout()`
-- [ ] Update `totalParameters` count in ParametersIDs.h
+- [x] Register all 6 parameters in `createParameterLayout()`
+- [x] Update `totalParameters` count in ParametersIDs.h
 
 ### Step 3.2: Implement Start/End in Voice Playback
 
-- [ ] In RRVoice.h, add member variables:
+- [x] In RRVoice.h, add member variables:
   - `float randomizedSampleStart = 0.0f;` (percentage)
   - `float randomizedSampleEnd = 100.0f;` (percentage)
   - `int playbackStartSample = 0;` (computed sample index)
   - `int playbackEndSample = 0;` (computed sample index)
-- [ ] In RRVoice.cpp `setRandomizationReferences()`, cache pointers for all 6 sample start/end parameters
-- [ ] In RRVoice.cpp `startNote()`:
+- [x] In RRVoice.cpp `setRandomizationReferences()`, cache pointers for all 6 sample start/end parameters
+- [x] In RRVoice.cpp `startNote()`:
   - Generate randomized sampleStart and sampleEnd values using RandomizationEngine
   - Scale randomization range: neg/pos values of 0-1 map to 0-50 percentage points offset
   - Clamp: randomized start must be >= 0%, randomized end must be <= 100%
