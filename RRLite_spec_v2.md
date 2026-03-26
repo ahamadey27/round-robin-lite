@@ -412,10 +412,10 @@ Each loaded sample row has 4 small icon buttons to the right of the sample name:
 
 ### Step 6.1: Define the Random Algorithm Parameter
 
-- [ ] Add parameter ID to ParametersIDs.h: `randomAlgorithm` (int, 0 to 17, default 0)
-- [ ] Register in `createParameterLayout()` as an integer parameter with 18 steps
-- [ ] Position 0 = no additional randomization (knob adds nothing)
-- [ ] Positions 1-17 = progressively increasing randomization amounts
+- [x] Add parameter ID to ParametersIDs.h: `randomAlgorithm` (int, 0 to 17, default 0)
+- [x] Register in `createParameterLayout()` as an integer parameter with 18 steps
+- [x] Position 0 = no additional randomization (knob adds nothing)
+- [x] Positions 1-17 = progressively increasing randomization amounts
 
 ### Step 6.2: Design the Randomization Scaling Table
 
@@ -423,7 +423,7 @@ Each tick position defines an additive offset applied to each parameter's random
 
 **Scaling philosophy:** No scaling philosophy now. Please follow custom settings below 
 
-**Tick-to-randomParameter mapping:**
+- [x] Tick-to-randomParameter mapping:
 - Tick 0: (off)
 - Tick 1: volumeRndNeg = 0.0600 / volumeRndPos = 0.0600 / fineTuneRndNeg = 8.0000 / fineTuneRndPos = 8.0000
 - Tick 2: volumeRndNeg = 0.1500 / volumeRndPos = 0.1500 / fineTuneRndNeg = 14.0000 / fineTuneRndPos = 14.0000

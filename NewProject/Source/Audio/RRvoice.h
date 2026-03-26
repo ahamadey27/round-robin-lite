@@ -12,6 +12,7 @@
 #include "RRSound.h"
 
 #include "../DSP/RandomizationEngine.h"
+#include "../DSP/RandomAlgorithmTable.h"
 #include "../Parameters/ParametersIDs.h"
 //==============================================================================
 /**
@@ -199,6 +200,8 @@ private:
         std::atomic<float>* sampleEnd = nullptr;
         std::atomic<float>* sampleStartNeg = nullptr;  std::atomic<float>* sampleStartPos = nullptr;
         std::atomic<float>* sampleEndNeg = nullptr;    std::atomic<float>* sampleEndPos = nullptr;
+
+        std::atomic<float>* randomAlgorithm = nullptr;
     } rndPtrs;
 
     // Reference to randomization engine and parameters

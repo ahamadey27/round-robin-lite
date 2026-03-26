@@ -386,6 +386,7 @@
 		F0248D59EA0D4A41AFFB141E /* juce_audio_plugin_client_AAX_utils.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = juce_audio_plugin_client_AAX_utils.cpp; path = /Users/alex/Documents/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX_utils.cpp; sourceTree = "<absolute>"; };
 		F08E2BD31DDE4B84ABE8FF29 /* RandomizationParams.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = RandomizationParams.h; path = Source/Parameters/RandomizationParams.h; sourceTree = SOURCE_ROOT; };
 		F0D9B2342DFC463E9B16DFF8 /* juce_audio_plugin_client_Unity.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = juce_audio_plugin_client_Unity.cpp; path = /Users/alex/Documents/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_Unity.cpp; sourceTree = "<absolute>"; };
+		FAFFABAA2F75A03D0078775C /* RRLite_spec_v2.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = RRLite_spec_v2.md; path = ../RRLite_spec_v2.md; sourceTree = SOURCE_ROOT; };
 		FCB089C28D764A2691F4D538 /* juce_audio_plugin_client_LV2.mm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = juce_audio_plugin_client_LV2.mm; path = /Users/alex/Documents/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_LV2.mm; sourceTree = "<absolute>"; };
 		FCE03562CC2D47C19ADEC1D8 /* CMakeLists.txt */ = {isa = PBXFileReference; explicitFileType = sourcecode.text; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = SOURCE_ROOT; };
 		FF9CB97645084302BABF8FEB /* PkgInfo.rule */ = {isa = PBXFileReference; explicitFileType = default; fileEncoding = 4; lastKnownFileType = file; name = PkgInfo.rule; path = build/RoundRobinLite_artefacts/JuceLibraryCode/RoundRobinLite_AU/PkgInfo.rule; sourceTree = SOURCE_ROOT; };
@@ -451,6 +452,7 @@
 				76FD080814104FF885D77852 /* Products */,
 				7E1B6A0C1C1645B1918A1EB4 /* Frameworks */,
 				3D3E691C27EA432E984FE93E /* Resources */,
+				FAFFABAA2F75A03D0078775C /* RRLite_spec_v2.md */,
 			);
 			sourceTree = "<group>";
 		};

@@ -67,6 +67,8 @@ void RRVoice::setRandomizationReferences(RandomizationEngine* engine,
     rndPtrs.sampleEndNeg   = params->getRawParameterValue(ParameterIDs::sampleEndRndNeg);
     rndPtrs.sampleEndPos   = params->getRawParameterValue(ParameterIDs::sampleEndRndPos);
 
+    rndPtrs.randomAlgorithm = params->getRawParameterValue(ParameterIDs::randomAlgorithm);
+
     // COMMENTED FOR LITE — ACTIVE IN PREMIUM
     //rndPtrs.atkNeg = params->getRawParameterValue(ParameterIDs::envAttackRndNeg);
     //rndPtrs.atkPos = params->getRawParameterValue(ParameterIDs::envAttackRndPos);
@@ -254,6 +256,86 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
         //    rndPtrs.transDecNeg->load(),
         //    rndPtrs.transDecPos->load());
         //randomizedTransientDecay = juce::jlimit(-127.0f, 127.0f, randomizedTransientDecay);
+
+        //======================================================================
+        // RANDOM ALGORITHM — additive offset layer on top of user randomization
+        int algoTick = (int)rndPtrs.randomAlgorithm->load();
+        algoTick = juce::jlimit(0, kNumAlgorithmTicks - 1, algoTick);
+
+        if (algoTick > 0)
+        {
+            const auto& t = randomAlgorithmTable[(size_t)algoTick];
+
+            // Volume (algorithm offsets are in the same 0-1 scale as the rnd sliders,
+            // so we scale to dB the same way: * 24)
+            if (t.volumeRndNeg > 0.0f || t.volumeRndPos > 0.0f)
+            {
+                float currentdB = juce::Decibels::gainToDecibels(randomizedVolume, -60.0f);
+                float algoVolOffset = randEngine->generateRandomValue(0.0f,
+                    t.volumeRndNeg * 24.0f, t.volumeRndPos * 24.0f);
+                currentdB += algoVolOffset;
+                currentdB = juce::jlimit(-60.0f, 12.0f, currentdB);
+                randomizedVolume = juce::Decibels::decibelsToGain(currentdB);
+            }
+
+            // Semitone
+            if (t.semitoneRndNeg > 0.0f || t.semitoneRndPos > 0.0f)
+            {
+                float algoSemiOffset = randEngine->generateRandomValue(0.0f,
+                    t.semitoneRndNeg, t.semitoneRndPos);
+                randomizedSemitones += algoSemiOffset;
+                randomizedSemitones = juce::jlimit(-12.0f, 12.0f, randomizedSemitones);
+            }
+
+            // Fine Tune
+            if (t.fineTuneRndNeg > 0.0f || t.fineTuneRndPos > 0.0f)
+            {
+                float algoFineOffset = randEngine->generateRandomValue(0.0f,
+                    t.fineTuneRndNeg, t.fineTuneRndPos);
+                randomizedCents += algoFineOffset;
+                randomizedCents = juce::jlimit(-100.0f, 100.0f, randomizedCents);
+            }
+
+            // Tone High (offsets are 0-1 scale, scale to ±12dB same as user rnd)
+            if (t.toneHighRndNeg > 0.0f || t.toneHighRndPos > 0.0f)
+            {
+                float algoToneHighOffset = randEngine->generateRandomValue(0.0f,
+                    t.toneHighRndNeg * 12.0f, t.toneHighRndPos * 12.0f);
+                randomizedToneHigh += algoToneHighOffset;
+                randomizedToneHigh = juce::jlimit(-12.0f, 12.0f, randomizedToneHigh);
+            }
+
+            // Tone Low (same scaling as Tone High)
+            if (t.toneLowRndNeg > 0.0f || t.toneLowRndPos > 0.0f)
+            {
+                float algoToneLowOffset = randEngine->generateRandomValue(0.0f,
+                    t.toneLowRndNeg * 12.0f, t.toneLowRndPos * 12.0f);
+                randomizedToneLow += algoToneLowOffset;
+                randomizedToneLow = juce::jlimit(-12.0f, 12.0f, randomizedToneLow);
+            }
+
+            // Sample Start (offset is 0-1 scale, scale to % same as user rnd: * 50)
+            if (t.sampleStartRndPos > 0.0f)
+            {
+                float algoStartOffset = randEngine->generateRandomValue(0.0f,
+                    0.0f, t.sampleStartRndPos * 50.0f);
+                randomizedSampleStart += algoStartOffset;
+                randomizedSampleStart = juce::jlimit(0.0f, 100.0f, randomizedSampleStart);
+            }
+
+            // Pan
+            if (t.panRndNeg > 0.0f || t.panRndPos > 0.0f)
+            {
+                float algoPanOffset = randEngine->generateRandomValue(0.0f,
+                    t.panRndNeg, t.panRndPos);
+                randomizedPan += algoPanOffset;
+                randomizedPan = juce::jlimit(-1.0f, 1.0f, randomizedPan);
+            }
+
+            // Re-enforce start < end after algorithm offset
+            if (randomizedSampleStart >= randomizedSampleEnd)
+                randomizedSampleStart = randomizedSampleEnd - 1.0f;
+        }
     }
     else
     {
