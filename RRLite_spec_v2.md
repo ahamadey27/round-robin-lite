@@ -457,13 +457,13 @@ Each tick position defines an additive offset applied to each parameter's random
 
 ### Step 6.4: Add Random Algorithm Knob to UI
 
-- [ ] Create a larger knob component for the Random Algorithm (approximately 1.5-2x the size of standard parameter knobs per the mockup)
-- [ ] Position: center of the plugin, to the right of the Sample Manager panel, above the Pitch section
-- [ ] Label: "Random Algorithm" section title above the knob
-- [ ] The knob should snap to 18 discrete positions (use `setNumDecimalPlacesToDisplay(0)` and integer slider range)
-- [ ] Visual: 18 tick marks around the knob to indicate discrete positions
-- [ ] Use existing RRKnobLAF but scaled up, or create a variant for the larger knob
-- [ ] No randomization arc on this knob (it IS the randomization control)
+- [x] Create a larger knob component for the Random Algorithm (approximately 1.5-2x the size of standard parameter knobs per the mockup)
+- [x] Position: center of the plugin, to the right of the Sample Manager panel, above the Pitch section
+- [x] Label: "Random Algorithm" section title above the knob
+- [x] The knob should snap to 18 discrete positions (use `setNumDecimalPlacesToDisplay(0)` and integer slider range)
+- [x] Visual: 18 tick marks around the knob to indicate discrete positions
+- [x] Use existing RRKnobLAF but scaled up, or create a variant for the larger knob
+- [x] No randomization arc on this knob (it IS the randomization control)
 
 ### Step 6.5: State Persistence
 
