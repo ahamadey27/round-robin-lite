@@ -27,13 +27,15 @@ No automated tests exist. Test manually via JUCE AudioPluginHost or any DAW.
 Standard JUCE Synthesiser pattern:
 
 - **PluginProcessor** (`Source/PluginProcessor.h/cpp`) — Main audio engine. Owns the `juce::Synthesiser`, `AudioProcessorValueTreeState` (APVTS), DSP processors, `SampleSlot[20]` array, and `SampleLoader`. `processBlock()` renders audio and applies the DSP chain.
-- **PluginEditor** (`Source/PluginEditor.h/cpp`) — GUI. Custom Look-and-Feel classes for knobs/sliders. 700×566px canvas.
+- **PluginEditor** (`Source/PluginEditor.h/cpp`) — GUI. Custom Look-and-Feel classes for knobs/sliders. 700×714px canvas.
 - **RRVoice** (`Source/Audio/RRvoice.h/cpp`) — `SynthesiserVoice` subclass. Handles sample playback, pitch shifting, ADSR envelope, and per-note randomization.
 - **RRSound** (`Source/Audio/RRSound.h/cpp`) — `SynthesiserSound` subclass. Holds one audio buffer per sample.
 - **MidiMapper** (`Source/Audio/MidiMapper.h`) — Static utility mapping 10 key pairs to MIDI notes. Root note = C1 (MIDI 36).
 - **SampleSlot/SampleLoader** (`Source/Data/`) — Sample loading with stereo-to-mono conversion and resampling.
 - **RandomizationEngine** (`Source/DSP/RandomizationEngine.h/cpp`) — Asymmetric per-note randomization (separate negative/positive ranges).
-- **ParametersIDs** (`Source/Parameters/ParametersIDs.h`) — All 41 parameter ID string constants.
+- **ParametersIDs** (`Source/Parameters/ParametersIDs.h`) — All 47 parameter ID string constants.
+- **SampleManagerPanel** (`Source/UI/SampleManagerPanel.h/cpp`) — Left panel component with sample list, load/delete/replace/audition/reorder, playback toggle.
+- **DualThumbRndSlider** (`Source/UI/DualThumbRndSlider.h`) — Header-only dual-thumb horizontal slider for neg/pos randomization. Reads/writes hidden APVTS sliders.
 
 ### DSP Chain (`Source/DSP/`)
 
@@ -64,14 +66,21 @@ Follow this sequence across files — each step builds on the previous:
 5. **RRVoice.cpp `startNote()`** — Call `randEngine->generateRandomValue(base, neg, pos)` and clamp. Rnd sliders are 0–1, scale them to the actual range (e.g., `* 12.0f` for ±12dB). Add defaults in the `else` branch.
 6. **PluginProcessor.cpp `processBlock()`** — Read from APVTS, override with voice getter when active.
 7. **PluginEditor.h** — Declare slider, attachment, rnd sliders, rnd attachments.
-8. **PluginEditor.cpp** — Constructor init list (attachments), `setupKnob`/`setupSlider` loops, LAF + color assignment, destructor cleanup, `paint()` section box + label, `paintOverChildren()` arc overlay, `resized()` positioning, `hitTest()`/`mouseDown()` trios.
+8. **PluginEditor.cpp** — Constructor init list (attachments), `setupKnob`/`setupSlider` loops, LAF + color assignment, destructor cleanup, `paint()` section box + label, `paintOverChildren()` arc outline, `resized()` positioning. Add a `DualThumbRndSlider` member in the header initialized with the neg/pos sliders and section color.
 
 Premium-only features use `// COMMENTED FOR LITE — ACTIVE IN PREMIUM` convention.
 
 ## Current State
 
-Phase 1 (UI simplification) complete. Phase 2 steps 2.1–2.5 complete. Step 2.6 (verification/testing) is next. EQ, TransientShaper, and Envelope controls are hidden/commented out in the Lite version but code remains for the Pro version. See `RRLite_spec_v2.md` for the full 5-phase roadmap.
+Phases 1–5 complete, including Phase 5.1 (randomization UI redesign). Phase 6 (Random Algorithm Knob) is next. EQ, TransientShaper, and Envelope controls are hidden/commented out in the Lite version but code remains for the Pro version. See `RRLite_spec_v2.md` for the full roadmap.
 
 ## Layout
 
-The right panel has three stacked sections (Amplitude → Tone → Pitch) with 8px gaps. Left panel is a Sample Manager placeholder. The `paint()` and `resized()` layout constants must stay in sync — they are duplicated in both methods.
+Right panel has four stacked sections (Amplitude → Tone → Pitch → Sample Start/End) with 8px gaps, each 140px tall. Left panel is the SampleManagerPanel. The `paint()` and `resized()` layout constants must stay in sync — they are duplicated in both methods. Each section layout: section title label → knob name label → centered knob (with value text box) → DualThumbRndSlider at bottom.
+
+## Randomization UI
+
+The old arc-dot overlay system was replaced in Phase 5.1 with:
+- **DualThumbRndSlider** — horizontal bar below each knob with two thumbs (neg left, pos right), same section color, 4px center gap at 0%
+- **Thin arc outlines** — drawn in `paintOverChildren()`, 2px stroke at 70% alpha around knob outer ring, CCW for neg / CW for pos
+- Hidden APVTS sliders still hold the values — the DualThumbRndSlider reads/writes them directly

@@ -396,13 +396,13 @@ Each loaded sample row has 4 small icon buttons to the right of the sample name:
 **Goal:** The current UI of the neagtive/positive paramater arcs with the white dots are becoming a UX issue. The fluuidt of changing these paramaters in a circular motion is getting frusterating so would like to redesign the UI and keep all logic the same
 
 ### Step 5.1.1: Create and Place New Randomize UI Slider 
-- [ ] Following a similar aestetic to the current desgign, create a new horizontel slider where in the center two parameter markers will be joined. When user moves the left one to the left, the negative randomization of the parameter's value will increase and when user moves the right paramater marker to the right, the positive randomization will increase. Image refernces for slider configuration are located at /ImageReferences/RanomSlider 0%.png and /ImageReferences/RanomSlider 100%.png. 
-- [ ] Color of dual slider markers will be consistent with that parameter's color scheme 
-- [ ] New random slider knobs will be located between the bottom of the parameter knob and the top of the parameter value window. Image reference for slider position is located at /ImageReferences/RandomSliderPostion.png
-- [ ] Get rid of the current random parameter arc UI around applicable paramater knobs
+- [x] Following a similar aestetic to the current desgign, create a new horizontel slider where in the center two parameter markers will be joined. When user moves the left one to the left, the negative randomization of the parameter's value will increase and when user moves the right paramater marker to the right, the positive randomization will increase. Image refernces for slider configuration are located at /ImageReferences/RanomSlider 0%.png and /ImageReferences/RanomSlider 100%.png. 
+- [x] Color of dual slider markers will be consistent with that parameter's color scheme 
+- [x] New random slider knobs will be located between the bottom of the parameter knob and the top of the parameter value window. Image reference for slider position is located at /ImageReferences/RandomSliderPostion.png
+- [x] Get rid of the current random parameter arc UI around applicable paramater knobs
 
 ### Step 5.1.2: Create Corresponding Random Parameter Amount at Location of Former Parameter Arc (IF this is possible using JUCE)
-- [ ] When user moves new parameter negative slider to the left, there will be colored outline that starts to appear on the outer parameter the paramter knob (where the arc used to be) that will represent the percentage of randomization for that particualr parameter that moves counter clockwise. Same will be the case when user moves positive randomize slider to the right but clockwise. Color of these parameter amounts will align with parameter's color scheme. Image reference is located at /ImageReferences/RandomSliderArcOutlinePosition.png
+- [x] When user moves new parameter negative slider to the left, there will be colored outline that starts to appear on the outer parameter the paramter knob (where the arc used to be) that will represent the percentage of randomization for that particualr parameter that moves counter clockwise. Same will be the case when user moves positive randomize slider to the right but clockwise. Color of these parameter amounts will align with parameter's color scheme. Image reference is located at /ImageReferences/RandomSliderArcOutlinePosition.png
 
 ---
 
@@ -453,14 +453,7 @@ Each tick position defines an additive offset applied to each parameter's random
 - Tick 16: 0.94
 - Tick 17: 1.00 (full max)
 
-So at tick 9, the additional randomization per parameter would be:
-- Semitone: +/- 0.225 semitones
-- Fine Tune: +/- 11.25 cents
-- Volume: +/- 1.8 dB
-- Pan: +/- 0.0675
-- Tone Low: +/- 1.35 dB
-- Tone High: +/- 1.35 dB
-- Sample Start: +/- 0.9%
+
 
 ### Step 6.3: Implement Algorithm Offset Application
 

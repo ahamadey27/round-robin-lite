@@ -11,7 +11,8 @@
 #include "DSP/RandomizationEngine.h"
 
 //==============================================================================
-class NewProjectAudioProcessor : public juce::AudioProcessor
+class NewProjectAudioProcessor : public juce::AudioProcessor,
+                                  public juce::AudioProcessorValueTreeState::Listener
 {
 public:
     //==============================================================================
@@ -49,6 +50,9 @@ public:
     //==============================================================================
     void getStateInformation(juce::MemoryBlock& destData) override;
     void setStateInformation(const void* data, int sizeInBytes) override;
+
+    // DEBUG: Parameter change logging (remove before final build)
+    void parameterChanged(const juce::String& parameterID, float newValue) override;
 
     //==============================================================================
     // Public Data (accessed by PluginEditor)

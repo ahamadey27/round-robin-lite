@@ -59,10 +59,25 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
     DBG("Slots available: " + juce::String(NUM_SAMPLE_SLOTS));
     DBG("All slots empty on startup — load via UI");
     DBG("================================");
+
+    // DEBUG: Register parameter change listener (remove before final build)
+    for (auto* param : getParameters())
+        if (auto* p = dynamic_cast<juce::RangedAudioParameter*>(param))
+            apvts.addParameterListener(p->paramID, this);
 }
 
 NewProjectAudioProcessor::~NewProjectAudioProcessor()
 {
+    // DEBUG: Remove parameter listeners (remove before final build)
+    for (auto* param : getParameters())
+        if (auto* p = dynamic_cast<juce::RangedAudioParameter*>(param))
+            apvts.removeParameterListener(p->paramID, this);
+}
+
+// DEBUG: Log parameter changes to console (remove before final build)
+void NewProjectAudioProcessor::parameterChanged(const juce::String& parameterID, float newValue)
+{
+    DBG("[PARAM] " + parameterID + " = " + juce::String(newValue, 4));
 }
 
 //==============================================================================
