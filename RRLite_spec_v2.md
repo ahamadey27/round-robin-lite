@@ -421,37 +421,27 @@ Each loaded sample row has 4 small icon buttons to the right of the sample name:
 
 Each tick position defines an additive offset applied to each parameter's randomization range. These offsets are ADDED to whatever the user has manually set on the individual neg/pos randomization sliders. The values below represent the additional randomization offset at each parameter for each tick:
 
-**Scaling philosophy:** Start barely perceptible (tick 1), reach "obvious but musical" by tick 9, and "heavy but not chaotic" by tick 17. The curve is roughly exponential — more change between ticks 10-17 than between 1-9.
+**Scaling philosophy:** No scaling philosophy now. Please follow custom settings below 
 
-**Parameter groups and their max additional offset at tick 17:**
-- Semitone: max +/- 0.5 semitones (very subtle pitch humanization even at max)
-- Fine Tune: max +/- 25 cents
-- Volume: max +/- 4 dB
-- Pan: max +/- 0.15 (subtle stereo width variation)
-- Tone Low: max +/- 3 dB (light tonal variation)
-- Tone High: max +/- 3 dB (light tonal variation)
-- Sample Start: max +/- 2% (very light even at tick 17, prevents chopping off transients)
-- Sample End: not affected (to preserve intentional tail cuts)
-
-**Tick-to-multiplier mapping (as fraction of max):**
-- Tick 0: 0.00 (off)
-- Tick 1: 0.02
-- Tick 2: 0.04
-- Tick 3: 0.07
-- Tick 4: 0.11
-- Tick 5: 0.16
-- Tick 6: 0.22
-- Tick 7: 0.29
-- Tick 8: 0.37
-- Tick 9: 0.45 (mid-point: about half of max)
-- Tick 10: 0.53
-- Tick 11: 0.61
-- Tick 12: 0.69
-- Tick 13: 0.76
-- Tick 14: 0.82
-- Tick 15: 0.88
-- Tick 16: 0.94
-- Tick 17: 1.00 (full max)
+**Tick-to-randomParameter mapping:**
+- Tick 0: (off)
+- Tick 1: volumeRndNeg = 0.0600 / volumeRndPos = 0.0600 / fineTuneRndNeg = 8.0000 / fineTuneRndPos = 8.0000
+- Tick 2: volumeRndNeg = 0.1500 / volumeRndPos = 0.1500 / fineTuneRndNeg = 14.0000 / fineTuneRndPos = 14.0000
+- Tick 3: volumeRndNeg = 0.1500 / volumeRndPos = 0.1500 / fineTuneRndNeg = 14.0000 / fineTuneRndPos = 14.0000 / toneHighRndNeg = 0.1000 / toneHighRndPos = 0.1000
+- Tick 4: volumeRndNeg = 0.1500 / volumeRndPos = 0.1500 / fineTuneRndNeg = 14.0000 / fineTuneRndPos = 14.0000 / toneHighRndNeg = 0.1000 / toneHighRndPos = 0.1000 / toneLowRndNeg = 0.1000 / toneLowRndPos = 0.1000
+- Tick 5: volumeRndNeg = 0.2000 / volumeRndPos = 0.2000 / fineTuneRndNeg = 20.0000 / fineTuneRndPos = 20.0000 / toneHighRndNeg = 0.1000 / toneHighRndPos = 0.1000 / toneLowRndNeg = 0.1000 / toneLowRndPos = 0.1000
+- Tick 6: volumeRndNeg = 0.2000 / volumeRndPos = 0.2000 / fineTuneRndNeg = 20.0000 / fineTuneRndPos = 20.0000 / toneHighRndNeg = 0.2000 / toneHighRndPos = 0.2000 / toneLowRndNeg = 0.2000 / toneLowRndPos = 0.2000
+- Tick 7: volumeRndNeg = 0.2000 / volumeRndPos = 0.2000 / fineTuneRndNeg = 40.0000 / fineTuneRndPos = 40.0000 / toneHighRndNeg = 0.2500 / toneHighRndPos = 0.2500 / toneLowRndNeg = 0.2500 / toneLowRndPos = 0.2500
+- Tick 8: volumeRndNeg = 0.2500 / volumeRndPos = 0.2500 / fineTuneRndNeg = 45.0000 / fineTuneRndPos = 45.0000 / toneHighRndNeg = 0.3000 / toneHighRndPos = 0.3000 / toneLowRndNeg = 0.3000 / toneLowRndPos = 0.2000
+- Tick 9: volumeRndNeg = 0.3000 / volumeRndPos = 0.3000 / fineTuneRndNeg = 60.0000 / fineTuneRndPos = 60.0000 / toneHighRndNeg = 0.3000 / toneHighRndPos = 0.3000 / toneLowRndNeg = 0.3000 / toneLowRndPos = 0.3000
+- Tick 10: volumeRndNeg = 0.3000 / volumeRndPos = 0.3000 / fineTuneRndNeg = 100.0000 / fineTuneRndPos = 100.0000 / toneHighRndNeg = 0.3500 / toneHighRndPos = 0.3500 / toneLowRndNeg = 0.3500 / toneLowRndPos = 0.3500
+- Tick 11: volumeRndNeg = 0.3500 / volumeRndPos = 0.3500 / fineTuneRndNeg = 100.0000 / fineTuneRndPos = 100.0000 / toneHighRndNeg = 0.3800 / toneHighRndPos = 0.3800 / toneLowRndNeg = 0.3800 / toneLowRndPos = 0.3800 / sampleStartRndPos = 0.2000
+- Tick 12: volumeRndNeg = 0.3500 / volumeRndPos = 0.3500 / semitoneRndNeg = 2.0000 / semitoneRndPos = 2.0000 / fineTuneRndNeg = 10.0000 / fineTuneRndPos = 10.0000 / toneHighRndNeg = 0.3900 / toneHighRndPos = 0.3900 / toneLowRndNeg = 0.3900 / toneLowRndPos = 0.3900 
+- Tick 13: volumeRndNeg = 0.3500 / volumeRndPos = 0.3500 / semitoneRndNeg = 3.0000 / semitoneRndPos = 3.0000 / toneHighRndNeg = 0.4500 / toneHighRndPos = 0.4500 / toneLowRndNeg = 0.4500 / toneLowRndPos = 0.4500 
+- Tick 14: volumeRndNeg = 0.4000 / volumeRndPos = 0.4000 / semitoneRndNeg = 4.0000 / semitoneRndPos = 4.0000 / fineTuneRndNeg = 30.0000 / fineTuneRndPos = 30.0000 / toneHighRndNeg = 0.4000 / toneHighRndPos = 0.4000 / toneLowRndNeg = 0.5000 / toneLowRndPos = 0.5000 
+- Tick 15: volumeRndNeg = 0.4000 / volumeRndPos = 0.4000 / semitoneRndNeg = 4.0000 / semitoneRndPos = 4.0000 / fineTuneRndNeg = 40.0000 / fineTuneRndPos = 40.0000 /toneHighRndNeg = 0.4000 / toneHighRndPos = 0.4000 / toneLowRndNeg = 0.5000 / toneLowRndPos = 0.5000 / sampleStartRndPos = 0.1200
+- Tick 16: TvolumeRndNeg = 0.4000 / volumeRndPos = 0.4000 / semitoneRndNeg = 4.0000 / semitoneRndPos = 5.0000 / fineTuneRndNeg = 50.0000 / fineTuneRndPos = 45.0000 / toneHighRndNeg = 0.5000 / toneHighRndPos = 0.5000 / toneLowRndNeg = 0.5000 / toneLowRndPos = 0.5000 / sampleStartRndPos = 0.1200
+- Tick 17: volumeRndNeg = 0.4500 / volumeRndPos = 0.4500 / semitoneRndNeg = 4.0000 / semitoneRndPos = 6.0000 / toneHighRndNeg = 0.5500 / toneHighRndPos = 0.5500 / toneLowRndNeg = 0.5500 / toneLowRndPos = 0.5500 / sampleStartRndPos = 0.1200 / panRndNeg = 0.1500 / panRndPos = 0.1500
 
 
 
