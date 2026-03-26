@@ -712,6 +712,14 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
 
 
     //==============================================================================
+    // RANDOM ALGORITHM
+
+    layout.add(std::make_unique<juce::AudioParameterInt>(
+        juce::ParameterID(ParameterIDs::randomAlgorithm, 1),
+        "Random Algorithm",
+        0, 17, 0));
+
+    //==============================================================================
     // PLAYBACK MODE -- Set true to select random
 
     layout.add(std::make_unique<juce::AudioParameterBool>(

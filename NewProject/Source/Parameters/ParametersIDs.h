@@ -246,12 +246,17 @@ namespace ParameterIDs
     const juce::String sampleEndRndPos   = "sampleEndRndPos";
 
     //==============================================================================
+    // RANDOM ALGORITHM
+
+    inline constexpr auto randomAlgorithm = "randomAlgorithm";
+
+    //==============================================================================
     // PARAMETER COUNT (useful for validation)
 
     /**
      * Total number of parameters in the plugin.
      * Update this if you add/remove parameters!
      */
-    inline constexpr int totalParameters = 47;
+    inline constexpr int totalParameters = 48;
 
 } 

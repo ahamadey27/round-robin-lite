@@ -68,6 +68,7 @@ set(SOURCE_DSP
     Source/DSP/TransientShaper.h
     Source/DSP/ToneControl.cpp
     Source/DSP/ToneControl.h
+    Source/DSP/RandomAlgorithmTable.h
 )
 
 set(SOURCE_PARAMETERS
