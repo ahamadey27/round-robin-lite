@@ -35,11 +35,13 @@ private:
     juce::Slider volumeSlider, panSlider;
     juce::Slider toneLowSlider, toneHighSlider;
     juce::Slider sampleStartSlider, sampleEndSlider;
+    juce::Slider randomAlgorithmSlider;
 
     SliderAttachment semitoneAttachment, fineTuneAttachment;
     SliderAttachment volumeAttachment, panAttachment;
     SliderAttachment toneLowAttachment, toneHighAttachment;
     SliderAttachment sampleStartAttachment, sampleEndAttachment;
+    SliderAttachment randomAlgorithmAttachment;
 
     // Hidden rnd sliders (APVTS-bound, values read by DualThumbRndSlider and arc outline)
     juce::Slider semitoneRndNegSlider, semitoneRndPosSlider;

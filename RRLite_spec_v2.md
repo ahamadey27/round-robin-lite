@@ -447,13 +447,13 @@ Each tick position defines an additive offset applied to each parameter's random
 
 ### Step 6.3: Implement Algorithm Offset Application
 
-- [ ] In RRVoice.cpp `startNote()`, after generating all randomized values from the user's manual randomization ranges, apply the Random Algorithm offset as an additional layer
-- [ ] Read the `randomAlgorithm` parameter value (0-17)
-- [ ] Look up the tick multiplier from the table
-- [ ] For each affected parameter, generate a second random offset within the algorithm's range and add it to the already-randomized value
-- [ ] The algorithm offset uses the same RandomizationEngine (uniform random within +/- range)
-- [ ] The algorithm always applies symmetrically (equal neg and pos range) — it does not respect the user's asymmetric neg/pos settings for its own contribution
-- [ ] Clamp final values to valid parameter ranges after applying both user randomization and algorithm offset
+- [x] In RRVoice.cpp `startNote()`, after generating all randomized values from the user's manual randomization ranges, apply the Random Algorithm offset as an additional layer
+- [x] Read the `randomAlgorithm` parameter value (0-17)
+- [x] Look up the tick multiplier from the table
+- [x] For each affected parameter, generate a second random offset within the algorithm's range and add it to the already-randomized value
+- [x] The algorithm offset uses the same RandomizationEngine (uniform random within +/- range)
+- [x] The algorithm always applies symmetrically (equal neg and pos range) — it does not respect the user's asymmetric neg/pos settings for its own contribution
+- [x] Clamp final values to valid parameter ranges after applying both user randomization and algorithm offset
 
 ### Step 6.4: Add Random Algorithm Knob to UI
 

@@ -22,6 +22,7 @@ namespace RRColors
     inline const juce::Colour eqHighCol { 0xffc89040 };
     inline const juce::Colour toneCol   { 0xff50a0c8 };
     inline const juce::Colour trimCol   { 0xffc8a060 };
+    inline const juce::Colour algoCol   { 0xff60c890 };
 
     // Rand arc neg colors (lighter version of each section)
     inline const juce::Colour pitchNeg  { 0xffe8b898 };

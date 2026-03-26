@@ -11,6 +11,7 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
     toneHighAttachment(p.apvts, ParameterIDs::toneHigh, toneHighSlider),
     sampleStartAttachment(p.apvts, ParameterIDs::sampleStart, sampleStartSlider),
     sampleEndAttachment(p.apvts, ParameterIDs::sampleEnd, sampleEndSlider),
+    randomAlgorithmAttachment(p.apvts, ParameterIDs::randomAlgorithm, randomAlgorithmSlider),
     // COMMENTED FOR LITE — ACTIVE IN PREMIUM
     //lowGainAttachment(p.apvts, ParameterIDs::lowGain, lowGainSlider),
     //lowFreqAttachment(p.apvts, ParameterIDs::lowFreq, lowFreqSlider),
@@ -142,6 +143,12 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
                      })
         setupKnob(*s);
 
+    // Random Algorithm knob — larger, integer snapping, no randomization arc
+    randomAlgorithmSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    randomAlgorithmSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, 16);
+    randomAlgorithmSlider.setNumDecimalPlacesToDisplay(0);
+    addAndMakeVisible(randomAlgorithmSlider);
+
     // Rnd sliders — hidden, APVTS-bound, values read by paintOverChildren
     for (auto* s : { &semitoneRndNegSlider,  &semitoneRndPosSlider,
                      &fineTuneRndNegSlider,  &fineTuneRndPosSlider,
@@ -190,6 +197,9 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
         for (auto* s : { &sampleStartSlider, &sampleEndSlider })
             s->setColour(juce::Slider::rotarySliderFillColourId, RRColors::trimCol);
 
+        randomAlgorithmSlider.setLookAndFeel(&knobLAF);
+        randomAlgorithmSlider.setColour(juce::Slider::rotarySliderFillColourId, RRColors::algoCol);
+
         // COMMENTED FOR LITE — ACTIVE IN PREMIUM
         //for (auto* s : { &envAttackSlider, &envDecaySlider })
         //    s->setColour(juce::Slider::rotarySliderFillColourId, RRColors::envCol);
@@ -222,6 +232,7 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
         setValueBoxColors(toneHighSlider,        RRColors::toneCol);
         setValueBoxColors(sampleStartSlider,     RRColors::trimCol);
         setValueBoxColors(sampleEndSlider,       RRColors::trimCol);
+        setValueBoxColors(randomAlgorithmSlider, RRColors::algoCol);
         // COMMENTED FOR LITE — ACTIVE IN PREMIUM
         //setValueBoxColors(envAttackSlider,       RRColors::envCol);
         //setValueBoxColors(envDecaySlider,        RRColors::envCol);
@@ -249,7 +260,8 @@ NewProjectAudioProcessorEditor::~NewProjectAudioProcessorEditor()
 {
     for (auto* s : { &semitoneSlider, &fineTuneSlider, &volumeSlider, &panSlider,
                      &toneLowSlider, &toneHighSlider,
-                     &sampleStartSlider, &sampleEndSlider })
+                     &sampleStartSlider, &sampleEndSlider,
+                     &randomAlgorithmSlider })
         s->setLookAndFeel(nullptr);
 }
 
@@ -472,10 +484,18 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
         g.drawRoundedRectangle(r.toFloat(), 5.0f, 1.0f);
     };
 
-    // ── Left panel: Sample Manager placeholder (Phase 3) ─────────────────────
+    // ── Left panel: Sample Manager ─────────────────────────────────────────────
+    constexpr int algoH   = 160;
     const int lpW = rpX - margin - 8;  // 336
-    const int lpH = pitchY + pitchH - ampY;  // total height of all right sections
-    drawSectionBox({ margin, ampY, lpW, lpH });
+    const int smH = trimY + trimH - ampY - algoH - 8;  // sample manager height
+    const int algoY = ampY + smH + 8;
+    drawSectionBox({ margin, ampY, lpW, smH });
+
+    // ── Left panel: Random Algorithm section ────────────────────────────────
+    drawSectionBox({ margin, algoY, lpW, algoH });
+    g.setColour(RRColors::algoCol);
+    g.setFont(juce::Font(juce::FontOptions(9.0f)).boldened());
+    g.drawText("RANDOM ALGORITHM", margin + 8, algoY + 7, lpW - 16, 10, juce::Justification::left);
 
     // ── Right panel: Amplitude section ───────────────────────────────────────
     drawSectionBox({ rpX, ampY, rpW, ampH });
@@ -643,11 +663,20 @@ void NewProjectAudioProcessorEditor::resized()
     loadPresetButton.setBounds(getWidth() - 144, 13, 80, 26);
     aboutButton.setBounds    (getWidth() -  56, 13, 26, 26);
 
-    // ── Left panel: Sample Manager ──────────────────────────────────────────
+    // ── Left panel: Sample Manager + Random Algorithm ──────────────────────
+    constexpr int algoH = 160;
     {
         const int lpW = rpX - margin - 8;
-        const int lpH = trimY + trimH - ampY;
-        sampleManagerPanel.setBounds(margin, ampY, lpW, lpH);
+        const int smH = trimY + trimH - ampY - algoH - 8;  // sample manager height
+        const int algoY = ampY + smH + 8;
+        sampleManagerPanel.setBounds(margin, ampY, lpW, smH);
+
+        // Random Algorithm knob — larger (100x116), centered in algo section
+        constexpr int algoKnobW = 100;
+        constexpr int algoKnobH = 116;  // 100 rotary + 16 text box
+        int algoKnobX = margin + (lpW - algoKnobW) / 2;
+        int algoKnobY = algoY + 22 + (algoH - 22 - algoKnobH) / 2;
+        randomAlgorithmSlider.setBounds(algoKnobX, algoKnobY, algoKnobW, algoKnobH);
     }
     // Load Samples + Playback Mode now inside SampleManagerPanel
 
