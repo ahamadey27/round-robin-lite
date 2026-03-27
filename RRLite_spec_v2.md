@@ -471,14 +471,14 @@ Each tick position defines an additive offset applied to each parameter's random
 - [ ] Verify it saves/loads with .rrpreset files
 
 **Test:**
-- [ ] Set Random Algorithm to tick 0 — verify no additional randomization beyond user's manual settings
-- [ ] Set to tick 1 — verify barely perceptible variation (A/B against tick 0 to hear difference)
-- [ ] Set to tick 9 — verify moderate, musical randomization across all parameters
-- [ ] Set to tick 17 — verify heavy but not chaotic randomization
-- [ ] Set user's manual Volume randomization to +3dB pos, then set Algorithm to tick 9 — verify the algorithm adds on top (total randomization exceeds +3dB)
-- [ ] Verify Tone Low/High randomization is light and musical even at tick 17
-- [ ] Verify Sample Start randomization is very light even at tick 17 (transients not destroyed)
-- [ ] Save/reload — verify tick position persists
+- [x] Set Random Algorithm to tick 0 — verify no additional randomization beyond user's manual settings
+- [x] Set to tick 1 — verify barely perceptible variation (A/B against tick 0 to hear difference)
+- [x] Set to tick 9 — verify moderate, musical randomization across all parameters
+- [x] Set to tick 17 — verify heavy but not chaotic randomization
+- [x] Set user's manual Volume randomization to +3dB pos, then set Algorithm to tick 9 — verify the algorithm adds on top (total randomization exceeds +3dB)
+- [x] Verify Tone Low/High randomization is light and musical even at tick 17
+- [x] Verify Sample Start randomization is very light even at tick 17 (transients not destroyed)
+- [x] Save/reload — verify tick position persists
 
 ---
 
@@ -549,6 +549,19 @@ Each tick position defines an additive offset applied to each parameter's random
 - [ ] Audition sample 07 via Play button -> verify it plays but does not advance round-robin
 - [ ] Switch to Random mode -> Trigger 20 times -> verify no immediate repeats (Fisher-Yates)
 - [ ] Save preset -> close plugin -> load preset -> verify identical state
+
+---
+
+## Phase 8: Ongoing Edits and Revisions
+
+**Goal:** Ongoing issues, bugs and revisions to work on
+
+### Step 8.1: Code Revisions and Additions
+- [ ] We need to change the sample start logic so the settings are relative to the longest sample in the sample pool. For short samples, for example, when sampleStart = 48.5000, the sample becomes in audible as the start point is beyond the actualy length of the sample. Can you and is it possible to adjust the samples start amount so that it is the length of the longest samples in the pool? 
+
+### Step 8.2: Bugs
+
+### Step 8.3: UI 
 
 ---
 

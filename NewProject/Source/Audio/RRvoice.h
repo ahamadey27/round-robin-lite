@@ -32,6 +32,7 @@ public:
     ~RRVoice() override;
 
     void updateGlobalParameters(float semitones, float cents, float attackMs, float decayMs);
+    void setMaxPoolSampleLength(int length) { maxPoolSampleLength = length; }
 
     //==============================================================================
     // JUCE SynthesiserVoice Required Methods
@@ -154,6 +155,7 @@ private:
     int playbackStartSample = 0;
     int playbackEndSample = 0;
     int fadeSamples = 0;
+    int maxPoolSampleLength = 0;  // longest sample in pool (for relative start/end)
 
     bool releaseTriggered = false;
 

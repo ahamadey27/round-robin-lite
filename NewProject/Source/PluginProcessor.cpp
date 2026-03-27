@@ -271,7 +271,10 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     for (int i = 0; i < synthesiser.getNumVoices(); ++i)
     {
         if (auto* voice = dynamic_cast<RRVoice*>(synthesiser.getVoice(i)))
+        {
             voice->updateGlobalParameters(semitones, cents, 0.0f, 0.0f); // LITE: attack/decay removed from APVTS
+            voice->setMaxPoolSampleLength(maxSampleLength);
+        }
     }
 
     //==============================================================================
@@ -907,9 +910,17 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
 void NewProjectAudioProcessor::rebuildLoadedIndices()
 {
     loadedSlotIndices.clear();
+    maxSampleLength = 0;
+
     for (int i = 0; i < NUM_SAMPLE_SLOTS; ++i)
+    {
         if (sampleSlots[i].isLoaded)
+        {
             loadedSlotIndices.push_back(i);
+            maxSampleLength = std::max(maxSampleLength,
+                                       sampleSlots[i].audioBuffer.getNumSamples());
+        }
+    }
 
     if (loadedSlotIndices.empty())
         roundRobinIndex = 0;

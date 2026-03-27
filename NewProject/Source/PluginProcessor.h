@@ -63,8 +63,9 @@ public:
     std::vector<int> loadedSlotIndices;
     int roundRobinIndex = 0;
 
-    std::vector<int> shuffledIndices;  
+    std::vector<int> shuffledIndices;
     int lastPlayedSlot = -1;     // Fisher-Yates shuffled copy
+    int maxSampleLength = 0;     // longest loaded sample in samples (for relative start/end)
     void reshuffleIndices();              // add declaration
 
     void advanceRoundRobin();
