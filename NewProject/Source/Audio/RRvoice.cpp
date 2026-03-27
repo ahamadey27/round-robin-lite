@@ -384,13 +384,16 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
         return;
     }
 
-    // Convert start/end percentages to sample indices, relative to longest sample in pool.
-    // This ensures short samples aren't silenced by moderate start values.
-    const int refLength = (maxPoolSampleLength > 0) ? maxPoolSampleLength : cachedSampleLength;
-    playbackStartSample = (int)(randomizedSampleStart / 100.0f * refLength);
-    playbackEndSample   = (int)(randomizedSampleEnd   / 100.0f * refLength);
+    // Convert start/end percentages to sample indices.
+    // Start: scale proportionally by (thisLength / maxLength) so short samples skip less.
+    // End:   direct percentage — 0% = silent, 100% = full, for all samples equally.
+    const float lengthRatio = (maxPoolSampleLength > 0)
+        ? (float)cachedSampleLength / (float)maxPoolSampleLength
+        : 1.0f;
+    const float scaledStart = randomizedSampleStart * lengthRatio;
 
-    // Clamp to this sample's actual length (short samples clamp near the end rather than silence)
+    playbackStartSample = (int)(scaledStart          / 100.0f * cachedSampleLength);
+    playbackEndSample   = (int)(randomizedSampleEnd  / 100.0f * cachedSampleLength);
     playbackStartSample = juce::jlimit(0, cachedSampleLength - 1, playbackStartSample);
     playbackEndSample   = juce::jlimit(playbackStartSample + 1, cachedSampleLength, playbackEndSample);
 

@@ -557,7 +557,7 @@ Each tick position defines an additive offset applied to each parameter's random
 **Goal:** Ongoing issues, bugs and revisions to work on
 
 ### Step 8.1: Code Revisions and Additions
-- [ ] We need to change the sample start logic so the settings are relative to the longest sample in the sample pool. For short samples, for example, when sampleStart = 48.5000, the sample becomes in audible as the start point is beyond the actualy length of the sample. Can you and is it possible to adjust the samples start amount so that it is the length of the longest samples in the pool? 
+- [x] We need to change the sample start logic so the settings are relative to the longest sample in the sample pool. For short samples, for example, when sampleStart = 48.5000, the sample becomes in audible as the start point is beyond the actualy length of the sample. Can you and is it possible to adjust the samples start amount so that it is the length of the longest samples in the pool? 
 
 ### Step 8.2: Bugs
 
