@@ -103,6 +103,6 @@ inline const std::array<RandomAlgorithmOffsets, kNumAlgorithmTicks> randomAlgori
       0.5f, 0.5f,     0.5f, 0.5f,   0.12f, 0.0f, 0.0f },
 
     // Tick 17
-    { 0.45f, 0.45f,   4.0f, 6.0f,   50.0f, 50.0f,
+    { 0.45f, 0.45f,   5.0f, 6.5f,   50.0f, 50.0f,
       0.55f, 0.55f,   0.55f, 0.55f, 0.12f, 0.15f, 0.15f },
 }};

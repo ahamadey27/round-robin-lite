@@ -112,40 +112,39 @@ void RRToggleLAF::drawButtonBackground(juce::Graphics& g, juce::Button& button,
     const bool isRandom = button.getToggleState();
     const auto b = button.getLocalBounds().toFloat();
 
-    // Fixed sizes that fit comfortably in the button bounds
-    constexpr float textH = 16.0f;
-    constexpr float pillH = 44.0f;
-    const float totalContent = textH * 2.0f + pillH;
-    const float topPad = (b.getHeight() - totalContent) * 0.5f;
+    // Horizontal layout: [SERIES]  [===pill===]  [RANDOM]
+    constexpr float textW  = 44.0f;
+    constexpr float pillW  = 34.0f;
+    constexpr float pillH  = 16.0f;
+    constexpr float pillGap = 6.0f;
 
-    const float pillW = 18.0f;
     const float pillX = b.getCentreX() - pillW * 0.5f;
-    const float pillY = b.getY() + topPad + textH;
+    const float pillY = b.getCentreY() - pillH * 0.5f;
 
-    // SERIES label — bright when active (top = not random)
+    // SERIES label — left of pill, bright when active
     g.setFont(juce::Font(juce::FontOptions(9.0f)).boldened());
     g.setColour(isRandom ? juce::Colour(0xff555555) : juce::Colour(0xff8aba6a));
-    g.drawText("SERIES", b.getX(), b.getY() + topPad, b.getWidth(), textH,
-               juce::Justification::centred);
+    g.drawText("SERIES", pillX - pillGap - textW, b.getY(), textW, b.getHeight(),
+               juce::Justification::centredRight);
 
-    // RANDOM label — bright when active (bottom = random)
+    // RANDOM label — right of pill, bright when active
     g.setColour(isRandom ? juce::Colour(0xff8aba6a) : juce::Colour(0xff555555));
-    g.drawText("RANDOM", b.getX(), b.getY() + topPad + textH + pillH, b.getWidth(), textH,
-               juce::Justification::centred);
+    g.drawText("RANDOM", pillX + pillW + pillGap, b.getY(), textW, b.getHeight(),
+               juce::Justification::centredLeft);
 
     // Pill track
     g.setColour(juce::Colour(0xff0e1a0e));
-    g.fillRoundedRectangle(pillX, pillY, pillW, pillH, pillW * 0.5f);
+    g.fillRoundedRectangle(pillX, pillY, pillW, pillH, pillH * 0.5f);
     g.setColour(juce::Colour(0xff3a5a3a));
-    g.drawRoundedRectangle(pillX, pillY, pillW, pillH, pillW * 0.5f, 1.0f);
+    g.drawRoundedRectangle(pillX, pillY, pillW, pillH, pillH * 0.5f, 1.0f);
 
-    // Knob inside pill — top = SERIES, bottom = RANDOM
-    const float knobD = pillW - 4.0f;
-    const float knobX = pillX + 2.0f;
-    const float knobY = isRandom
-        ? pillY + pillH - 2.0f - knobD   // bottom
-        : pillY + 2.0f;                   // top
-    g.setColour(juce::Colour(0xffc87030));
+    // Knob inside pill — left = SERIES, right = RANDOM
+    const float knobD = pillH - 4.0f;
+    const float knobY = pillY + 2.0f;
+    const float knobX = isRandom
+        ? pillX + pillW - 2.0f - knobD   // right
+        : pillX + 2.0f;                  // left
+    g.setColour(juce::Colour(0xff8aba6a));
     g.fillEllipse(knobX, knobY, knobD, knobD);
 }
 

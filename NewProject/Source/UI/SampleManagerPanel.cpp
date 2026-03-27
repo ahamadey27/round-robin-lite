@@ -46,6 +46,11 @@ void SampleManagerPanel::paint(juce::Graphics& g)
     g.setFont(juce::Font(juce::FontOptions(9.0f)).boldened());
     g.drawText("SAMPLE POOL", 8, 7, getWidth() - 16, 10, juce::Justification::left);
 
+    // ── Playback type label above toggle ─────────────────────────────────────
+    g.setColour(juce::Colour(0xff666666));
+    g.setFont(juce::Font(juce::FontOptions(8.0f)));
+    g.drawText("PLAYBACK TYPE", getWidth() - 168, 16, 160, 10, juce::Justification::centred);
+
     // ── Sample list (single column, 20 rows) ─────────────────────────────────
     constexpr int listY     = 58;
     constexpr int rowH      = 18;
@@ -146,7 +151,8 @@ void SampleManagerPanel::resized()
 {
     constexpr int headerY = 24;
     loadSamplesButton .setBounds(8, headerY, 120, 26);
-    playbackModeButton.setBounds(getWidth() - 98, headerY, 90, 26);
+    // Horizontal toggle: needs ~160px wide for labels + pill, 20px tall
+    playbackModeButton.setBounds(getWidth() - 168, headerY + 3, 160, 20);
 }
 
 int SampleManagerPanel::getSlotAtPosition(juce::Point<int> pos, bool& isInsertGap) const
