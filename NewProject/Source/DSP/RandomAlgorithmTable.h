@@ -13,15 +13,21 @@ struct RandomAlgorithmOffsets
 {
     float volumeRndNeg      = 0.0f;
     float volumeRndPos      = 0.0f;
+    
     float semitoneRndNeg    = 0.0f;
     float semitoneRndPos    = 0.0f;
+    
     float fineTuneRndNeg    = 0.0f;
     float fineTuneRndPos    = 0.0f;
+    
     float toneHighRndNeg    = 0.0f;
     float toneHighRndPos    = 0.0f;
+    
     float toneLowRndNeg     = 0.0f;
     float toneLowRndPos     = 0.0f;
+    
     float sampleStartRndPos = 0.0f;
+    
     float panRndNeg         = 0.0f;
     float panRndPos         = 0.0f;
 };
@@ -73,23 +79,23 @@ inline const std::array<RandomAlgorithmOffsets, kNumAlgorithmTicks> randomAlgori
       0.35f, 0.35f,   0.35f, 0.35f, 0.0f, 0.0f, 0.0f },
 
     // Tick 11
-    { 0.35f, 0.35f,   0.0f, 0.0f,   100.0f, 100.0f,
+    { 0.3f, 0.3f,   0.0f, 0.0f,   100.0f, 100.0f,
       0.38f, 0.38f,   0.38f, 0.38f, 0.2f, 0.0f, 0.0f },
 
     // Tick 12
-    { 0.35f, 0.35f,   2.0f, 2.0f,   10.0f, 10.0f,
+    { 0.3f, 0.3f,   2.0f, 2.0f,   10.0f, 10.0f,
       0.39f, 0.39f,   0.39f, 0.39f, 0.0f, 0.0f, 0.0f },
 
     // Tick 13
-    { 0.35f, 0.35f,   3.0f, 3.0f,   10.0f, 10.0f,
+    { 0.3f, 0.3f,   3.0f, 3.0f,   10.0f, 10.0f,
       0.45f, 0.45f,   0.45f, 0.45f, 0.0f, 0.0f, 0.0f },
 
     // Tick 14
-    { 0.4f, 0.4f,     4.0f, 4.0f,   30.0f, 30.0f,
+    { 0.3f, 0.3f,     4.0f, 4.0f,   30.0f, 30.0f,
       0.45f, 0.45f,   0.5f, 0.5f,   0.0f, 0.0f, 0.0f },
 
     // Tick 15
-    { 0.4f, 0.4f,     4.0f, 4.0f,   40.0f, 40.0f,
+    { 0.3f, 0.3f,     4.0f, 4.0f,   40.0f, 40.0f,
       0.4f, 0.4f,     0.5f, 0.5f,   0.12f, 0.0f, 0.0f },
 
     // Tick 16
