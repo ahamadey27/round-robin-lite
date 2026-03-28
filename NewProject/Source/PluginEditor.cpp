@@ -462,8 +462,8 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
     constexpr int pitchY  = ampY  + secH + gap;   // 372
     constexpr int toneY   = pitchY + secH + gap;  // 528
 
-    // Left column: sample manager (top) + trim (bottom, aligned with pitch)
-    constexpr int trimY   = pitchY;
+    // Left column: sample manager (top) + trim (bottom, aligned with tone)
+    constexpr int trimY   = toneY;
     constexpr int smH     = trimY - topY - gap;    // 460
 
     // Knob X offsets within right panel (two knobs centered)
@@ -670,8 +670,8 @@ void NewProjectAudioProcessorEditor::resized()
     constexpr int pitchY = ampY  + secH + gap;   // 372
     constexpr int toneY  = pitchY + secH + gap;  // 528
 
-    // Left column: sample manager (top) + trim (bottom, aligned with pitch)
-    constexpr int trimY  = pitchY;
+    // Left column: sample manager (top) + trim (bottom, aligned with tone)
+    constexpr int trimY  = toneY;
     constexpr int smH    = trimY - topY - gap;    // 460
 
     // Knob X offsets within right panel
