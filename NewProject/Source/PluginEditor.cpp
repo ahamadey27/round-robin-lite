@@ -524,6 +524,36 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
     g.setFont(juce::Font(juce::FontOptions(9.0f)).boldened());
     g.drawText("RANDOM ALGORITHM", rpX + 8, algoY + 7, rpW - 16, 10, juce::Justification::left);
 
+    // ── Random Algorithm tick marks (18 ticks, one per algorithm) ───────────
+    {
+        constexpr int numTicks = 18;
+        constexpr int tbH     = 16;
+
+        // Match the knob's actual bounds and rotary parameters exactly
+        auto kb = randomAlgorithmSlider.getBounds();
+        auto rp = randomAlgorithmSlider.getRotaryParameters();
+
+        const float w  = (float)kb.getWidth();
+        const float h  = (float)(kb.getHeight() - tbH);
+        const float cx = kb.getX() + w * 0.5f;
+        const float cy = kb.getY() + h * 0.5f;
+
+        const float bodyRadius = juce::jmin(w, h) * 0.5f - 2.5f;
+        const float tickInner  = bodyRadius + 2.0f;
+        const float tickOuter  = bodyRadius + 7.0f;
+
+        g.setColour(RRColors::algoCol.withAlpha(0.45f));
+        for (int i = 0; i < numTicks; ++i)
+        {
+            float norm  = (float)i / (float)(numTicks - 1);
+            float angle = rp.startAngleRadians + norm * (rp.endAngleRadians - rp.startAngleRadians);
+            float sinA  = std::sin(angle);
+            float cosA  = std::cos(angle);
+            g.drawLine(cx + sinA * tickInner, cy - cosA * tickInner,
+                       cx + sinA * tickOuter, cy - cosA * tickOuter, 1.5f);
+        }
+    }
+
     // ── Right panel: Amplitude ──────────────────────────────────────────────
     drawSectionBox({ rpX, ampY, rpW, secH });
     g.setColour(RRColors::ampCol);
