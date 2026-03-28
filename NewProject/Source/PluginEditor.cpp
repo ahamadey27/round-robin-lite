@@ -261,6 +261,11 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
                        &toneLowRndBar, &toneHighRndBar, &sampleStartRndBar, &sampleEndRndBar })
         addAndMakeVisible(*bar);
 
+    // Repaint arc outlines when main knobs move (arcs track knob position)
+    for (auto* s : { &semitoneSlider, &fineTuneSlider, &volumeSlider, &panSlider,
+                     &toneLowSlider, &toneHighSlider, &sampleStartSlider, &sampleEndSlider })
+        s->onValueChange = [this] { repaint(); };
+
     setSize(700, 714);
     resized();
 }
@@ -576,8 +581,6 @@ void NewProjectAudioProcessorEditor::paintOverChildren(juce::Graphics& g)
         g.reduceClipRegion(clip);
     }
 
-    constexpr float twoPi  = juce::MathConstants<float>::twoPi;
-    constexpr float maxArc = juce::MathConstants<float>::pi * 0.8f;
     constexpr float arcW   = 2.0f;
     constexpr int   tbH    = 16;
 
@@ -596,6 +599,20 @@ void NewProjectAudioProcessorEditor::paintOverChildren(juce::Graphics& g)
         float posNorm = getNorm(posSlider);
         if (negNorm < 0.01f && posNorm < 0.01f) return;
 
+        // Compute the knob's current angle from its value
+        float knobNorm = getNorm(knob);
+        auto rp = knob.getRotaryParameters();
+        float startA    = rp.startAngleRadians;   // ~7 o'clock
+        float endA      = rp.endAngleRadians;     // ~5 o'clock
+        float knobAngle = startA + knobNorm * (endA - startA);
+
+        // Available arc room from knob position to each rotary limit
+        float roomNeg = knobAngle - startA;   // room toward 7 o'clock
+        float roomPos = endA - knobAngle;     // room toward 5 o'clock
+
+        float negExtent = negNorm * roomNeg;  // at max rnd → fills to 7 o'clock
+        float posExtent = posNorm * roomPos;  // at max rnd → fills to 5 o'clock
+
         auto  b  = knob.getBounds();
         float w  = (float)b.getWidth();
         float h  = (float)(b.getHeight() - tbH);
@@ -605,26 +622,23 @@ void NewProjectAudioProcessorEditor::paintOverChildren(juce::Graphics& g)
         float knobRadius = juce::jmin(w, h) * 0.5f - 4.0f;
         float radius     = knobRadius + 4.0f;
 
-        float negExtent = negNorm * maxArc;
-        float posExtent = posNorm * maxArc;
-
-        // Neg arc: counter-clockwise from 12 o'clock
+        // Neg arc: counter-clockwise from knob position (clamped to start)
         if (negExtent > 0.01f)
         {
             juce::Path negArc;
             negArc.addArc(cx - radius, cy - radius, radius * 2.0f, radius * 2.0f,
-                twoPi - negExtent, twoPi, true);
+                knobAngle - negExtent, knobAngle, true);
             g.setColour(col.withAlpha(0.7f));
             g.strokePath(negArc, juce::PathStrokeType(arcW,
                 juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
         }
 
-        // Pos arc: clockwise from 12 o'clock
+        // Pos arc: clockwise from knob position (clamped to end)
         if (posExtent > 0.01f)
         {
             juce::Path posArc;
             posArc.addArc(cx - radius, cy - radius, radius * 2.0f, radius * 2.0f,
-                0.0f, posExtent, true);
+                knobAngle, knobAngle + posExtent, true);
             g.setColour(col.withAlpha(0.7f));
             g.strokePath(posArc, juce::PathStrokeType(arcW,
                 juce::PathStrokeType::curved, juce::PathStrokeType::rounded));

@@ -558,6 +558,7 @@ Each tick position defines an additive offset applied to each parameter's random
 
 ### Step 8.1: Code Revisions and Additions
 - [x] We need to change the sample start logic so the settings are relative to the longest sample in the sample pool. For short samples, for example, when sampleStart = 48.5000, the sample becomes in audible as the start point is beyond the actualy length of the sample. Can you and is it possible to adjust the samples start amount so that it is the length of the longest samples in the pool? 
+- [x] I'd like to adjust Step 5.1.2: Create Corresponding Random Parameter Amount at Location of Former Parameter Arc. When the user moves the random parameter slider, I'd like for the parameter arc outline to adjust relative to the paramter knob's location which, I believe, reflects how the randomize logic is effected when its parameter position is changed. Take special care with the volume knob as its default location is set to 2.5db.  
 
 ### Step 8.2: Bugs
 
