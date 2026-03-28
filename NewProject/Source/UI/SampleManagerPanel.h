@@ -23,6 +23,7 @@ public:
 
     // Callbacks wired by the editor
     std::function<void()> onLoadSamplesClicked;
+    std::function<void()> onClearSamplesClicked;
     std::function<void()> onAddMoreClicked;
     std::function<void(int slotIndex)> onReplaceSample;
     std::function<void(int slotIndex)> onAuditionSample;
@@ -31,6 +32,7 @@ private:
     NewProjectAudioProcessor& processor;
 
     juce::TextButton loadSamplesButton;
+    juce::TextButton clearSamplesButton;
     juce::TextButton playbackModeButton;
 
     RRToggleLAF toggleLAF;

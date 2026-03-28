@@ -8,6 +8,10 @@ SampleManagerPanel::SampleManagerPanel(NewProjectAudioProcessor& p)
     loadSamplesButton.onClick = [this]() { if (onLoadSamplesClicked) onLoadSamplesClicked(); };
     addAndMakeVisible(loadSamplesButton);
 
+    clearSamplesButton.setButtonText("Clear");
+    clearSamplesButton.onClick = [this]() { if (onClearSamplesClicked) onClearSamplesClicked(); };
+    addAndMakeVisible(clearSamplesButton);
+
     playbackModeButton.setButtonText("Series");
     playbackModeButton.setClickingTogglesState(true);
     playbackModeButton.onClick = [this]()
@@ -150,7 +154,8 @@ void SampleManagerPanel::paint(juce::Graphics& g)
 void SampleManagerPanel::resized()
 {
     constexpr int headerY = 24;
-    loadSamplesButton .setBounds(8, headerY, 120, 26);
+    loadSamplesButton .setBounds(8, headerY, 76, 26);
+    clearSamplesButton.setBounds(88, headerY, 46, 26);
     // Horizontal toggle: needs ~160px wide for labels + pill, 20px tall
     playbackModeButton.setBounds(getWidth() - 168, headerY + 3, 160, 20);
 }

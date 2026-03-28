@@ -55,7 +55,7 @@ inline const std::array<RandomAlgorithmOffsets, kNumAlgorithmTicks> randomAlgori
       0.1f, 0.1f,     0.1f, 0.1f,   0.0f, 0.0f, 0.0f },
 
     // Tick 5
-    { 0.2f, 0.2f,     0.0f, 0.0f,   20.0f, 20.0f,
+    { 0.18f, 0.18f,     0.0f, 0.0f,   20.0f, 20.0f,
       0.1f, 0.1f,     0.1f, 0.1f,   0.0f, 0.0f, 0.0f },
 
     // Tick 6
@@ -63,7 +63,7 @@ inline const std::array<RandomAlgorithmOffsets, kNumAlgorithmTicks> randomAlgori
       0.2f, 0.2f,     0.2f, 0.2f,   0.0f, 0.0f, 0.0f },
 
     // Tick 7
-    { 0.2f, 0.2f,     0.0f, 0.0f,   40.0f, 40.0f,
+    { 0.22f, 0.22f,     0.0f, 0.0f,   40.0f, 40.0f,
       0.25f, 0.25f,   0.25f, 0.25f, 0.0f, 0.0f, 0.0f },
 
     // Tick 8
@@ -71,11 +71,11 @@ inline const std::array<RandomAlgorithmOffsets, kNumAlgorithmTicks> randomAlgori
       0.3f, 0.3f,     0.3f, 0.3f,   0.0f, 0.0f, 0.0f },
 
     // Tick 9
-    { 0.3f, 0.3f,     0.0f, 0.0f,   60.0f, 60.0f,
+    { 0.27f, 0.27f,     0.0f, 0.0f,   60.0f, 60.0f,
       0.3f, 0.3f,     0.3f, 0.3f,   0.0f, 0.0f, 0.0f },
 
     // Tick 10
-    { 0.3f, 0.3f,     0.0f, 0.0f,   100.0f, 100.0f,
+    { 0.28f, 0.28f,     0.0f, 0.0f,   100.0f, 100.0f,
       0.35f, 0.35f,   0.35f, 0.35f, 0.0f, 0.0f, 0.0f },
 
     // Tick 11
@@ -99,10 +99,10 @@ inline const std::array<RandomAlgorithmOffsets, kNumAlgorithmTicks> randomAlgori
       0.4f, 0.4f,     0.5f, 0.5f,   0.12f, 0.0f, 0.0f },
 
     // Tick 16
-    { 0.4f, 0.4f,     4.0f, 5.0f,   50.0f, 45.0f,
+    { 0.3f, 0.3f,     4.0f, 5.0f,   50.0f, 45.0f,
       0.5f, 0.5f,     0.5f, 0.5f,   0.12f, 0.0f, 0.0f },
 
     // Tick 17
-    { 0.45f, 0.45f,   5.0f, 6.5f,   50.0f, 50.0f,
+    { 0.3f, 0.3f,   5.0f, 6.5f,   50.0f, 50.0f,
       0.55f, 0.55f,   0.55f, 0.55f, 0.12f, 0.15f, 0.15f },
 }};

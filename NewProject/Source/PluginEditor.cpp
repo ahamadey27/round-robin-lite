@@ -64,6 +64,16 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
 {
     // Wire sample manager panel callbacks
     sampleManagerPanel.onLoadSamplesClicked = [this]() { loadSamplesFromFiles(); };
+    sampleManagerPanel.onClearSamplesClicked = [this]()
+        {
+            for (int i = 0; i < NewProjectAudioProcessor::NUM_SAMPLE_SLOTS; ++i)
+                audioProcessor.sampleLoader.clearSlot(i);
+
+            audioProcessor.rebuildLoadedIndices();
+            audioProcessor.reshuffleIndices();
+            audioProcessor.sampleLoader.updateSynthesiserSounds();
+            sampleManagerPanel.repaint();
+        };
     sampleManagerPanel.onAddMoreClicked = [this]() { addMoreSamples(); };
     sampleManagerPanel.onReplaceSample = [this](int slotIndex)
         {
@@ -446,11 +456,11 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
     constexpr int rpW     = 332;
     constexpr int lpW     = rpX - margin - gap;  // 336
 
-    // Right column: algo → amp → tone → pitch (top to bottom)
+    // Right column: algo → amp → pitch → tone (top to bottom)
     constexpr int algoY   = topY;
     constexpr int ampY    = algoY + secH + gap;   // 216
-    constexpr int toneY   = ampY  + secH + gap;   // 372
-    constexpr int pitchY  = toneY + secH + gap;   // 528
+    constexpr int pitchY  = ampY  + secH + gap;   // 372
+    constexpr int toneY   = pitchY + secH + gap;  // 528
 
     // Left column: sample manager (top) + trim (bottom, aligned with pitch)
     constexpr int trimY   = pitchY;
@@ -654,11 +664,11 @@ void NewProjectAudioProcessorEditor::resized()
     constexpr int rpW    = 332;
     constexpr int lpW    = rpX - margin - gap;  // 336
 
-    // Right column: algo → amp → tone → pitch
+    // Right column: algo → amp → pitch → tone
     constexpr int algoY  = topY;
     constexpr int ampY   = algoY + secH + gap;   // 216
-    constexpr int toneY  = ampY  + secH + gap;   // 372
-    constexpr int pitchY = toneY + secH + gap;   // 528
+    constexpr int pitchY = ampY  + secH + gap;   // 372
+    constexpr int toneY  = pitchY + secH + gap;  // 528
 
     // Left column: sample manager (top) + trim (bottom, aligned with pitch)
     constexpr int trimY  = pitchY;
