@@ -39,15 +39,15 @@ inline const std::array<RandomAlgorithmOffsets, kNumAlgorithmTicks> randomAlgori
     {},
 
     // Tick 1
-    { 0.06f, 0.06f,   0.0f, 0.0f,   8.0f, 8.0f,
+    { 0.03f, 0.03f,   0.0f, 0.0f,   8.0f, 8.0f,
       0.0f, 0.0f,     0.0f, 0.0f,   0.0f, 0.0f, 0.0f },
 
     // Tick 2
-    { 0.15f, 0.15f,   0.0f, 0.0f,   14.0f, 14.0f,
+    { 0.05f, 0.05f,   0.0f, 0.0f,   14.0f, 14.0f,
       0.0f, 0.0f,     0.0f, 0.0f,   0.0f, 0.0f, 0.0f },
 
     // Tick 3
-    { 0.15f, 0.15f,   0.0f, 0.0f,   14.0f, 14.0f,
+    { 0.08f, 0.08f,   0.0f, 0.0f,   14.0f, 14.0f,
       0.1f, 0.1f,     0.0f, 0.0f,   0.0f, 0.0f, 0.0f },
 
     // Tick 4
