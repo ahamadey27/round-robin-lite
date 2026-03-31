@@ -55,95 +55,107 @@ void SampleManagerPanel::paint(juce::Graphics& g)
     g.setFont(juce::Font(juce::FontOptions(8.0f)));
     g.drawText("PLAYBACK TYPE", getWidth() - 168, 16, 160, 10, juce::Justification::centred);
 
-    // ── Sample list (single column, 20 rows) ─────────────────────────────────
+    // ── Sample list (two columns, 10 rows each) ──────────────────────────────
     constexpr int listY     = 58;
     constexpr int rowH      = 18;
     constexpr int btnSize   = 14;
     constexpr int btnGap    = 2;
     constexpr int btnsW     = btnSize * 4 + btnGap * 3;
     constexpr int padX      = 8;
+    constexpr int colGap    = 8;
+    constexpr int rowsPerCol = 10;
 
-    const int listW = getWidth() - padX * 2;
-    const int nameW = listW - btnsW - 4;
-    const int maxChars = juce::jmax(14, nameW / 7); // approximate chars that fit
+    const int halfW = (getWidth() - padX * 2 - colGap) / 2;
+    const int nameW = halfW - btnsW - 4;
+    const int maxChars = juce::jmax(12, nameW / 7);
 
     rowHitAreas.clear();
-    int loadedCount = 0;
 
     for (int i = 0; i < NewProjectAudioProcessor::NUM_SAMPLE_SLOTS; ++i)
     {
-        if (!processor.sampleSlots[i].isLoaded)
-            continue;
+        int col = i / rowsPerCol;   // 0 = left, 1 = right
+        int row = i % rowsPerCol;
 
-        int y = listY + loadedCount * rowH;
+        int colX = padX + col * (halfW + colGap);
+        int y = listY + row * rowH;
 
-        // Highlight drop target (swap)
-        if (isDragging && !dragIsInsert && dragTargetSlot == i)
+        if (processor.sampleSlots[i].isLoaded)
         {
-            g.setColour(juce::Colour(0xff3a4a3a));
-            g.fillRect(padX, y, listW, rowH);
+            // Highlight drop target (swap)
+            if (isDragging && !dragIsInsert && dragTargetSlot == i)
+            {
+                g.setColour(juce::Colour(0xff3a4a3a));
+                g.fillRect(colX, y, halfW, rowH);
+            }
+
+            // Sample name
+            juce::String slotNum = juce::String(i + 1).paddedLeft('0', 2);
+            juce::String fileName = processor.sampleSlots[i].sourceFile.getFileName();
+            juce::String display = slotNum + ". " + truncateName(fileName, maxChars);
+
+            g.setColour(isDragging && dragSourceSlot == i ? juce::Colour(0xff606060) : juce::Colour(0xffb0b0b0));
+            g.setFont(juce::Font(juce::FontOptions(11.0f)));
+            g.drawText(display, colX, y, nameW, rowH, juce::Justification::centredLeft);
+
+            // Action buttons
+            int bx = colX + nameW + 4;
+            RowHitAreas hit;
+            hit.slotIndex = i;
+            hit.nameArea = { colX, y, nameW, rowH };
+            hit.rowArea  = { colX, y, halfW, rowH };
+
+            hit.reorderBtn = { bx, y, btnSize, btnSize };
+            g.setColour(juce::Colour(0xff707070));
+            g.setFont(juce::Font(juce::FontOptions(11.0f)));
+            g.drawText(juce::String::charToString(0x2725), hit.reorderBtn, juce::Justification::centred);
+            bx += btnSize + btnGap;
+
+            hit.playBtn = { bx, y, btnSize, btnSize };
+            g.setColour(juce::Colour(0xff80b080));
+            g.drawText(juce::String::charToString(0x25B6), hit.playBtn, juce::Justification::centred);
+            bx += btnSize + btnGap;
+
+            hit.replaceBtn = { bx, y, btnSize, btnSize };
+            g.setColour(juce::Colour(0xff8080b0));
+            g.drawText(juce::String::charToString(0x21C4), hit.replaceBtn, juce::Justification::centred);
+            bx += btnSize + btnGap;
+
+            hit.deleteBtn = { bx, y, btnSize, btnSize };
+            g.setColour(juce::Colour(0xffb07070));
+            g.drawText(juce::String::charToString(0x2715), hit.deleteBtn, juce::Justification::centred);
+
+            rowHitAreas.push_back(hit);
+
+            // Draw insertion line if dragging between rows
+            if (isDragging && dragIsInsert && dragTargetSlot == i)
+            {
+                g.setColour(juce::Colour(0xff70c870));
+                g.fillRect(colX, y - 1, halfW, 2);
+            }
         }
-
-        // Sample name
-        juce::String slotNum = juce::String(i + 1).paddedLeft('0', 2);
-        juce::String fileName = processor.sampleSlots[i].sourceFile.getFileName();
-        juce::String display = slotNum + ". " + truncateName(fileName, maxChars);
-
-        g.setColour(isDragging && dragSourceSlot == i ? juce::Colour(0xff606060) : juce::Colour(0xffb0b0b0));
-        g.setFont(juce::Font(juce::FontOptions(11.0f)));
-        g.drawText(display, padX, y, nameW, rowH, juce::Justification::centredLeft);
-
-        // Action buttons
-        int bx = padX + nameW + 4;
-        RowHitAreas hit;
-        hit.slotIndex = i;
-        hit.nameArea = { padX, y, nameW, rowH };
-        hit.rowArea  = { padX, y, listW, rowH };
-
-        hit.reorderBtn = { bx, y, btnSize, btnSize };
-        g.setColour(juce::Colour(0xff707070));
-        g.setFont(juce::Font(juce::FontOptions(11.0f)));
-        g.drawText(juce::String::charToString(0x2725), hit.reorderBtn, juce::Justification::centred);
-        bx += btnSize + btnGap;
-
-        hit.playBtn = { bx, y, btnSize, btnSize };
-        g.setColour(juce::Colour(0xff80b080));
-        g.drawText(juce::String::charToString(0x25B6), hit.playBtn, juce::Justification::centred);
-        bx += btnSize + btnGap;
-
-        hit.replaceBtn = { bx, y, btnSize, btnSize };
-        g.setColour(juce::Colour(0xff8080b0));
-        g.drawText(juce::String::charToString(0x21C4), hit.replaceBtn, juce::Justification::centred);
-        bx += btnSize + btnGap;
-
-        hit.deleteBtn = { bx, y, btnSize, btnSize };
-        g.setColour(juce::Colour(0xffb07070));
-        g.drawText(juce::String::charToString(0x2715), hit.deleteBtn, juce::Justification::centred);
-
-        rowHitAreas.push_back(hit);
-
-        // Draw insertion line if dragging between rows
-        if (isDragging && dragIsInsert && dragTargetSlot == i)
-        {
-            g.setColour(juce::Colour(0xff70c870));
-            g.fillRect(padX, y - 1, listW, 2);
-        }
-
-        ++loadedCount;
     }
 
-    // ── "Add more" text (always directly below last loaded sample) ───────────
+    // ── "Add more" text (below samples in right column or left if < 10) ─────
+    int loadedCount = 0;
+    for (int i = 0; i < NewProjectAudioProcessor::NUM_SAMPLE_SLOTS; ++i)
+        if (processor.sampleSlots[i].isLoaded) ++loadedCount;
+
     int emptySlots = NewProjectAudioProcessor::NUM_SAMPLE_SLOTS - loadedCount;
     if (emptySlots > 0)
     {
-        int addY = listY + loadedCount * rowH + 4;
+        // Place "add more" after the last loaded slot position
+        int nextSlot = loadedCount;
+        int col = nextSlot / rowsPerCol;
+        int row = nextSlot % rowsPerCol;
+        int colX = padX + col * (halfW + colGap);
+        int addY = listY + row * rowH + 4;
 
-        juce::String addText = "--- click to add " + juce::String(emptySlots) + " samples ---";
+        juce::String addText = "--- click to add " + juce::String(emptySlots).paddedLeft('0', 2) + " samples ---";
         g.setColour(juce::Colour(0xff606068));
         g.setFont(juce::Font(juce::FontOptions(10.0f)).italicised());
-        g.drawText(addText, padX, addY, listW, rowH, juce::Justification::centredLeft);
+        g.drawText(addText, colX, addY, halfW, rowH, juce::Justification::centredLeft);
 
-        addMoreArea = { padX, addY, listW, rowH };
+        addMoreArea = { colX, addY, halfW, rowH };
     }
     else
     {

@@ -266,7 +266,7 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
                      &toneLowSlider, &toneHighSlider, &sampleStartSlider, &sampleEndSlider })
         s->onValueChange = [this] { repaint(); };
 
-    setSize(700, 714);
+    setSize(1080, 504);
     resized();
 }
 
@@ -450,44 +450,52 @@ void NewProjectAudioProcessorEditor::loadPreset()
 void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
 {
     // ── Layout constants (must match resized() exactly) ───────────────────────
-    constexpr int margin  = 12;
-    constexpr int knobW   = 68;
-    constexpr int topY    = 60;
-    constexpr int gap     = 8;
-    constexpr int secH    = 148;   // uniform section height
+    constexpr int margin   = 12;
+    constexpr int knobW    = 68;
+    constexpr int topY     = 60;
+    constexpr int gap      = 8;
+    constexpr int headerH  = 52;
+    constexpr int footerH  = 28;
+    constexpr int trimSecH = 130;    // Sample Start/End section (compact)
 
-    // Columns
-    constexpr int rpX     = 356;
-    constexpr int rpW     = 332;
-    constexpr int lpW     = rpX - margin - gap;  // 336
+    // All bottom borders align here, with breathing room above footer
+    constexpr int secBot   = 504 - footerH - 8;             // 468
 
-    // Right column: algo → amp → pitch → tone (top to bottom)
-    constexpr int algoY   = topY;
-    constexpr int ampY    = algoY + secH + gap;   // 216
-    constexpr int pitchY  = ampY  + secH + gap;   // 372
-    constexpr int toneY   = pitchY + secH + gap;  // 528
+    // Left panel
+    constexpr int lpW      = 480;
+    constexpr int trimY    = secBot - trimSecH;              // 338
+    constexpr int lpH      = trimY - topY - gap;             // 270
 
-    // Left column: sample manager (top) + trim (bottom, aligned with tone)
-    constexpr int trimY   = toneY;
-    constexpr int smH     = trimY - topY - gap;    // 460
+    // Right area — 2×2 grid, sections stretch to align with secBot
+    constexpr int rpX      = margin + lpW + gap;             // 500
+    constexpr int rpW      = 1080 - rpX - margin;            // 568
+    constexpr int secW     = (rpW - gap) / 2;                // 280
+    constexpr int secX1    = rpX + secW + gap;
+    constexpr int rpSecH   = (secBot - topY - gap) / 2;     // 200
+    constexpr int row2Y    = topY + rpSecH + gap;            // 268
 
-    // Knob X offsets within right panel (two knobs centered)
-    constexpr int knobGap = 24;
-    constexpr int kxOff0  = (rpW - 2 * knobW - knobGap) / 2;   // 86
-    constexpr int kxOff1  = kxOff0 + knobW + knobGap;           // 178
+    // Knob X offsets within right-side sections
+    constexpr int knobGap  = 16;
+    constexpr int kxOff0   = (secW - 2 * knobW - knobGap) / 2;
+    constexpr int kxOff1   = kxOff0 + knobW + knobGap;
 
-    // Knob X offsets within left panel (for trim section)
-    constexpr int lpKxOff0 = (lpW - 2 * knobW - knobGap) / 2;  // 88
-    constexpr int lpKxOff1 = lpKxOff0 + knobW + knobGap;        // 180
+    // Knob X offsets within left trim section
+    constexpr int trimKx0  = (lpW - 2 * knobW - knobGap) / 2;
+    constexpr int trimKx1  = trimKx0 + knobW + knobGap;
+
+    // Vertical centering offset for knob content within right sections
+    // Content block: 12(label) + 2 + 80(knob) + 2 + 12(rndbar) = 108px
+    // Usable area: rpSecH - 20(title) = 180px → pad = (180-108)/2 = 36
+    constexpr int rpPadTop = (rpSecH - 20 - 108) / 2;       // 36
 
     // ── Background ────────────────────────────────────────────────────────────
     g.fillAll(RRColors::background);
 
     // ── Header bar ────────────────────────────────────────────────────────────
     g.setColour(RRColors::headerBg);
-    g.fillRect(0, 0, getWidth(), 52);
+    g.fillRect(0, 0, getWidth(), headerH);
     g.setColour(RRColors::sectionBorder);
-    g.fillRect(0, 52, getWidth(), 1);
+    g.fillRect(0, headerH, getWidth(), 1);
 
     juce::Font rrFont(juce::FontOptions(26.0f));
     rrFont = rrFont.boldened();
@@ -509,27 +517,26 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
         g.drawRoundedRectangle(r.toFloat(), 5.0f, 1.0f);
     };
 
-    // ── Left panel: Sample Manager ──────────────────────────────────────────
-    drawSectionBox({ margin, topY, lpW, smH });
+    // ── Left: Sample Pool ───────────────────────────────────────────────────
+    drawSectionBox({ margin, topY, lpW, lpH });
 
-    // ── Left panel: Sample Start/End (below sample manager) ─────────────────
-    drawSectionBox({ margin, trimY, lpW, secH });
+    // ── Left: Sample Start/End ──────────────────────────────────────────────
+    drawSectionBox({ margin, trimY, lpW, trimSecH });
     g.setColour(RRColors::trimCol);
     g.setFont(juce::Font(juce::FontOptions(9.0f)).boldened());
     g.drawText("SAMPLE START/END", margin + 8, trimY + 7, lpW - 16, 10, juce::Justification::left);
 
-    // ── Right panel: Random Algorithm ───────────────────────────────────────
-    drawSectionBox({ rpX, algoY, rpW, secH });
+    // ── Right top-left: Random Algorithm ────────────────────────────────────
+    drawSectionBox({ rpX, topY, secW, rpSecH });
     g.setColour(RRColors::algoCol);
     g.setFont(juce::Font(juce::FontOptions(9.0f)).boldened());
-    g.drawText("RANDOM ALGORITHM", rpX + 8, algoY + 7, rpW - 16, 10, juce::Justification::left);
+    g.drawText("RANDOM ALGORITHM", rpX + 8, topY + 7, secW - 16, 10, juce::Justification::left);
 
-    // ── Random Algorithm tick marks (18 ticks, one per algorithm) ───────────
+    // ── Random Algorithm tick marks (18 ticks) ──────────────────────────────
     {
         constexpr int numTicks = 18;
         constexpr int tbH     = 16;
 
-        // Match the knob's actual bounds and rotary parameters exactly
         auto kb = randomAlgorithmSlider.getBounds();
         auto rp = randomAlgorithmSlider.getRotaryParameters();
 
@@ -554,48 +561,51 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
         }
     }
 
-    // ── Right panel: Amplitude ──────────────────────────────────────────────
-    drawSectionBox({ rpX, ampY, rpW, secH });
+    // ── Right top-right: Amplitude ──────────────────────────────────────────
+    drawSectionBox({ secX1, topY, secW, rpSecH });
     g.setColour(RRColors::ampCol);
     g.setFont(juce::Font(juce::FontOptions(9.0f)).boldened());
-    g.drawText("AMPLITUDE", rpX + 8, ampY + 7, rpW - 16, 10, juce::Justification::left);
+    g.drawText("AMPLITUDE", secX1 + 8, topY + 7, secW - 16, 10, juce::Justification::left);
 
-    // ── Right panel: Tone ───────────────────────────────────────────────────
-    drawSectionBox({ rpX, toneY, rpW, secH });
-    g.setColour(RRColors::toneCol);
-    g.setFont(juce::Font(juce::FontOptions(9.0f)).boldened());
-    g.drawText("TONE", rpX + 8, toneY + 7, rpW - 16, 10, juce::Justification::left);
-
-    // ── Right panel: Pitch ──────────────────────────────────────────────────
-    drawSectionBox({ rpX, pitchY, rpW, secH });
+    // ── Right bottom-left: Pitch ────────────────────────────────────────────
+    drawSectionBox({ rpX, row2Y, secW, rpSecH });
     g.setColour(RRColors::pitchCol);
     g.setFont(juce::Font(juce::FontOptions(9.0f)).boldened());
-    g.drawText("PITCH", rpX + 8, pitchY + 7, rpW - 16, 10, juce::Justification::left);
+    g.drawText("PITCH", rpX + 8, row2Y + 7, secW - 16, 10, juce::Justification::left);
 
-    // ── Knob labels ───────────────────────────────────────────────────────────
-    g.setFont(juce::Font(juce::FontOptions(12.0f)));
-    auto drawKnobLabel = [&](const juce::String& text, int secY, int knobX)
+    // ── Right bottom-right: Tone ────────────────────────────────────────────
+    drawSectionBox({ secX1, row2Y, secW, rpSecH });
+    g.setColour(RRColors::toneCol);
+    g.setFont(juce::Font(juce::FontOptions(9.0f)).boldened());
+    g.drawText("TONE", secX1 + 8, row2Y + 7, secW - 16, 10, juce::Justification::left);
+
+    // ── Knob labels (vertically centered in right sections) ─────────────────
+    g.setFont(juce::Font(juce::FontOptions(11.0f)));
+    auto drawKnobLabel = [&](const juce::String& text, int secY, int secHeight,
+                             int knobX, juce::Colour col)
     {
-        int labelY = secY + 22;
-        g.setColour(juce::Colour(0xff666666));
+        // Center content block within usable area (below title)
+        int padTop = (secHeight - 20 - 108) / 2;
+        int labelY = secY + 20 + padTop;
+        g.setColour(col.withAlpha(0.5f));
         g.drawText(text, knobX - 8, labelY, knobW + 16, 12,
                    juce::Justification::centred);
     };
-    drawKnobLabel("VOLUME",    ampY,   rpX + kxOff0);
-    drawKnobLabel("PAN",       ampY,   rpX + kxOff1);
-    drawKnobLabel("LOW",       toneY,  rpX + kxOff0);
-    drawKnobLabel("HIGH",      toneY,  rpX + kxOff1);
-    drawKnobLabel("SEMITONE",  pitchY, rpX + kxOff0);
-    drawKnobLabel("FINE TUNE", pitchY, rpX + kxOff1);
-    drawKnobLabel("START",     trimY,  margin + lpKxOff0);
-    drawKnobLabel("END",       trimY,  margin + lpKxOff1);
+    drawKnobLabel("Volume",     topY,  rpSecH,  secX1 + kxOff0,   RRColors::ampCol);
+    drawKnobLabel("Pan",        topY,  rpSecH,  secX1 + kxOff1,   RRColors::ampCol);
+    drawKnobLabel("Semitone",   row2Y, rpSecH,  rpX + kxOff0,     RRColors::pitchCol);
+    drawKnobLabel("Fine Tune",  row2Y, rpSecH,  rpX + kxOff1,     RRColors::pitchCol);
+    drawKnobLabel("Low",        row2Y, rpSecH,  secX1 + kxOff0,   RRColors::toneCol);
+    drawKnobLabel("High",       row2Y, rpSecH,  secX1 + kxOff1,   RRColors::toneCol);
+    drawKnobLabel("Start",      trimY, trimSecH, margin + trimKx0, RRColors::trimCol);
+    drawKnobLabel("End",        trimY, trimSecH, margin + trimKx1, RRColors::trimCol);
 
-    // ── Footer ────────────────────────────────────────────────────────────────
+    // ── Footer ──────────────────────────────────────────────────────────────
     g.setColour(RRColors::sectionBorder.darker(0.5f));
-    g.fillRect(0, getHeight() - 30, getWidth(), 1);
+    g.fillRect(0, getHeight() - footerH, getWidth(), 1);
     g.setColour(RRColors::companyText);
     g.setFont(juce::Font(juce::FontOptions(10.0f)));
-    g.drawText("Alex Hamadey", 0, getHeight() - 26, getWidth() - 14, 20,
+    g.drawText("Alex Hamadey", 0, getHeight() - footerH + 4, getWidth() - 14, 20,
                juce::Justification::right);
 }
 
@@ -695,89 +705,88 @@ void NewProjectAudioProcessorEditor::componentVisibilityChanged(juce::Component&
 void NewProjectAudioProcessorEditor::resized()
 {
     // ── Layout constants (must match paint() exactly) ─────────────────────────
-    constexpr int margin  = 12;
-    constexpr int knobW   = 68;
-    constexpr int knobH   = 80;   // includes 16px text box
-    constexpr int knobGap = 24;   // horizontal gap between knob pair
-    constexpr int topY    = 60;
-    constexpr int gap     = 8;
-    constexpr int secH    = 148;  // uniform section height
+    constexpr int margin   = 12;
+    constexpr int knobW    = 68;
+    constexpr int knobH    = 80;   // 64 rotary + 16 text box
+    constexpr int knobGap  = 16;
+    constexpr int topY     = 60;
+    constexpr int gap      = 8;
+    constexpr int footerH  = 28;
+    constexpr int trimSecH = 130;
 
-    // Columns
-    constexpr int rpX    = 356;
-    constexpr int rpW    = 332;
-    constexpr int lpW    = rpX - margin - gap;  // 336
+    // All bottom borders align here
+    constexpr int secBot   = 504 - footerH - 8;             // 468
 
-    // Right column: algo → amp → pitch → tone
-    constexpr int algoY  = topY;
-    constexpr int ampY   = algoY + secH + gap;   // 216
-    constexpr int pitchY = ampY  + secH + gap;   // 372
-    constexpr int toneY  = pitchY + secH + gap;  // 528
+    // Left panel
+    constexpr int lpW      = 480;
+    constexpr int trimY    = secBot - trimSecH;              // 338
+    constexpr int lpH      = trimY - topY - gap;             // 270
 
-    // Left column: sample manager (top) + trim (bottom, aligned with tone)
-    constexpr int trimY  = toneY;
-    constexpr int smH    = trimY - topY - gap;    // 460
+    // Right area — 2×2 grid
+    constexpr int rpX      = margin + lpW + gap;
+    constexpr int rpW      = 1080 - rpX - margin;
+    constexpr int secW     = (rpW - gap) / 2;
+    constexpr int secX1    = rpX + secW + gap;
+    constexpr int rpSecH   = (secBot - topY - gap) / 2;     // 200
+    constexpr int row2Y    = topY + rpSecH + gap;            // 268
 
-    // Knob X offsets within right panel
-    constexpr int kxOff0  = (rpW - 2 * knobW - knobGap) / 2;   // 86
-    constexpr int kxOff1  = kxOff0 + knobW + knobGap;           // 178
+    // Knob X offsets (right-side sections)
+    constexpr int kxOff0   = (secW - 2 * knobW - knobGap) / 2;
+    constexpr int kxOff1   = kxOff0 + knobW + knobGap;
 
-    // Knob X offsets within left panel (for trim section)
-    constexpr int lpKxOff0 = (lpW - 2 * knobW - knobGap) / 2;  // 88
-    constexpr int lpKxOff1 = lpKxOff0 + knobW + knobGap;        // 180
+    // Knob X offsets (left trim section)
+    constexpr int trimKx0  = (lpW - 2 * knobW - knobGap) / 2;
+    constexpr int trimKx1  = trimKx0 + knobW + knobGap;
 
-    // ── Header: preset buttons + about — all inside header bar ───────────────
-    triggerButton.setBounds   (getWidth() - 310, 13, 70, 26);
-    savePresetButton.setBounds(getWidth() - 232, 13, 80, 26);
-    loadPresetButton.setBounds(getWidth() - 144, 13, 80, 26);
-    aboutButton.setBounds    (getWidth() -  56, 13, 26, 26);
+    // ── Header buttons ──────────────────────────────────────────────────────
+    loadPresetButton.setBounds(getWidth() - 298, 13, 60, 26);
+    savePresetButton.setBounds(getWidth() - 230, 13, 60, 26);
+    triggerButton.setBounds   (getWidth() - 162, 13, 70, 26);
+    aboutButton.setBounds     (getWidth() -  56, 13, 26, 26);
 
-    // ── Left panel: Sample Manager ──────────────────────────────────────────
-    sampleManagerPanel.setBounds(margin, topY, lpW, smH);
+    // ── Left: Sample Manager ────────────────────────────────────────────────
+    sampleManagerPanel.setBounds(margin, topY, lpW, lpH);
 
-    // ── Left panel: Sample Start/End knobs ──────────────────────────────────
-    constexpr int nameBottom = 34;
-    constexpr int barSpace   = 14;
-
-    // Knob pair positioning lambda (parameterized by xBase for left/right)
+    // ── Knob pair placement (centered vertically in section) ────────────────
+    // Content block: 12(label) + 2 + 80(knob) + 2 + 12(rndbar) = 108px
     auto placeKnobPair = [&](juce::Slider& knob0, juce::Slider& knob1,
-                             int secY, int xBase, int xOff0, int xOff1)
+                             int secY, int secHeight, int xBase, int xOff0, int xOff1)
     {
-        int available = secH - nameBottom - barSpace;
-        int ky = secY + nameBottom + (available - knobH) / 2;
+        int padTop = (secHeight - 20 - 108) / 2;  // center in usable area
+        int ky = secY + 20 + padTop + 14;          // 12px label + 2px gap
         knob0.setBounds(xBase + xOff0, ky, knobW, knobH);
         knob1.setBounds(xBase + xOff1, ky, knobW, knobH);
     };
 
-    placeKnobPair(sampleStartSlider, sampleEndSlider,  trimY,  margin, lpKxOff0, lpKxOff1);
-    placeKnobPair(volumeSlider,      panSlider,        ampY,   rpX,    kxOff0,   kxOff1);
-    placeKnobPair(toneLowSlider,     toneHighSlider,   toneY,  rpX,    kxOff0,   kxOff1);
-    placeKnobPair(semitoneSlider,    fineTuneSlider,   pitchY, rpX,    kxOff0,   kxOff1);
+    placeKnobPair(volumeSlider,      panSlider,         topY,  rpSecH,  secX1,  kxOff0,  kxOff1);
+    placeKnobPair(semitoneSlider,    fineTuneSlider,    row2Y, rpSecH,  rpX,    kxOff0,  kxOff1);
+    placeKnobPair(toneLowSlider,     toneHighSlider,    row2Y, rpSecH,  secX1,  kxOff0,  kxOff1);
+    placeKnobPair(sampleStartSlider, sampleEndSlider,   trimY, trimSecH, margin, trimKx0, trimKx1);
 
-    // ── Random Algorithm knob — larger (100x116), centered in algo section ──
+    // ── Algorithm knob (centered in its section) ────────────────────────────
     {
-        constexpr int algoKnobW = 100;
-        constexpr int algoKnobH = 116;  // 100 rotary + 16 text box
-        int algoKnobX = rpX + (rpW - algoKnobW) / 2;
-        int algoKnobY = algoY + 22 + (secH - 22 - algoKnobH) / 2;
+        constexpr int algoKnobW = 90;
+        constexpr int algoKnobH = 106;  // 90 rotary + 16 text box
+        int algoKnobX = rpX + (secW - algoKnobW) / 2;
+        int algoKnobY = topY + 20 + (rpSecH - 20 - algoKnobH) / 2;
         randomAlgorithmSlider.setBounds(algoKnobX, algoKnobY, algoKnobW, algoKnobH);
     }
 
-    // ── Dual-thumb randomization sliders (below each knob) ──────────────────
-    auto placeRndBar = [&](DualThumbRndSlider& bar, juce::Slider& knob, int secY)
+    // ── Dual-thumb rnd sliders (2px below knob text box) ────────────────────
+    auto placeRndBar = [&](DualThumbRndSlider& bar, juce::Slider& knob)
     {
         auto b = knob.getBounds();
         constexpr int barH = 12;
-        int barY = secY + secH - barH - 2;
+        int barY = b.getBottom() + 2;
         bar.setBounds(b.getX() + 2, barY, b.getWidth() - 4, barH);
     };
 
-    placeRndBar(volumeRndBar,       volumeSlider,       ampY);
-    placeRndBar(panRndBar,          panSlider,          ampY);
-    placeRndBar(toneLowRndBar,      toneLowSlider,      toneY);
-    placeRndBar(toneHighRndBar,     toneHighSlider,     toneY);
-    placeRndBar(semitoneRndBar,     semitoneSlider,     pitchY);
-    placeRndBar(fineTuneRndBar,     fineTuneSlider,     pitchY);
-    placeRndBar(sampleStartRndBar,  sampleStartSlider,  trimY);
-    placeRndBar(sampleEndRndBar,    sampleEndSlider,    trimY);
+    placeRndBar(volumeRndBar,       volumeSlider);
+    placeRndBar(panRndBar,          panSlider);
+    placeRndBar(semitoneRndBar,     semitoneSlider);
+    placeRndBar(fineTuneRndBar,     fineTuneSlider);
+    placeRndBar(toneLowRndBar,      toneLowSlider);
+    placeRndBar(toneHighRndBar,     toneHighSlider);
+    placeRndBar(sampleStartRndBar,  sampleStartSlider);
+    placeRndBar(sampleEndRndBar,    sampleEndSlider);
 }

@@ -563,6 +563,10 @@ Each tick position defines an additive offset applied to each parameter's random
 ### Step 8.2: Bugs
 
 ### Step 8.3: UI 
+- [ ] Redesign the positioning of the UI based on the uploaded image 'VST_RRLite_v3'. This is a mockup so do not adjust sections, parameters, windows, etc exactly to the image but rather move everything around so it roughly aligns with it but use design theory to fine tune where the sections are located. For this you will have to change the dimensions of the plugin so the width exceeds the height. 
+- [ ] I would like for you to change the general aestetic so it feels like GeneralInspo_01 and GeneralInspo_02. NOT exactly like these images but has a pseudo-vintage feel with a modern shein. This step includes finding a good color pallete that's similar to what we have going but try and improve the style of the pallete. 
+- [ ] For the parameter/algorithm knobs and sliders, I'll attach labeled screenshots that I'd like for you to take inspriation from to redesign the UI componenets 
+- [ ] For the sample browser, I want you to do your best to emulate the LED screen of the Eventide Orville. Blue backround with white text font. You do not have to do copy the exact colors ig they do not match well with the color pallete at this stage, but try and keep the colors close to the refernce. Image reference is called 'LEDScreen' 
 
 ---
 
