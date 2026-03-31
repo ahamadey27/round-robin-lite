@@ -59,29 +59,73 @@ void SampleManagerPanel::paint(juce::Graphics& g)
     g.drawText("SAMPLE POOL", 8, 7, getWidth() - 16, 10, juce::Justification::left);
 
     // ── Playback type label above toggle ─────────────────────────────────────
-    g.setColour(juce::Colour(0xff666666));
+    g.setColour(juce::Colour(0xff555555));
     g.setFont(juce::Font(juce::FontOptions(8.0f)));
     g.drawText("PLAYBACK TYPE", getWidth() - 168, 16, 160, 10, juce::Justification::centred);
 
-    // ── Sample list (two columns, 10 rows each) ──────────────────────────────
-    constexpr int listY     = 58;
-    constexpr int rowH      = 18;
-    constexpr int btnSize   = 14;
-    constexpr int btnGap    = 2;
-    constexpr int btnsW     = btnSize * 4 + btnGap * 3;
-    constexpr int padX      = 8;
-    constexpr int colGap    = 8;
+    // ── LED Screen area ─────────────────────────────────────────────────────
+    constexpr int screenY    = 55;
+    constexpr int screenPad  = 6;
+    const int screenH = getHeight() - screenY - 4;
+    const auto screenRect = juce::Rectangle<int>(screenPad, screenY,
+                                                  getWidth() - screenPad * 2, screenH);
+
+    // Outer bezel (recessed look)
+    g.setColour(juce::Colour(0xff0a0a0a));
+    g.fillRoundedRectangle(screenRect.toFloat().expanded(1.0f), 3.0f);
+
+    // Screen background — dark green-black like H3000
+    g.setColour(juce::Colour(0xff0a150e));
+    g.fillRoundedRectangle(screenRect.toFloat(), 2.0f);
+
+    // Subtle inner shadow (top edge darker)
+    {
+        juce::ColourGradient shadow(
+            juce::Colours::black.withAlpha(0.3f), 0.0f, (float)screenRect.getY(),
+            juce::Colours::transparentBlack,      0.0f, (float)screenRect.getY() + 8.0f,
+            false);
+        g.setGradientFill(shadow);
+        g.fillRect(screenRect.getX() + 1, screenRect.getY() + 1,
+                   screenRect.getWidth() - 2, 8);
+    }
+
+    // Scanline overlay (subtle horizontal lines for CRT/LED texture)
+    g.setColour(juce::Colours::black.withAlpha(0.08f));
+    for (int sy = screenRect.getY(); sy < screenRect.getBottom(); sy += 2)
+        g.fillRect(screenRect.getX(), sy, screenRect.getWidth(), 1);
+
+    // Screen border highlight (subtle green edge glow)
+    g.setColour(juce::Colour(0xff1a3020));
+    g.drawRoundedRectangle(screenRect.toFloat(), 2.0f, 1.0f);
+
+    // ── LED colors ──────────────────────────────────────────────────────────
+    const juce::Colour ledGreen    (0xff40b858);   // bright LED green
+    const juce::Colour ledDim      (0xff1a4028);   // dim/inactive LED
+    const juce::Colour ledAmber    (0xffa89030);   // amber for icons
+    const juce::Colour ledRed      (0xffb04838);   // red for delete
+
+    // ── Sample list (two columns, 10 rows each) ────────────────────────────
+    constexpr int listY      = 62;     // inside the screen
+    constexpr int rowH       = 18;
+    constexpr int btnSize    = 14;
+    constexpr int btnGap     = 2;
+    constexpr int btnsW      = btnSize * 4 + btnGap * 3;
+    constexpr int padX       = 14;     // inside screen padding
+    constexpr int colGap     = 10;
     constexpr int rowsPerCol = 10;
 
     const int halfW = (getWidth() - padX * 2 - colGap) / 2;
     const int nameW = halfW - btnsW - 4;
     const int maxChars = juce::jmax(12, nameW / 7);
 
+    // LED-style monospace font
+    juce::Font ledFont(juce::FontOptions("Courier New", 11.0f, juce::Font::plain));
+
     rowHitAreas.clear();
 
     for (int i = 0; i < NewProjectAudioProcessor::NUM_SAMPLE_SLOTS; ++i)
     {
-        int col = i / rowsPerCol;   // 0 = left, 1 = right
+        int col = i / rowsPerCol;
         int row = i % rowsPerCol;
 
         int colX = padX + col * (halfW + colGap);
@@ -92,20 +136,20 @@ void SampleManagerPanel::paint(juce::Graphics& g)
             // Highlight drop target (swap)
             if (isDragging && !dragIsInsert && dragTargetSlot == i)
             {
-                g.setColour(juce::Colour(0xff3a4a3a));
+                g.setColour(juce::Colour(0xff1a3820));
                 g.fillRect(colX, y, halfW, rowH);
             }
 
-            // Sample name
+            // Sample name — LED green
             juce::String slotNum = juce::String(i + 1).paddedLeft('0', 2);
             juce::String fileName = processor.sampleSlots[i].sourceFile.getFileName();
             juce::String display = slotNum + ". " + truncateName(fileName, maxChars);
 
-            g.setColour(isDragging && dragSourceSlot == i ? juce::Colour(0xff606060) : juce::Colour(0xffb0b0b0));
-            g.setFont(juce::Font(juce::FontOptions(11.0f)));
+            g.setColour(isDragging && dragSourceSlot == i ? ledDim : ledGreen);
+            g.setFont(ledFont);
             g.drawText(display, colX, y, nameW, rowH, juce::Justification::centredLeft);
 
-            // Action buttons
+            // Action buttons — LED-colored icons
             int bx = colX + nameW + 4;
             RowHitAreas hit;
             hit.slotIndex = i;
@@ -113,23 +157,23 @@ void SampleManagerPanel::paint(juce::Graphics& g)
             hit.rowArea  = { colX, y, halfW, rowH };
 
             hit.reorderBtn = { bx, y, btnSize, btnSize };
-            g.setColour(juce::Colour(0xff707070));
+            g.setColour(ledDim.brighter(0.3f));
             g.setFont(juce::Font(juce::FontOptions(11.0f)));
             g.drawText(juce::String::charToString(0x2725), hit.reorderBtn, juce::Justification::centred);
             bx += btnSize + btnGap;
 
             hit.playBtn = { bx, y, btnSize, btnSize };
-            g.setColour(juce::Colour(0xff80b080));
+            g.setColour(ledGreen.withAlpha(0.7f));
             g.drawText(juce::String::charToString(0x25B6), hit.playBtn, juce::Justification::centred);
             bx += btnSize + btnGap;
 
             hit.replaceBtn = { bx, y, btnSize, btnSize };
-            g.setColour(juce::Colour(0xff8080b0));
+            g.setColour(ledAmber.withAlpha(0.7f));
             g.drawText(juce::String::charToString(0x21C4), hit.replaceBtn, juce::Justification::centred);
             bx += btnSize + btnGap;
 
             hit.deleteBtn = { bx, y, btnSize, btnSize };
-            g.setColour(juce::Colour(0xffb07070));
+            g.setColour(ledRed.withAlpha(0.7f));
             g.drawText(juce::String::charToString(0x2715), hit.deleteBtn, juce::Justification::centred);
 
             rowHitAreas.push_back(hit);
@@ -137,13 +181,13 @@ void SampleManagerPanel::paint(juce::Graphics& g)
             // Draw insertion line if dragging between rows
             if (isDragging && dragIsInsert && dragTargetSlot == i)
             {
-                g.setColour(juce::Colour(0xff70c870));
+                g.setColour(ledGreen);
                 g.fillRect(colX, y - 1, halfW, 2);
             }
         }
     }
 
-    // ── "Add more" text (below samples in right column or left if < 10) ─────
+    // ── "Add more" text ─────────────────────────────────────────────────────
     int loadedCount = 0;
     for (int i = 0; i < NewProjectAudioProcessor::NUM_SAMPLE_SLOTS; ++i)
         if (processor.sampleSlots[i].isLoaded) ++loadedCount;
@@ -151,7 +195,6 @@ void SampleManagerPanel::paint(juce::Graphics& g)
     int emptySlots = NewProjectAudioProcessor::NUM_SAMPLE_SLOTS - loadedCount;
     if (emptySlots > 0)
     {
-        // Place "add more" after the last loaded slot position
         int nextSlot = loadedCount;
         int col = nextSlot / rowsPerCol;
         int row = nextSlot % rowsPerCol;
@@ -159,8 +202,8 @@ void SampleManagerPanel::paint(juce::Graphics& g)
         int addY = listY + row * rowH + 4;
 
         juce::String addText = "--- click to add " + juce::String(emptySlots).paddedLeft('0', 2) + " samples ---";
-        g.setColour(juce::Colour(0xff606068));
-        g.setFont(juce::Font(juce::FontOptions(10.0f)).italicised());
+        g.setColour(ledDim);
+        g.setFont(ledFont);
         g.drawText(addText, colX, addY, halfW, rowH, juce::Justification::centredLeft);
 
         addMoreArea = { colX, addY, halfW, rowH };
