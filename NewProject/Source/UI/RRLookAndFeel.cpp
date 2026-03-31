@@ -6,52 +6,113 @@
 void RRKnobLAF::drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height,
     float sliderPos, float rotaryStartAngle, float rotaryEndAngle, juce::Slider& slider)
 {
-    // IMPORTANT: JUCE already subtracts the text box height before calling here.
-    // 'height' is the knob-only area. Do NOT subtract tbH again — that was the bug.
-
     const float cx = x + width  * 0.5f;
-    const float cy = y + height * 0.5f;   // now matches paintOverChildren cy exactly
+    const float cy = y + height * 0.5f;
 
-    // paintOverChildren arc: knobRadius = jmin(w, h_inner)*0.5 - 4, arc at knobRadius + 5
-    // Arc inner edge = (knobRadius + 5) - trackW/2 = knobRadius + 2.5
-    // Body fills to just inside arc inner edge: bodyRadius = knobRadius + 1.5
-    //   = jmin(width, height)*0.5 - 4 + 1.5 = jmin(width, height)*0.5 - 2.5
     const float bodyRadius  = juce::jmin((float)width, (float)height) * 0.5f - 2.5f;
-    const float trackRadius = bodyRadius * 0.96f;   // grey groove slightly inside body edge
+    const float trackRadius = bodyRadius * 0.92f;
 
-    // ── Shadow ───────────────────────────────────────────────────────────────
-    g.setColour(juce::Colours::black.withAlpha(0.4f));
-    g.fillEllipse(cx - bodyRadius + 1.0f, cy - bodyRadius + 2.0f,
+    // ── Drop shadow ─────────────────────────────────────────────────────────
+    g.setColour(juce::Colours::black.withAlpha(0.5f));
+    g.fillEllipse(cx - bodyRadius + 1.0f, cy - bodyRadius + 2.5f,
                   bodyRadius * 2.0f, bodyRadius * 2.0f);
 
-    // ── Knob body ────────────────────────────────────────────────────────────
-    g.setColour(juce::Colour(0xff1c1c1c));
+    // ── Outer rim (subtle metallic ring) ────────────────────────────────────
+    g.setColour(RRColors::knobRim);
     g.fillEllipse(cx - bodyRadius, cy - bodyRadius,
                   bodyRadius * 2.0f, bodyRadius * 2.0f);
-    g.setColour(juce::Colour(0xff0a0a0a));
-    g.drawEllipse(cx - bodyRadius, cy - bodyRadius,
-                  bodyRadius * 2.0f, bodyRadius * 2.0f, 1.2f);
 
-    // ── Track arc (grey, 275° sweep) ─────────────────────────────────────────
+    // ── Knob body — radial gradient for metallic depth ──────────────────────
+    {
+        const float inner = bodyRadius - 1.5f;
+        juce::ColourGradient grad(
+            juce::Colour(0xff2a2a2a), cx, cy - inner * 0.4f,   // lighter top
+            juce::Colour(0xff111111), cx, cy + inner * 0.8f,    // darker bottom
+            false);
+        g.setGradientFill(grad);
+        g.fillEllipse(cx - inner, cy - inner, inner * 2.0f, inner * 2.0f);
+    }
+
+    // ── Subtle top highlight (metallic sheen) ───────────────────────────────
+    {
+        const float hl = bodyRadius * 0.65f;
+        juce::ColourGradient sheen(
+            juce::Colours::white.withAlpha(0.06f), cx, cy - bodyRadius * 0.5f,
+            juce::Colours::transparentBlack,       cx, cy + bodyRadius * 0.1f,
+            false);
+        g.setGradientFill(sheen);
+        g.fillEllipse(cx - hl, cy - bodyRadius + 2.0f, hl * 2.0f, hl * 1.4f);
+    }
+
+    // ── Inner ring (dark edge around body) ──────────────────────────────────
+    g.setColour(juce::Colour(0xff0a0a0a));
+    g.drawEllipse(cx - bodyRadius + 1.5f, cy - bodyRadius + 1.5f,
+                  (bodyRadius - 1.5f) * 2.0f, (bodyRadius - 1.5f) * 2.0f, 0.8f);
+
+    // ── Track arc (recessed groove) ─────────────────────────────────────────
     juce::Path track;
     track.addArc(cx - trackRadius, cy - trackRadius,
                  trackRadius * 2.0f, trackRadius * 2.0f,
                  rotaryStartAngle, rotaryEndAngle, true);
-    g.setColour(juce::Colour(0xff2a2a2a));
+    g.setColour(juce::Colour(0xff1a1a1a));
     g.strokePath(track, juce::PathStrokeType(3.0f,
         juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
 
-    // ── Indicator line ────────────────────────────────────────────────────────
+    // ── Indicator line (from center to edge) ───────────────────────────────
     const juce::Colour lineCol = slider.findColour(juce::Slider::rotarySliderFillColourId);
-    const float angle     = rotaryStartAngle + sliderPos * (rotaryEndAngle - rotaryStartAngle);
-    const float lineInner = bodyRadius * 0.18f;
-    const float lineOuter = bodyRadius * 0.55f;
+    const float angle = rotaryStartAngle + sliderPos * (rotaryEndAngle - rotaryStartAngle);
+    const float lineInner = bodyRadius * 0.20f;
+    const float lineOuter = bodyRadius - 2.0f;    // extends to knob edge
     g.setColour(lineCol);
     g.drawLine(cx + std::sin(angle) * lineInner,
                cy - std::cos(angle) * lineInner,
                cx + std::sin(angle) * lineOuter,
                cy - std::cos(angle) * lineOuter,
-               2.2f);
+               2.4f);
+}
+
+//==============================================================================
+// RRButtonLAF — hardware-style buttons
+
+void RRButtonLAF::drawButtonBackground(juce::Graphics& g, juce::Button& button,
+    const juce::Colour& baseColour, bool isMouseOver, bool isButtonDown)
+{
+    auto b = button.getLocalBounds().toFloat().reduced(0.5f);
+    auto col = baseColour;
+
+    if (isButtonDown)
+        col = col.brighter(0.15f);
+    else if (isMouseOver)
+        col = col.brighter(0.07f);
+
+    // Recessed background
+    g.setColour(juce::Colours::black.withAlpha(0.3f));
+    g.fillRoundedRectangle(b.translated(0.0f, 1.0f), 3.0f);
+
+    // Button body gradient
+    juce::ColourGradient grad(col.brighter(0.1f), b.getX(), b.getY(),
+                               col.darker(0.15f),  b.getX(), b.getBottom(),
+                               false);
+    g.setGradientFill(grad);
+    g.fillRoundedRectangle(b, 3.0f);
+
+    // Top highlight
+    g.setColour(juce::Colours::white.withAlpha(isButtonDown ? 0.02f : 0.08f));
+    g.fillRoundedRectangle(b.removeFromTop(b.getHeight() * 0.45f), 3.0f);
+
+    // Border
+    g.setColour(col.darker(0.4f));
+    g.drawRoundedRectangle(button.getLocalBounds().toFloat().reduced(0.5f), 3.0f, 0.8f);
+}
+
+void RRButtonLAF::drawButtonText(juce::Graphics& g, juce::TextButton& button,
+    bool isMouseOver, bool isButtonDown)
+{
+    g.setFont(juce::Font(juce::FontOptions(10.0f)).boldened());
+    g.setColour(button.findColour(juce::TextButton::textColourOnId)
+                    .withAlpha(button.isEnabled() ? 1.0f : 0.5f));
+    g.drawText(button.getButtonText(), button.getLocalBounds(),
+               juce::Justification::centred);
 }
 
 //==============================================================================
@@ -123,19 +184,19 @@ void RRToggleLAF::drawButtonBackground(juce::Graphics& g, juce::Button& button,
 
     // SERIES label — left of pill, bright when active
     g.setFont(juce::Font(juce::FontOptions(9.0f)).boldened());
-    g.setColour(isRandom ? juce::Colour(0xff555555) : juce::Colour(0xff8aba6a));
+    g.setColour(isRandom ? juce::Colour(0xff484848) : RRColors::algoCol.withAlpha(0.8f));
     g.drawText("SERIES", pillX - pillGap - textW, b.getY(), textW, b.getHeight(),
                juce::Justification::centredRight);
 
     // RANDOM label — right of pill, bright when active
-    g.setColour(isRandom ? juce::Colour(0xff8aba6a) : juce::Colour(0xff555555));
+    g.setColour(isRandom ? RRColors::algoCol.withAlpha(0.8f) : juce::Colour(0xff484848));
     g.drawText("RANDOM", pillX + pillW + pillGap, b.getY(), textW, b.getHeight(),
                juce::Justification::centredLeft);
 
     // Pill track
-    g.setColour(juce::Colour(0xff0e1a0e));
+    g.setColour(juce::Colour(0xff0e1610));
     g.fillRoundedRectangle(pillX, pillY, pillW, pillH, pillH * 0.5f);
-    g.setColour(juce::Colour(0xff3a5a3a));
+    g.setColour(RRColors::sectionBorder);
     g.drawRoundedRectangle(pillX, pillY, pillW, pillH, pillH * 0.5f, 1.0f);
 
     // Knob inside pill — left = SERIES, right = RANDOM
@@ -144,7 +205,7 @@ void RRToggleLAF::drawButtonBackground(juce::Graphics& g, juce::Button& button,
     const float knobX = isRandom
         ? pillX + pillW - 2.0f - knobD   // right
         : pillX + 2.0f;                  // left
-    g.setColour(juce::Colour(0xff8aba6a));
+    g.setColour(RRColors::algoCol);
     g.fillEllipse(knobX, knobY, knobD, knobD);
 }
 

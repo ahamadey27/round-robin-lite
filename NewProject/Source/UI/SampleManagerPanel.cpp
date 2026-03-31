@@ -5,10 +5,16 @@ SampleManagerPanel::SampleManagerPanel(NewProjectAudioProcessor& p)
     : processor(p)
 {
     loadSamplesButton.setButtonText("Load Samples");
+    loadSamplesButton.setColour(juce::TextButton::buttonColourId, juce::Colour(0xff2a3a30));
+    loadSamplesButton.setColour(juce::TextButton::textColourOnId, juce::Colour(0xffa0b0a0));
+    loadSamplesButton.setLookAndFeel(&buttonLAF);
     loadSamplesButton.onClick = [this]() { if (onLoadSamplesClicked) onLoadSamplesClicked(); };
     addAndMakeVisible(loadSamplesButton);
 
     clearSamplesButton.setButtonText("Clear");
+    clearSamplesButton.setColour(juce::TextButton::buttonColourId, juce::Colour(0xff3a2a2a));
+    clearSamplesButton.setColour(juce::TextButton::textColourOnId, juce::Colour(0xffb0a0a0));
+    clearSamplesButton.setLookAndFeel(&buttonLAF);
     clearSamplesButton.onClick = [this]() { if (onClearSamplesClicked) onClearSamplesClicked(); };
     addAndMakeVisible(clearSamplesButton);
 
@@ -29,6 +35,8 @@ SampleManagerPanel::SampleManagerPanel(NewProjectAudioProcessor& p)
 SampleManagerPanel::~SampleManagerPanel()
 {
     playbackModeButton.setLookAndFeel(nullptr);
+    loadSamplesButton.setLookAndFeel(nullptr);
+    clearSamplesButton.setLookAndFeel(nullptr);
 }
 
 juce::String SampleManagerPanel::truncateName(const juce::String& name, int maxChars)
@@ -46,7 +54,7 @@ juce::String SampleManagerPanel::truncateName(const juce::String& name, int maxC
 void SampleManagerPanel::paint(juce::Graphics& g)
 {
     // ── Section title ────────────────────────────────────────────────────────
-    g.setColour(juce::Colour(0xff3a3a4a));
+    g.setColour(juce::Colour(0xff4a5a50));
     g.setFont(juce::Font(juce::FontOptions(9.0f)).boldened());
     g.drawText("SAMPLE POOL", 8, 7, getWidth() - 16, 10, juce::Justification::left);
 

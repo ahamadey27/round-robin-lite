@@ -99,13 +99,17 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
 
     // Trigger button
     triggerButton.setButtonText("Trigger");
-    triggerButton.setColour(juce::TextButton::buttonColourId, juce::Colour(0xffa03030));
-    triggerButton.setColour(juce::TextButton::textColourOffId, juce::Colours::white);
+    triggerButton.setColour(juce::TextButton::buttonColourId, juce::Colour(0xff8a3030));
+    triggerButton.setColour(juce::TextButton::textColourOnId, juce::Colour(0xffe0d0d0));
+    triggerButton.setLookAndFeel(&buttonLAF);
     triggerButton.onClick = [this]() { audioProcessor.requestTrigger(); };
     addAndMakeVisible(triggerButton);
 
     // About button
     aboutButton.setButtonText("?");
+    aboutButton.setColour(juce::TextButton::buttonColourId, juce::Colour(0xff2a3530));
+    aboutButton.setColour(juce::TextButton::textColourOnId, juce::Colour(0xff808880));
+    aboutButton.setLookAndFeel(&buttonLAF);
     aboutButton.onClick = [this]
         {
             aboutWindow.setTopLeftPosition(getWidth() / 2 - 170, getHeight() / 2 - 100); 
@@ -118,11 +122,17 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
     aboutWindow.addComponentListener(this);   // ← ADD: watch for visibility changes
 
     // User Presets
-    savePresetButton.setButtonText("Save Preset");
+    savePresetButton.setButtonText("Save");
+    savePresetButton.setColour(juce::TextButton::buttonColourId, juce::Colour(0xff2a3a30));
+    savePresetButton.setColour(juce::TextButton::textColourOnId, juce::Colour(0xffa0b0a0));
+    savePresetButton.setLookAndFeel(&buttonLAF);
     savePresetButton.onClick = [this]() { savePreset(); };
     addAndMakeVisible(savePresetButton);
 
-    loadPresetButton.setButtonText("Load Preset");
+    loadPresetButton.setButtonText("Load");
+    loadPresetButton.setColour(juce::TextButton::buttonColourId, juce::Colour(0xff2a3a30));
+    loadPresetButton.setColour(juce::TextButton::textColourOnId, juce::Colour(0xffa0b0a0));
+    loadPresetButton.setLookAndFeel(&buttonLAF);
     loadPresetButton.onClick = [this]() { loadPreset(); };
     addAndMakeVisible(loadPresetButton);
 
@@ -278,6 +288,9 @@ NewProjectAudioProcessorEditor::~NewProjectAudioProcessorEditor()
                      &sampleStartSlider, &sampleEndSlider,
                      &randomAlgorithmSlider })
         s->setLookAndFeel(nullptr);
+
+    for (auto* b : { &triggerButton, &savePresetButton, &loadPresetButton, &aboutButton })
+        b->setLookAndFeel(nullptr);
 }
 
 //==============================================================================
@@ -500,30 +513,50 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
     // ── Background ────────────────────────────────────────────────────────────
     g.fillAll(RRColors::background);
 
-    // ── Header bar ────────────────────────────────────────────────────────────
-    g.setColour(RRColors::headerBg);
-    g.fillRect(0, 0, getWidth(), headerH);
-    g.setColour(RRColors::sectionBorder);
+    // ── Header bar (subtle gradient) ────────────────────────────────────────
+    {
+        juce::ColourGradient hdrGrad(
+            RRColors::headerBg.brighter(0.05f), 0.0f, 0.0f,
+            RRColors::headerBg,                 0.0f, (float)headerH,
+            false);
+        g.setGradientFill(hdrGrad);
+        g.fillRect(0, 0, getWidth(), headerH);
+    }
+    // Divider: dark line + subtle highlight below
+    g.setColour(juce::Colours::black.withAlpha(0.4f));
     g.fillRect(0, headerH, getWidth(), 1);
+    g.setColour(juce::Colours::white.withAlpha(0.03f));
+    g.fillRect(0, headerH + 1, getWidth(), 1);
 
     juce::Font rrFont(juce::FontOptions(26.0f));
     rrFont = rrFont.boldened();
     g.setFont(rrFont);
-    g.setColour(juce::Colour(0xffd0d0d0));
+    g.setColour(juce::Colour(0xffc8c8c8));
     g.drawText("RoundRobin", 14, 10, 200, 32, juce::Justification::left);
 
     const int liteX = 14 + rrFont.getStringWidth("RoundRobin") + 3;
-    g.setColour(juce::Colour(0xff999999));
+    g.setColour(juce::Colour(0xff808080));
     g.setFont(juce::Font(juce::FontOptions(17.0f)));
     g.drawText("Lite", liteX, 14, 60, 26, juce::Justification::left);
 
-    // ── Section box helper ────────────────────────────────────────────────────
+    // ── Section box helper (recessed panel look) ───────────────────────────
     auto drawSectionBox = [&](juce::Rectangle<int> r)
     {
-        g.setColour(juce::Colours::black.withAlpha(0.15f));
-        g.fillRoundedRectangle(r.toFloat(), 5.0f);
+        // Outer shadow (depth)
+        g.setColour(juce::Colours::black.withAlpha(0.25f));
+        g.fillRoundedRectangle(r.toFloat().translated(1.0f, 1.5f), 4.0f);
+        // Panel fill
+        g.setColour(RRColors::sectionBg);
+        g.fillRoundedRectangle(r.toFloat(), 4.0f);
+        // Top inner highlight (subtle bevel)
+        {
+            auto top = r.toFloat().removeFromTop(1.0f).reduced(4.0f, 0.0f);
+            g.setColour(juce::Colours::white.withAlpha(0.03f));
+            g.fillRect(top);
+        }
+        // Border
         g.setColour(RRColors::sectionBorder);
-        g.drawRoundedRectangle(r.toFloat(), 5.0f, 1.0f);
+        g.drawRoundedRectangle(r.toFloat(), 4.0f, 1.0f);
     };
 
     // ── Left: Sample Pool ───────────────────────────────────────────────────
@@ -589,13 +622,13 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
     g.drawText("PITCH", apX + 8, pitchY + 7, apW - 16, 10, juce::Justification::left);
 
     // ── Knob labels ─────────────────────────────────────────────────────────
-    g.setFont(juce::Font(juce::FontOptions(11.0f)));
+    g.setFont(juce::Font(juce::FontOptions(10.0f)));
     auto drawKnobLabel = [&](const juce::String& text, int secY, int secHeight,
                              int knobX, juce::Colour col)
     {
         int padTop = (secHeight - 20 - 108) / 2;
         int labelY = secY + 20 + padTop;
-        g.setColour(col.withAlpha(0.5f));
+        g.setColour(col.withAlpha(0.55f));
         g.drawText(text, knobX - 8, labelY, knobW + 16, 12,
                    juce::Justification::centred);
     };
@@ -609,7 +642,7 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
     drawKnobLabel("High",       botY,   botSecH, toneX + lpKx1,   RRColors::toneCol);
 
     // ── Footer ──────────────────────────────────────────────────────────────
-    g.setColour(RRColors::sectionBorder.darker(0.5f));
+    g.setColour(juce::Colours::black.withAlpha(0.3f));
     g.fillRect(0, getHeight() - footerH, getWidth(), 1);
     g.setColour(RRColors::companyText);
     g.setFont(juce::Font(juce::FontOptions(10.0f)));
@@ -667,8 +700,8 @@ void NewProjectAudioProcessorEditor::paintOverChildren(juce::Graphics& g)
         float cx = b.getX() + w * 0.5f;
         float cy = b.getY() + h * 0.5f;
 
-        float knobRadius = juce::jmin(w, h) * 0.5f - 4.0f;
-        float radius     = knobRadius + 4.0f;
+        float knobRadius = juce::jmin(w, h) * 0.5f - 2.5f;  // match body radius
+        float radius     = knobRadius;                     // draw right on the perimeter
 
         // Neg arc: counter-clockwise from knob position (clamped to start)
         if (negExtent > 0.01f)

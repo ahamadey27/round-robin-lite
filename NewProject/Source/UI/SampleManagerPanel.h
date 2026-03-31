@@ -36,6 +36,7 @@ private:
     juce::TextButton playbackModeButton;
 
     RRToggleLAF toggleLAF;
+    RRButtonLAF buttonLAF;
     juce::TooltipWindow tooltipWindow{ this };
 
     using ButtonAttachment = juce::AudioProcessorValueTreeState::ButtonAttachment;

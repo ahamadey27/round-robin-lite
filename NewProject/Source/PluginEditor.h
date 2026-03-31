@@ -23,6 +23,7 @@ private:
     using ButtonAttachment = juce::AudioProcessorValueTreeState::ButtonAttachment;
 
     RRKnobLAF knobLAF;
+    RRButtonLAF buttonLAF;
 
     // Buttons & labels
     juce::TextButton triggerButton;
