@@ -106,20 +106,22 @@ void SampleManagerPanel::paint(juce::Graphics& g)
 
     // ── Sample list (two columns, 10 rows each) ────────────────────────────
     constexpr int listY      = 62;     // inside the screen
-    constexpr int rowH       = 18;
-    constexpr int btnSize    = 14;
+    constexpr int btnSize    = 16;
     constexpr int btnGap     = 2;
     constexpr int btnsW      = btnSize * 4 + btnGap * 3;
     constexpr int padX       = 14;     // inside screen padding
     constexpr int colGap     = 10;
     constexpr int rowsPerCol = 10;
 
+    // Dynamic row height: fill available space
+    const int rowH = (getHeight() - listY - 4) / rowsPerCol;
+
     const int halfW = (getWidth() - padX * 2 - colGap) / 2;
     const int nameW = halfW - btnsW - 4;
     const int maxChars = juce::jmax(12, nameW / 7);
 
-    // LED-style monospace font
-    juce::Font ledFont(juce::FontOptions("Courier New", 11.0f, juce::Font::plain));
+    // LED-style monospace font (slightly larger)
+    juce::Font ledFont(juce::FontOptions("Courier New", 12.5f, juce::Font::plain));
 
     rowHitAreas.clear();
 
