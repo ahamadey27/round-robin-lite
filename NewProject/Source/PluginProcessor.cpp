@@ -147,6 +147,7 @@ void NewProjectAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBl
     DBG("prepareToPlay called - Sample Rate: " + juce::String(sampleRate) +
         " Hz, Buffer Size: " + juce::String(samplesPerBlock) + " samples");
 
+    sampleLoader.setSampleRate(sampleRate);
     synthesiser.setCurrentPlaybackSampleRate(sampleRate);
 
     // COMMENTED FOR LITE — ACTIVE IN PREMIUM

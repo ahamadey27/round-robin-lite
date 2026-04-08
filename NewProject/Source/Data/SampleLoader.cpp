@@ -88,7 +88,8 @@ bool SampleLoader::loadSample(int slotIndex, const juce::File& file)
         DBG("Slot " + juce::String(slotIndex) + " loaded: " + slots[slotIndex].displayName);
 
         // --- Step 4: Resample to plugin sample rate if needed ---
-        resampleBuffer(slots[slotIndex].audioBuffer, slots[slotIndex].sampleRate);  // not originalSampleRate
+        resampleBuffer(slots[slotIndex].audioBuffer, slots[slotIndex].sampleRate);
+        slots[slotIndex].sampleRate = currentSampleRate;  // buffer is now at plugin rate
 
     }
     else
@@ -126,7 +127,8 @@ void SampleLoader::setSampleRate(double newSampleRate)
         if (!slots[i].isLoaded)
             continue;
 
-        resampleBuffer(slots[i].audioBuffer, slots[i].sampleRate);  // not originalSampleRate
+        resampleBuffer(slots[i].audioBuffer, slots[i].sampleRate);
+        slots[i].sampleRate = currentSampleRate;  // buffer is now at new plugin rate
     }
 
     //updateSynthesiserSounds();
