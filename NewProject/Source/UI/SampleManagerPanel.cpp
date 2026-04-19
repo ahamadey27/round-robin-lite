@@ -18,6 +18,13 @@ SampleManagerPanel::SampleManagerPanel(NewProjectAudioProcessor& p)
     clearSamplesButton.onClick = [this]() { if (onClearSamplesClicked) onClearSamplesClicked(); };
     addAndMakeVisible(clearSamplesButton);
 
+    resetPoolButton.setButtonText("Reset");
+    resetPoolButton.setColour(juce::TextButton::buttonColourId, juce::Colour(0xff2a2a3a));
+    resetPoolButton.setColour(juce::TextButton::textColourOnId, juce::Colour(0xffa0a0b0));
+    resetPoolButton.setLookAndFeel(&buttonLAF);
+    resetPoolButton.onClick = [this]() { processor.resetPlaybackPosition(); };
+    addAndMakeVisible(resetPoolButton);
+
     playbackModeButton.setButtonText("Series");
     playbackModeButton.setClickingTogglesState(true);
     playbackModeButton.onClick = [this]()
@@ -37,6 +44,7 @@ SampleManagerPanel::~SampleManagerPanel()
     playbackModeButton.setLookAndFeel(nullptr);
     loadSamplesButton.setLookAndFeel(nullptr);
     clearSamplesButton.setLookAndFeel(nullptr);
+    resetPoolButton.setLookAndFeel(nullptr);
 }
 
 juce::String SampleManagerPanel::truncateName(const juce::String& name, int maxChars)
@@ -221,6 +229,7 @@ void SampleManagerPanel::resized()
     constexpr int headerY = 24;
     loadSamplesButton .setBounds(8, headerY, 76, 26);
     clearSamplesButton.setBounds(88, headerY, 46, 26);
+    resetPoolButton   .setBounds(138, headerY, 46, 26);
     // Horizontal toggle: needs ~160px wide for labels + pill, 20px tall
     playbackModeButton.setBounds(getWidth() - 168, headerY + 3, 160, 20);
 }

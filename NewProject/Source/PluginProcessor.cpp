@@ -949,6 +949,12 @@ void NewProjectAudioProcessor::reshuffleIndices()
     roundRobinIndex = 0;
 }
 
+void NewProjectAudioProcessor::resetPlaybackPosition()
+{
+    roundRobinIndex = 0;
+    reshuffleIndices();
+    lastPlayedSlot = -1;
+}
 
 void NewProjectAudioProcessor::advanceRoundRobin()
 {

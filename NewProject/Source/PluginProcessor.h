@@ -69,6 +69,7 @@ public:
     void reshuffleIndices();              // add declaration
 
     void advanceRoundRobin();
+    void resetPlaybackPosition();
     void rebuildLoadedIndices();
 
     void savePreset(const juce::File& file);

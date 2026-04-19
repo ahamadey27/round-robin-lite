@@ -33,6 +33,7 @@ private:
 
     juce::TextButton loadSamplesButton;
     juce::TextButton clearSamplesButton;
+    juce::TextButton resetPoolButton;
     juce::TextButton playbackModeButton;
 
     RRToggleLAF toggleLAF;
