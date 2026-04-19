@@ -399,3 +399,21 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# CMake / JUCE build output
+NewProject/build/
+
+# Xcode
+*.xcuserstate
+*.xcscmblueprint
+*.xccheckout
+xcuserdata/
+DerivedData/
+
+# macOS
+.DS_Store
+
+# JUCE / Audio plugin artifacts
+*.vst3
+*.component
+*.app
