@@ -27,8 +27,8 @@ No automated tests exist. Test manually via JUCE AudioPluginHost or any DAW.
 Standard JUCE Synthesiser pattern:
 
 - **PluginProcessor** (`Source/PluginProcessor.h/cpp`) — Main audio engine. Owns the `juce::Synthesiser`, `AudioProcessorValueTreeState` (APVTS), DSP processors, `SampleSlot[20]` array, and `SampleLoader`. `processBlock()` renders audio and applies the DSP chain.
-- **PluginEditor** (`Source/PluginEditor.h/cpp`) — GUI. Custom Look-and-Feel classes for knobs/sliders. 700×714px canvas.
-- **RRVoice** (`Source/Audio/RRvoice.h/cpp`) — `SynthesiserVoice` subclass. Handles sample playback, pitch shifting, ADSR envelope, and per-note randomization.
+- **PluginEditor** (`Source/PluginEditor.h/cpp`) — GUI. Custom Look-and-Feel classes for knobs/sliders. 1400×400px canvas. Header hosts (right-to-left): About `?`, Panic `!`, Trigger, Save, Load.
+- **RRVoice** (`Source/Audio/RRvoice.h/cpp`) — `SynthesiserVoice` subclass. Handles sample playback, pitch shifting, and per-note randomization. The `juce::ADSR` member is retained but **dormant in Lite**: `envelope.getNextSample()` is called but not multiplied into output, and the voice terminates immediately when `sourceSamplePosition` reaches `playbackEndSample` (no envelope-tail wait). Kept as a hook for Premium's transient shaper.
 - **RRSound** (`Source/Audio/RRSound.h/cpp`) — `SynthesiserSound` subclass. Holds one audio buffer per sample.
 - **MidiMapper** (`Source/Audio/MidiMapper.h`) — Static utility mapping 10 key pairs to MIDI notes. Root note = C1 (MIDI 36).
 - **SampleSlot/SampleLoader** (`Source/Data/`) — Sample loading with stereo-to-mono conversion and resampling.
@@ -53,7 +53,9 @@ Standard JUCE Synthesiser pattern:
 - **Unpitched playback:** MIDI key determines which sample, not pitch. Pitch control is global only (semitone + fine tune).
 - **Playback modes:** Series (round-robin) or Random (Fisher-Yates shuffle, no repeats until all played).
 - **Randomization:** Every parameter has 4 associated randomization params (neg range, pos range for asymmetric variation). Values generated per note-on in `RRVoice::startNote()`.
+- **Sample Start/End:** percentages reference `maxPoolSampleLength` (longest loaded sample), then clamp to each voice's own length. Example: End=50% with a 40 s max cuts a 1 s sample at its natural end and a 40 s sample at 20 s.
 - **Presets:** Saved as `.rrpreset` files. DAW state save/restore via APVTS `getStateInformation()`/`setStateInformation()`.
+- **Trigger / Panic:** both are atomic flags set from the editor and consumed in `processBlock`. Trigger injects a synthetic note-on; Panic clears `midiMessages` and calls `synthesiser.allNotesOff(0, false)` right before `renderNextBlock`, so panic wins over any trigger queued in the same block.
 
 ## Adding a New Parameter (established pattern)
 
@@ -72,11 +74,11 @@ Premium-only features use `// COMMENTED FOR LITE — ACTIVE IN PREMIUM` conventi
 
 ## Current State
 
-Phases 1–5 complete, including Phase 5.1 (randomization UI redesign). Phase 6 (Random Algorithm Knob) is next. EQ, TransientShaper, and Envelope controls are hidden/commented out in the Lite version but code remains for the Pro version. See `RRLite_spec_v2.md` for the full roadmap.
+Phases 1–6 complete, plus Phase 5.1 (randomization UI redesign). Phase 7 (final layout polish) is not yet started. Phase 8 is an ongoing bucket for revisions — recent items done: 8.1 (start relative to longest pool sample), 8.3 (wider 1400×400 canvas + LED-style sample browser), 8.4 (envelope dormancy + start/end pool-relative clamp). Panic button in header was also imported from Premium. EQ, TransientShaper, and Envelope controls are hidden/commented out in Lite but code remains for Pro. See `RRLite_spec_v2.md` for the full roadmap.
 
 ## Layout
 
-Right panel has four stacked sections (Amplitude → Tone → Pitch → Sample Start/End) with 8px gaps, each 140px tall. Left panel is the SampleManagerPanel. The `paint()` and `resized()` layout constants must stay in sync — they are duplicated in both methods. Each section layout: section title label → knob name label → centered knob (with value text box) → DualThumbRndSlider at bottom.
+Canvas is 1400×400. Left column is the SampleManagerPanel; right column hosts the parameter sections. The `paint()` and `resized()` layout constants are duplicated across both methods — keep them in sync. Each section layout: section title label → knob name label → centered knob (with value text box) → DualThumbRndSlider at bottom. See `resized()` for current section positions and header button X coords.
 
 ## Randomization UI
 
