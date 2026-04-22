@@ -78,6 +78,7 @@ public:
     void swapSamples(int indexA, int indexB);
     void insertSample(int fromIndex, int toIndex);
     void requestTrigger() { triggerPending.store(true); }
+    void requestPanic()   { panicPending.store(true); }
 
 private:
     //==============================================================================
@@ -101,6 +102,7 @@ private:
 
     // Trigger flag (set by UI, consumed by processBlock)
     std::atomic<bool> triggerPending{ false };
+    std::atomic<bool> panicPending{ false };
 
     // Current global pitch values
     std::atomic<float> globalSemitones{ 0.0f };

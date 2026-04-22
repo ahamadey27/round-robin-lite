@@ -105,6 +105,13 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
     triggerButton.onClick = [this]() { audioProcessor.requestTrigger(); };
     addAndMakeVisible(triggerButton);
 
+    panicButton.setButtonText("!");
+    panicButton.setColour(juce::TextButton::buttonColourId, juce::Colour(0xffd83030));
+    panicButton.setColour(juce::TextButton::textColourOnId, juce::Colour(0xffffe0e0));
+    panicButton.setLookAndFeel(&buttonLAF);
+    panicButton.onClick = [this]() { audioProcessor.requestPanic(); };
+    addAndMakeVisible(panicButton);
+
     // About button
     aboutButton.setButtonText("?");
     aboutButton.setColour(juce::TextButton::buttonColourId, juce::Colour(0xff2a3530));
@@ -289,7 +296,7 @@ NewProjectAudioProcessorEditor::~NewProjectAudioProcessorEditor()
                      &randomAlgorithmSlider })
         s->setLookAndFeel(nullptr);
 
-    for (auto* b : { &triggerButton, &savePresetButton, &loadPresetButton, &aboutButton })
+    for (auto* b : { &triggerButton, &panicButton, &savePresetButton, &loadPresetButton, &aboutButton })
         b->setLookAndFeel(nullptr);
 }
 
@@ -778,9 +785,10 @@ void NewProjectAudioProcessorEditor::resized()
     constexpr int secKx1   = secKx0 + knobW + knobGap;
 
     // ── Header buttons ──────────────────────────────────────────────────────
-    loadPresetButton.setBounds(getWidth() - 298, 11, 60, 26);
-    savePresetButton.setBounds(getWidth() - 230, 11, 60, 26);
-    triggerButton.setBounds   (getWidth() - 162, 11, 70, 26);
+    loadPresetButton.setBounds(getWidth() - 334, 11, 60, 26);
+    savePresetButton.setBounds(getWidth() - 266, 11, 60, 26);
+    triggerButton.setBounds   (getWidth() - 198, 11, 70, 26);
+    panicButton.setBounds     (getWidth() - 118, 11, 26, 26);
     aboutButton.setBounds     (getWidth() -  56, 11, 26, 26);
 
     // ── Left: Sample Manager ────────────────────────────────────────────────

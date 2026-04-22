@@ -384,18 +384,23 @@ void RRVoice::startNote(int midiNoteNumber, float velocity,
         return;
     }
 
-    // Convert start/end percentages to sample indices.
-    // Start: scale proportionally by (thisLength / maxLength) so short samples skip less.
-    // End:   direct percentage — 0% = silent, 100% = full, for all samples equally.
-    const float lengthRatio = (maxPoolSampleLength > 0)
-        ? (float)cachedSampleLength / (float)maxPoolSampleLength
-        : 1.0f;
-    const float scaledStart = randomizedSampleStart * lengthRatio;
+    // Start/End percentages reference the longest sample in the pool, then clamp to
+    // this sample's length. Example: End=50% with a 40s max cuts at the 20s mark for
+    // every sample — a 1s sample plays fully (clamped), a 40s sample stops at 20s.
+    const int refLength = (maxPoolSampleLength > 0) ? maxPoolSampleLength : cachedSampleLength;
+    playbackStartSample = (int)(randomizedSampleStart / 100.0f * refLength);
+    playbackEndSample   = (int)(randomizedSampleEnd   / 100.0f * refLength);
+    playbackStartSample = juce::jlimit(0, cachedSampleLength, playbackStartSample);
+    playbackEndSample   = juce::jlimit(0, cachedSampleLength, playbackEndSample);
 
-    playbackStartSample = (int)(scaledStart          / 100.0f * cachedSampleLength);
-    playbackEndSample   = (int)(randomizedSampleEnd  / 100.0f * cachedSampleLength);
-    playbackStartSample = juce::jlimit(0, cachedSampleLength - 1, playbackStartSample);
-    playbackEndSample   = juce::jlimit(playbackStartSample + 1, cachedSampleLength, playbackEndSample);
+    // If the start lands beyond this sample's end (or start >= end after clamping),
+    // there's nothing to play.
+    if (playbackEndSample <= playbackStartSample)
+    {
+        isPlaying = false;
+        clearCurrentNote();
+        return;
+    }
 
     // Micro-fade length (~3ms), reduced if trimmed region is very short
     fadeSamples = (int)(0.003 * getSampleRate());
@@ -454,7 +459,9 @@ void RRVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer,
 
     for (int i = 0; i < numSamples; ++i)
     {
-        const float envelopeLevel = envelope.getNextSample();  // AD curve, no manual noteOff needed
+        // ADSR is dormant in Lite — advance but don't apply to output.
+        // Kept so Premium's transient shaper can reuse the envelope hook cleanly.
+        envelope.getNextSample();
 
         float outputSample = 0.0f;
 
@@ -465,7 +472,7 @@ void RRVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer,
             const float fraction = static_cast<float>(sourceSamplePosition - index0);
             const float sample0 = sampleData[index0];
             const float sample1 = sampleData[index1];
-            outputSample = (sample0 + (sample1 - sample0) * fraction) * envelopeLevel * randomizedVolume;
+            outputSample = (sample0 + (sample1 - sample0) * fraction) * randomizedVolume;
 
             // Micro-fade at trim points (only when trimmed away from 0%/100%)
             if (fadeSamples > 0)
@@ -491,15 +498,12 @@ void RRVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer,
         }
         else
         {
-            if (!envelope.isActive())
-            {
-                isPlaying = false;
-                voiceBuffer.setSize(0, 0);
-                cachedSampleLength = 0;
-                clearCurrentNote();
-                return;
-            }
-            outputSample = 0.0f;  // envelope tail over silence
+            // Reached playbackEndSample — terminate immediately (no envelope tail).
+            isPlaying = false;
+            voiceBuffer.setSize(0, 0);
+            cachedSampleLength = 0;
+            clearCurrentNote();
+            return;
         }
 
         float panAngle = (randomizedPan + 1.0f) * 0.5f * juce::MathConstants<float>::halfPi;

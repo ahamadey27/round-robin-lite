@@ -299,6 +299,15 @@ void NewProjectAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     }
 
     //==============================================================================
+    // PANIC: kill all sound before rendering
+
+    if (panicPending.exchange(false))
+    {
+        midiMessages.clear();
+        synthesiser.allNotesOff(0, false);
+    }
+
+    //==============================================================================
     // RENDER AUDIO FROM SYNTHESISER
 
     synthesiser.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());

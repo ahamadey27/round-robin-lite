@@ -567,6 +567,13 @@ Each tick position defines an additive offset applied to each parameter's random
 - [x] I would like for you to change the general aestetic so it feels like MainInspo as your northstar and GeneralInspo_01 and GeneralInspo_02 support. NOT exactly like these images but has a pseudo-vintage feel with a modern shein. This step includes finding a good color pallete that's similar to what we have going but try and improve the style of the pallete. 
 - [x] For the sample browser, I want you to do your best to emulate the LED screen of the Eventide Orville. Blue backround with white text font. You do not have to do copy the exact colors ig they do not match well with the color pallete at this stage, but try and keep the colors close to the refernce. Image reference is called 'LEDScreen' 
 
+### Step 8.4: Sample Length and Start/Stop Issue - Change envelope behavior/sample start and end logic
+- [ ] Envelope removed — envelopeLevel no longer multiplied into output; voice terminates immediately when it reaches playbackEndSample. Samples now play start-to-stop at full amplitude regardless of length. The juce::ADSR member and envelope.noteOn() call are still present but dormant (no behavior), so Phase 5's  transient shaper can reuse or replace the envelope cleanly later.   
+- [ ] Start/End relative to longest pool sample — both percentages now reference maxPoolSampleLength and clamp to each individual sample's length. For a 40-second  sample alongside a 1-second sample: End=50% cuts both at the 20-second mark (so the 1-second one plays fully, the 40-second one cuts at 20s).         
+
+### Step 8.5: Add mp3 Compatability 
+- [ ] Enable plugin to import mp3 files in addition to .wav, .aif, etc 
+
 ---
 
 ## Parameter Summary (Lite Redesign)
